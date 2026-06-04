@@ -75,12 +75,15 @@ const evChargerInstallationSchema = new Schema<IEVChargerInstallation>(
     },
     chargerConnectionType: {
       type: String,
-      enum: ['Plug-in', 'Hardwired', 'Help deciding'],
+      enum: ['Plug-in', 'Hardwired', 'I want help deciding'],
       required: [true, 'Charger connection type is required!'],
+    },
+    nemaConfiguration: {
+      type: String,
+      trim: true,
     },
     chargerProvidedByUser: {
       type: Boolean,
-      default: false,
     },
     chargerStatus: {
       type: String,
@@ -90,7 +93,6 @@ const evChargerInstallationSchema = new Schema<IEVChargerInstallation>(
         'Need to place order',
         'Need help choosing a charger',
       ],
-      required: [true, 'Charger status is required!'],
     },
     installationLocation: {
       type: String,
@@ -110,16 +112,37 @@ const evChargerInstallationSchema = new Schema<IEVChargerInstallation>(
     },
     panelDistance: {
       type: String,
-      enum: ['Less than 25 ft', '25-50 ft', '50-100 ft', 'More than 100 ft', 'Unsure'],
+      enum: [
+        'Less than 25 ft',
+        '25-50 ft',
+        '50-100 ft',
+        'More than 100 ft',
+        'Unsure',
+      ],
       required: [true, 'Distance is required!'],
+    },
+    environment: {
+      type: String,
+      trim: true,
+    },
+    budget: {
+      type: String,
+      trim: true,
+    },
+    accessibility: {
+      type: String,
+      trim: true,
+    },
+    schedule: {
+      type: String,
+      trim: true,
     },
     additionalInformation: {
       type: String,
       trim: true,
     },
-    areaPhotos: {
-      type: [String],
-      default: [],
+    areaPhoto: {
+      type: String,
     },
     panelPhotos: {
       type: [String],
@@ -131,7 +154,15 @@ const evChargerInstallationSchema = new Schema<IEVChargerInstallation>(
     },
     status: {
       type: String,
-      enum: ['draft', 'submitted', 'in_review', 'quoted', 'scheduled', 'completed', 'cancelled'],
+      enum: [
+        'draft',
+        'submitted',
+        'in_review',
+        'quoted',
+        'scheduled',
+        'completed',
+        'cancelled',
+      ],
       default: 'submitted',
     },
   },

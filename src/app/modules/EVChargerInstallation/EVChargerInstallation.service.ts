@@ -11,8 +11,7 @@ const createEVChargerInstallationIntoDB = async (
     ...payload,
     createdBy: userId,
     serviceType: 'EV Charger Installation',
-    chargerProvidedByUser: payload.chargerProvidedByUser ?? false,
-    areaPhotos: payload.areaPhotos ?? [],
+    // chargerProvidedByUser: payload.chargerProvidedByUser ?? false,
     panelPhotos: payload.panelPhotos ?? [],
     status: payload.status ?? 'submitted',
   });

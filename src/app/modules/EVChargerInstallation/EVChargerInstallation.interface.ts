@@ -1,6 +1,9 @@
 import { Document, Types } from 'mongoose';
 
-export type TEVChargerConnectionType = 'Plug-in' | 'Hardwired' | 'Help deciding';
+export type TEVChargerConnectionType =
+  | 'Plug-in'
+  | 'Hardwired'
+  | 'I want help deciding';
 export type TEVChargerStatus =
   | 'Currently have the charger'
   | 'Ordered and waiting on delivery'
@@ -23,7 +26,11 @@ export type TEVChargerDistance =
   | '50-100 ft'
   | 'More than 100 ft'
   | 'Unsure';
-export type TEVChargerPropertyType = 'House' | 'Condo' | 'Apartment' | 'Commercial';
+export type TEVChargerPropertyType =
+  | 'House'
+  | 'Condo'
+  | 'Apartment'
+  | 'Commercial';
 export type TEVChargerOwnershipStatus =
   | 'Owner'
   | 'Tenant'
@@ -57,19 +64,32 @@ export interface IEVChargerInstallation extends Document {
   timelineUrgency: TEVChargerTimelineUrgency;
 
   chargerConnectionType: TEVChargerConnectionType;
-  chargerProvidedByUser: boolean;
-  chargerStatus: TEVChargerStatus;
+  nemaConfiguration?: string;
+  chargerProvidedByUser?: boolean;
+  chargerStatus?: TEVChargerStatus;
 
   installationLocation: TEVChargerInstallationLocation;
   panelLocation: TEVChargerPanelLocation;
   panelDistance: TEVChargerDistance;
 
+  environment?: string;
+  budget?: string;
+  accessibility?: string;
+  schedule?: string;
+
   additionalInformation?: string;
-  areaPhotos: string[];
+  areaPhoto?: string;
   panelPhotos: string[];
 
   notes?: string;
-  status: 'draft' | 'submitted' | 'in_review' | 'quoted' | 'scheduled' | 'completed' | 'cancelled';
+  status:
+    | 'draft'
+    | 'submitted'
+    | 'in_review'
+    | 'quoted'
+    | 'scheduled'
+    | 'completed'
+    | 'cancelled';
 
   createdAt: Date;
   updatedAt: Date;
