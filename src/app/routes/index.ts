@@ -4,6 +4,7 @@ import { AddressRoutes } from '../modules/Address/address.route';
 import { ServiceCallRoutes } from '../modules/ServiceCall/ServiceCall.routes';
 import { EVChargerInstallationRoutes } from '../modules/EVChargerInstallation/EVChargerInstallation.routes';
 import { PanelUpgradeReplacementRoutes } from '../modules/PanelUpgradeReplacement/PanelUpgradeReplacement.routes';
+import { RemodelingRoutes } from '../modules/Remodeling/Remodeling.routes';
 
 const router = Router();
 
@@ -27,6 +28,10 @@ const moduleRoutes = [
   {
     path: '/panel-upgrade-replacements',
     route: PanelUpgradeReplacementRoutes,
+  },
+  {
+    path: '/remodelings',
+    route: RemodelingRoutes,
   },
 ];
 
