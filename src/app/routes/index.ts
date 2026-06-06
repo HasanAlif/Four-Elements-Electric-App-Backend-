@@ -5,6 +5,7 @@ import { ServiceCallRoutes } from '../modules/ServiceCall/ServiceCall.routes';
 import { EVChargerInstallationRoutes } from '../modules/EVChargerInstallation/EVChargerInstallation.routes';
 import { PanelUpgradeReplacementRoutes } from '../modules/PanelUpgradeReplacement/PanelUpgradeReplacement.routes';
 import { RemodelingRoutes } from '../modules/Remodeling/Remodeling.routes';
+import { AccessoryBuildingPowerRoutes } from '../modules/AccessoryBuildingPower/AccessoryBuildingPower.routes';
 
 const router = Router();
 
@@ -32,6 +33,10 @@ const moduleRoutes = [
   {
     path: '/remodelings',
     route: RemodelingRoutes,
+  },
+  {
+    path: '/accessory-building-powers',
+    route: AccessoryBuildingPowerRoutes,
   },
 ];
 
