@@ -81,52 +81,6 @@ const verifySignupOtpSchema = z.object({
   }),
 });
 
-// 4. createDriverAccountSchema
-const createDriverAccountSchema = z.object({
-  body: z.object({
-    // name: z.string({
-    //   error: 'Name is required',
-    // }),
-    // phone: z.string({
-    //   error: 'Phone is required',
-    // }),
-    // email: z
-    //   .string({
-    //     error: 'Email is required!',
-    //   })
-    //   .email({ message: 'Invalid email format!' })
-    //   .transform((email) => email.toLowerCase())
-    //   .refine((email) => email !== '', { message: 'Email is required!' })
-    //   .refine((value) => typeof value === 'string', {
-    //     message: 'Email must be string!',
-    //   }),
-    // password: z
-    //   .string({
-    //     error: 'Password is required',
-    //   })
-    //   .min(6, { message: 'Password must be at least 6 characters long' })
-    //   .max(20, { message: 'Password cannot exceed 20 characters' }),
-    insuranceProvider: z.string().optional(),
-    insurancePolicyNumber: z.string().optional(),
-    insuranceExpiration: z.string().optional(),
-    vehicleMake: z.string().optional(),
-    vehicleModel: z.string().optional(),
-    vehicleYear: z.string().optional(),
-    vehiclePlate: z.string().optional(),
-
-    firstName: z.string().optional(),
-    lastName: z.string().optional(),
-    dateOfBirth: z.string().optional(),
-    idNumber: z.string().optional(),
-    documentType: z.string().optional(),
-    documentCountry: z.string().optional(),
-    fullAddress: z.string().optional(),
-
-    // role: zodEnumFromObject({ USER: 'USER' }),
-    // role: z.enum([ROLE.USER]),
-  }),
-});
-
 // 5. signinSchema
 const signinSchema = z.object({
   body: z.object({
@@ -145,7 +99,7 @@ const signinSchema = z.object({
       .string({
         error: 'Password is required!',
       })
-      .min(6, { message: 'Password must be at least 6 characters long!' })
+      .min(8, { message: 'Password must be at least 8 characters long!' })
       .max(20, { message: 'Password cannot exceed 20 characters!' }),
   }),
 });
@@ -179,14 +133,14 @@ const changePasswordSchema = z.object({
       .string({
         error: 'Old password is required!',
       })
-      .min(6, { message: 'Old password must be at least 6 characters long!' })
+      .min(8, { message: 'Old password must be at least 8 characters long!' })
       .max(20, { message: 'Old password cannot exceed 20 characters!' }),
 
     newPassword: z
       .string({
         error: 'New password is required!',
       })
-      .min(6, { message: 'New password must be at least 6 characters long!' })
+      .min(8, { message: 'New password must be at least 8 characters long!' })
       .max(20, { message: 'New password cannot exceed 20 characters!' }),
   }),
 });
@@ -238,7 +192,7 @@ const resetPasswordSchema = z.object({
       .string({
         error: 'New password is required!',
       })
-      .min(6, { message: 'New password must be at least 6 characters long!' })
+      .min(8, { message: 'New password must be at least 8 characters long!' })
       .max(20, { message: 'New password cannot exceed 20 characters!' }),
   }),
 });
@@ -271,7 +225,7 @@ const deactivateUserAccountSchema = z.object({
         .string({
           error: 'Password is required!',
         })
-        .min(6, { message: 'Password must be at least 6 characters long!' })
+        .min(8, { message: 'Password must be at least 8 characters long!' })
         .max(20, { message: 'Password cannot exceed 20 characters!' }),
 
       deactivationReason: z
@@ -297,7 +251,6 @@ export const UserValidation = {
   createUserSchema,
   sendSignupOtpAgainSchema,
   verifySignupOtpSchema,
-  createDriverAccountSchema,
   signinSchema,
   socialSigninSchema,
   updateUserDataSchema,
