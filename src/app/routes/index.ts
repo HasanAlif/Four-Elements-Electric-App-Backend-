@@ -6,6 +6,7 @@ import { EVChargerInstallationRoutes } from '../modules/EVChargerInstallation/EV
 import { PanelUpgradeReplacementRoutes } from '../modules/PanelUpgradeReplacement/PanelUpgradeReplacement.routes';
 import { RemodelingRoutes } from '../modules/Remodeling/Remodeling.routes';
 import { AccessoryBuildingPowerRoutes } from '../modules/AccessoryBuildingPower/AccessoryBuildingPower.routes';
+import { HotTubRoutes } from '../modules/HotTub/HotTub.routes';
 
 const router = Router();
 
@@ -37,6 +38,10 @@ const moduleRoutes = [
   {
     path: '/accessory-building-powers',
     route: AccessoryBuildingPowerRoutes,
+  },
+  {
+    path: '/hot-tub-installations',
+    route: HotTubRoutes,
   },
 ];
 
