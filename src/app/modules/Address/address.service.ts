@@ -52,8 +52,19 @@ const updateSingleAddressIntoDB = async (
   return updatedAddress;
 };
 
+// deleteSingleAddressFromDB
+const deleteSingleAddressFromDB = async (userId: string, id: string) => {
+  const address = await AddressModel.findOneAndDelete({
+    _id: id,
+    user: userId,
+  });
+
+  return address;
+};
+
 export const AddressService = {
   getMyAllAddressesFromDB,
   getSingleAddressFromDB,
   updateSingleAddressIntoDB,
+  deleteSingleAddressFromDB,
 };

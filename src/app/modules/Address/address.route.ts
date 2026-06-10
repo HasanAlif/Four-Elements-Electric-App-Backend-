@@ -24,6 +24,12 @@ router
     auth(ROLE.USER),
     validateRequest(AddressValidation.updateAddressSchema),
     AddressController.updateSingleAddress,
+  )
+  // deleteSingleAddress
+  .delete(
+    auth(ROLE.USER),
+    validateRequest(AddressValidation.addressIdParamsSchema),
+    AddressController.deleteSingleAddress,
   );
 
 export const AddressRoutes = router;

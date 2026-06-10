@@ -46,4 +46,18 @@ export const AddressController = {
       data,
     });
   }),
+
+  // deleteSingleAddress
+  deleteSingleAddress: asyncHandler(async (req: Request, res: Response) => {
+    const data = await AddressService.deleteSingleAddressFromDB(
+      req.user._id.toString(),
+      req.params.id as string,
+    );
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      message: 'Address deleted successfully!',
+      data,
+    });
+  }),
 };
