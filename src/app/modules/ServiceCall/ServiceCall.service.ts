@@ -22,8 +22,8 @@ const getAllServiceCallsFromDB = async () => {
     .select('-createdAt -updatedAt');
 };
 
-// getServiceCallsByUserFromDB
-const getServiceCallsByUserFromDB = async (userId: string) => {
+// getMyAllServiceCallsFromDB
+const getMyAllServiceCallsFromDB = async (userId: string) => {
   return await ServiceCallModel.find({ createdBy: userId })
     .sort({
       createdAt: -1,
@@ -66,7 +66,7 @@ const updateServiceCallIntoDB = async (
 export const ServiceCallService = {
   createServiceCallIntoDB,
   getAllServiceCallsFromDB,
-  getServiceCallsByUserFromDB,
+  getMyAllServiceCallsFromDB,
   getSingleServiceCallFromDB,
   updateServiceCallIntoDB,
 };

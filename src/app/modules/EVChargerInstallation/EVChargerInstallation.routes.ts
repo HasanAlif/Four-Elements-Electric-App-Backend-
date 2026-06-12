@@ -11,21 +11,31 @@ router
   .post(
     auth(ROLE.USER),
     validateRequest(EVChargerInstallationValidation.createSchema),
-    EVChargerInstallationController.create,
+    EVChargerInstallationController.createEVChargerInstallation,
   )
-  .get(auth(ROLE.USER), EVChargerInstallationController.getMyAll);
+  .get(
+    auth(ROLE.ADMIN, ROLE.SUPER_ADMIN),
+    EVChargerInstallationController.getAllEVChargerInstallations,
+  );
+
+router
+  .route('/my')
+  .get(
+    auth(ROLE.USER),
+    EVChargerInstallationController.getMyAllEVChargerInstallations,
+  );
 
 router
   .route('/:id')
   .get(
     auth(ROLE.USER),
     validateRequest(EVChargerInstallationValidation.idParamsSchema),
-    EVChargerInstallationController.getSingle,
+    EVChargerInstallationController.getSingleEVChargerInstallation,
   )
   .patch(
     auth(ROLE.USER),
     validateRequest(EVChargerInstallationValidation.updateSchema),
-    EVChargerInstallationController.updateSingle,
+    EVChargerInstallationController.updateSingleEVChargerInstallation,
   );
 
 export const EVChargerInstallationRoutes = router;

@@ -11,21 +11,30 @@ router
   .post(
     auth(ROLE.USER),
     validateRequest(AccessoryBuildingPowerValidation.createSchema),
-    AccessoryBuildingPowerController.create,
+    AccessoryBuildingPowerController.createAccessoryBuilding,
   )
-  .get(auth(ROLE.USER), AccessoryBuildingPowerController.getMyAll);
+  .get(
+    auth(ROLE.ADMIN, ROLE.SUPER_ADMIN),
+    AccessoryBuildingPowerController.getAllAccessoryBuildings,
+  );
+
+router.get(
+  '/my',
+  auth(ROLE.USER),
+  AccessoryBuildingPowerController.getMyAllAccessoryBuildings,
+);
 
 router
   .route('/:id')
   .get(
     auth(ROLE.USER),
     validateRequest(AccessoryBuildingPowerValidation.idParamsSchema),
-    AccessoryBuildingPowerController.getSingle,
+    AccessoryBuildingPowerController.getSingleAccessoryBuilding,
   )
   .patch(
     auth(ROLE.USER),
     validateRequest(AccessoryBuildingPowerValidation.updateSchema),
-    AccessoryBuildingPowerController.updateSingle,
+    AccessoryBuildingPowerController.updateSingleAccessoryBuilding,
   );
 
 export const AccessoryBuildingPowerRoutes = router;

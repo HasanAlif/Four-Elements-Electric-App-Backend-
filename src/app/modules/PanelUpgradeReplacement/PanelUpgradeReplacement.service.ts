@@ -20,6 +20,14 @@ const createPanelUpgradeReplacementIntoDB = async (
   return sanitizedData;
 };
 
+const getAllPanelUpgradeReplacementsFromDB = async () => {
+  return await PanelUpgradeReplacementModel.find()
+    .sort({
+      createdAt: -1,
+    })
+    .select('-createdAt -updatedAt');
+};
+
 const getMyAllPanelUpgradeReplacementsFromDB = async (userId: string) => {
   return await PanelUpgradeReplacementModel.find({ createdBy: userId })
     .sort({
@@ -70,6 +78,7 @@ const updateSinglePanelUpgradeReplacementIntoDB = async (
 
 export const PanelUpgradeReplacementService = {
   createPanelUpgradeReplacementIntoDB,
+  getAllPanelUpgradeReplacementsFromDB,
   getMyAllPanelUpgradeReplacementsFromDB,
   getSinglePanelUpgradeReplacementFromDB,
   updateSinglePanelUpgradeReplacementIntoDB,

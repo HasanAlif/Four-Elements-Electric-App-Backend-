@@ -11,21 +11,31 @@ router
   .post(
     auth(ROLE.USER),
     validateRequest(PanelUpgradeReplacementValidation.createSchema),
-    PanelUpgradeReplacementController.create,
+    PanelUpgradeReplacementController.createPanelUpgradeReplacement,
   )
-  .get(auth(ROLE.USER), PanelUpgradeReplacementController.getMyAll);
+  .get(
+    auth(ROLE.ADMIN, ROLE.SUPER_ADMIN),
+    PanelUpgradeReplacementController.getAllPanelUpgradeReplacements,
+  );
+
+router
+  .route('/my')
+  .get(
+    auth(ROLE.USER),
+    PanelUpgradeReplacementController.getMyAllPanelUpgradeReplacements,
+  );
 
 router
   .route('/:id')
   .get(
     auth(ROLE.USER),
     validateRequest(PanelUpgradeReplacementValidation.idParamsSchema),
-    PanelUpgradeReplacementController.getSingle,
+    PanelUpgradeReplacementController.getSinglePanelUpgradeReplacement,
   )
   .patch(
     auth(ROLE.USER),
     validateRequest(PanelUpgradeReplacementValidation.updateSchema),
-    PanelUpgradeReplacementController.updateSingle,
+    PanelUpgradeReplacementController.updateSinglePanelUpgradeReplacement,
   );
 
 export const PanelUpgradeReplacementRoutes = router;

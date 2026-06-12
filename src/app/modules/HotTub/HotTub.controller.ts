@@ -5,7 +5,7 @@ import { IHotTub } from './HotTub.interface';
 import { HotTubService } from './HotTub.service';
 
 export const HotTubController = {
-  create: asyncHandler(async (req: Request, res: Response) => {
+  createHotTub: asyncHandler(async (req: Request, res: Response) => {
     const payload = req.body as Partial<IHotTub>;
     const data = await HotTubService.createHotTubIntoDB(
       req.user._id.toString(),
@@ -19,7 +19,17 @@ export const HotTubController = {
     });
   }),
 
-  getMyAll: asyncHandler(async (req: Request, res: Response) => {
+  getAllHotTubs: asyncHandler(async (req: Request, res: Response) => {
+    const data = await HotTubService.getAllHotTubsFromDB();
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      message: 'Hot tub installation requests retrieved successfully!',
+      data,
+    });
+  }),
+
+  getMyAllHotTubs: asyncHandler(async (req: Request, res: Response) => {
     const data = await HotTubService.getMyAllHotTubsFromDB(
       req.user._id.toString(),
     );
@@ -31,7 +41,7 @@ export const HotTubController = {
     });
   }),
 
-  getSingle: asyncHandler(async (req: Request, res: Response) => {
+  getSingleHotTub: asyncHandler(async (req: Request, res: Response) => {
     const data = await HotTubService.getSingleHotTubFromDB(
       req.user._id.toString(),
       req.params.id as string,
@@ -44,7 +54,7 @@ export const HotTubController = {
     });
   }),
 
-  updateSingle: asyncHandler(async (req: Request, res: Response) => {
+  updateSingleHotTub: asyncHandler(async (req: Request, res: Response) => {
     const data = await HotTubService.updateSingleHotTubIntoDB(
       req.user._id.toString(),
       req.params.id as string,

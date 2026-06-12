@@ -21,10 +21,20 @@ const createAccessoryBuildingPowerIntoDB = async (
   return sanitizedData;
 };
 
+const getAllAccessoryBuildingPowersFromDB = async () => {
+  return await AccessoryBuildingPowerModel.find()
+    .sort({
+      createdAt: -1,
+    })
+    .select('-createdAt -updatedAt');
+};
+
 const getMyAllAccessoryBuildingPowersFromDB = async (userId: string) => {
-  return await AccessoryBuildingPowerModel.find({ createdBy: userId }).sort({
-    createdAt: -1,
-  });
+  return await AccessoryBuildingPowerModel.find({ createdBy: userId })
+    .sort({
+      createdAt: -1,
+    })
+    .select('-createdAt -updatedAt');
 };
 
 const getSingleAccessoryBuildingPowerFromDB = async (
@@ -69,6 +79,7 @@ const updateSingleAccessoryBuildingPowerIntoDB = async (
 
 export const AccessoryBuildingPowerService = {
   createAccessoryBuildingPowerIntoDB,
+  getAllAccessoryBuildingPowersFromDB,
   getMyAllAccessoryBuildingPowersFromDB,
   getSingleAccessoryBuildingPowerFromDB,
   updateSingleAccessoryBuildingPowerIntoDB,

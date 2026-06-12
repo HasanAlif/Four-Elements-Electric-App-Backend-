@@ -11,21 +11,23 @@ router
   .post(
     auth(ROLE.USER),
     validateRequest(HotTubValidation.createSchema),
-    HotTubController.create,
+    HotTubController.createHotTub,
   )
-  .get(auth(ROLE.USER), HotTubController.getMyAll);
+  .get(auth(ROLE.ADMIN, ROLE.SUPER_ADMIN), HotTubController.getAllHotTubs);
+
+router.get('/my', auth(ROLE.USER), HotTubController.getMyAllHotTubs);
 
 router
   .route('/:id')
   .get(
     auth(ROLE.USER),
     validateRequest(HotTubValidation.idParamsSchema),
-    HotTubController.getSingle,
+    HotTubController.getSingleHotTub,
   )
   .patch(
     auth(ROLE.USER),
     validateRequest(HotTubValidation.updateSchema),
-    HotTubController.updateSingle,
+    HotTubController.updateSingleHotTub,
   );
 
 export const HotTubRoutes = router;

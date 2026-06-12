@@ -21,6 +21,14 @@ const createHotTubIntoDB = async (
   return sanitizedData;
 };
 
+const getAllHotTubsFromDB = async () => {
+  return await HotTubModel.find()
+    .sort({
+      createdAt: -1,
+    })
+    .select('-createdAt -updatedAt');
+};
+
 const getMyAllHotTubsFromDB = async (userId: string) => {
   return await HotTubModel.find({ createdBy: userId })
     .sort({
@@ -62,6 +70,7 @@ const updateSingleHotTubIntoDB = async (
 
 export const HotTubService = {
   createHotTubIntoDB,
+  getAllHotTubsFromDB,
   getMyAllHotTubsFromDB,
   getSingleHotTubFromDB,
   updateSingleHotTubIntoDB,

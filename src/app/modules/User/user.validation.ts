@@ -140,7 +140,16 @@ const updateUserDataSchema = z.object({
         }),
       )
       .optional(),
-  }),
+  })
+  .refine(
+    data =>
+      Object.values(data).some(
+        value => value !== undefined && value !== null,
+      ),
+    {
+      message: 'At least one field is required to update!',
+    },
+  ),
 });
 
 // 8. changePasswordSchema

@@ -5,7 +5,7 @@ import { IDockPower } from './DockPower.interface';
 import { DockPowerService } from './DockPower.service';
 
 export const DockPowerController = {
-  create: asyncHandler(async (req: Request, res: Response) => {
+  createDockPower: asyncHandler(async (req: Request, res: Response) => {
     const payload = req.body as Partial<IDockPower>;
     const data = await DockPowerService.createDockPowerIntoDB(
       req.user._id.toString(),
@@ -19,7 +19,17 @@ export const DockPowerController = {
     });
   }),
 
-  getMyAll: asyncHandler(async (req: Request, res: Response) => {
+  getAllDockPowers: asyncHandler(async (req: Request, res: Response) => {
+    const data = await DockPowerService.getAllDockPowersFromDB();
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      message: 'Dock power requests retrieved successfully!',
+      data,
+    });
+  }),
+
+  getMyAllDockPowers: asyncHandler(async (req: Request, res: Response) => {
     const data = await DockPowerService.getMyAllDockPowersFromDB(
       req.user._id.toString(),
     );
@@ -31,7 +41,7 @@ export const DockPowerController = {
     });
   }),
 
-  getSingle: asyncHandler(async (req: Request, res: Response) => {
+  getSingleDockPower: asyncHandler(async (req: Request, res: Response) => {
     const data = await DockPowerService.getSingleDockPowerFromDB(
       req.user._id.toString(),
       req.params.id as string,
@@ -44,7 +54,7 @@ export const DockPowerController = {
     });
   }),
 
-  updateSingle: asyncHandler(async (req: Request, res: Response) => {
+  updateSingleDockPower: asyncHandler(async (req: Request, res: Response) => {
     const data = await DockPowerService.updateSingleDockPowerIntoDB(
       req.user._id.toString(),
       req.params.id as string,

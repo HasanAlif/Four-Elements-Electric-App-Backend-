@@ -11,21 +11,28 @@ router
   .post(
     auth(ROLE.USER),
     validateRequest(RemodelingValidation.createSchema),
-    RemodelingController.create,
+    RemodelingController.createRemodeling,
   )
-  .get(auth(ROLE.USER), RemodelingController.getMyAll);
+  .get(
+    auth(ROLE.ADMIN, ROLE.SUPER_ADMIN),
+    RemodelingController.getAllRemodelings,
+  );
+
+router
+  .route('/my')
+  .get(auth(ROLE.USER), RemodelingController.getMyAllRemodelings);
 
 router
   .route('/:id')
   .get(
     auth(ROLE.USER),
     validateRequest(RemodelingValidation.idParamsSchema),
-    RemodelingController.getSingle,
+    RemodelingController.getSingleRemodeling,
   )
   .patch(
     auth(ROLE.USER),
     validateRequest(RemodelingValidation.updateSchema),
-    RemodelingController.updateSingle,
+    RemodelingController.updateSingleRemodeling,
   );
 
 export const RemodelingRoutes = router;

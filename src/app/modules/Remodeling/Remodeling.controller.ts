@@ -5,7 +5,7 @@ import { IRemodeling } from './Remodeling.interface';
 import { RemodelingService } from './Remodeling.service';
 
 export const RemodelingController = {
-  create: asyncHandler(async (req: Request, res: Response) => {
+  createRemodeling: asyncHandler(async (req: Request, res: Response) => {
     const payload = req.body as Partial<IRemodeling>;
     const data = await RemodelingService.createRemodelingIntoDB(
       req.user._id.toString(),
@@ -19,7 +19,17 @@ export const RemodelingController = {
     });
   }),
 
-  getMyAll: asyncHandler(async (req: Request, res: Response) => {
+  getAllRemodelings: asyncHandler(async (req: Request, res: Response) => {
+    const data = await RemodelingService.getAllRemodelingsFromDB();
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      message: 'All remodeling requests retrieved successfully!',
+      data,
+    });
+  }),
+
+  getMyAllRemodelings: asyncHandler(async (req: Request, res: Response) => {
     const data = await RemodelingService.getMyAllRemodelingsFromDB(
       req.user._id.toString(),
     );
@@ -31,7 +41,7 @@ export const RemodelingController = {
     });
   }),
 
-  getSingle: asyncHandler(async (req: Request, res: Response) => {
+  getSingleRemodeling: asyncHandler(async (req: Request, res: Response) => {
     const data = await RemodelingService.getSingleRemodelingFromDB(
       req.user._id.toString(),
       req.params.id as string,
@@ -44,7 +54,7 @@ export const RemodelingController = {
     });
   }),
 
-  updateSingle: asyncHandler(async (req: Request, res: Response) => {
+  updateSingleRemodeling: asyncHandler(async (req: Request, res: Response) => {
     const data = await RemodelingService.updateSingleRemodelingIntoDB(
       req.user._id.toString(),
       req.params.id as string,

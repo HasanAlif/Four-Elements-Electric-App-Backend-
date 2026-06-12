@@ -49,7 +49,16 @@ export const ServiceCallValidation = {
       quickTags: z.array(z.string()).optional(),
       status: z.enum(Service_STATUSES).optional(),
       completionPercentage: z.number().optional(),
-    }),
+    })
+    .refine(
+      data =>
+        Object.values(data).some(
+          value => value !== undefined && value !== null,
+        ),
+      {
+        message: 'At least one field is required to update!',
+      },
+    ),
   }),
 
   serviceCallIdParamsSchema: z.object({

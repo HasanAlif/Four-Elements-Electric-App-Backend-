@@ -5,37 +5,57 @@ import { PanelUpgradeReplacementService } from './PanelUpgradeReplacement.servic
 import { IPanelUpgradeReplacement } from './PanelUpgradeReplacement.interface';
 
 export const PanelUpgradeReplacementController = {
-  create: asyncHandler(async (req: Request, res: Response) => {
-    const payload = req.body as Partial<IPanelUpgradeReplacement>;
-    const data = await PanelUpgradeReplacementService.createPanelUpgradeReplacementIntoDB(
-      req.user._id.toString(),
-      payload,
-    );
+  createPanelUpgradeReplacement: asyncHandler(
+    async (req: Request, res: Response) => {
+      const payload = req.body as Partial<IPanelUpgradeReplacement>;
+      const data =
+        await PanelUpgradeReplacementService.createPanelUpgradeReplacementIntoDB(
+          req.user._id.toString(),
+          payload,
+        );
 
-    sendResponse(res, {
-      statusCode: httpStatus.CREATED,
-      message: 'Panel request created successfully!',
-      data,
-    });
-  }),
+      sendResponse(res, {
+        statusCode: httpStatus.CREATED,
+        message: 'Panel request created successfully!',
+        data,
+      });
+    },
+  ),
 
-  getMyAll: asyncHandler(async (req: Request, res: Response) => {
-    const data = await PanelUpgradeReplacementService.getMyAllPanelUpgradeReplacementsFromDB(
-      req.user._id.toString(),
-    );
+  getAllPanelUpgradeReplacements: asyncHandler(
+    async (req: Request, res: Response) => {
+      const data =
+        await PanelUpgradeReplacementService.getAllPanelUpgradeReplacementsFromDB();
 
-    sendResponse(res, {
-      statusCode: httpStatus.OK,
-      message: 'Your panel requests retrieved successfully!',
-      data,
-    });
-  }),
+      sendResponse(res, {
+        statusCode: httpStatus.OK,
+        message: 'All panel requests retrieved successfully!',
+        data,
+      });
+    },
+  ),
 
-  getSingle: asyncHandler(async (req: Request, res: Response) => {
-    const data = await PanelUpgradeReplacementService.getSinglePanelUpgradeReplacementFromDB(
-      req.user._id.toString(),
-      req.params.id as string,
-    );
+  getMyAllPanelUpgradeReplacements: asyncHandler(
+    async (req: Request, res: Response) => {
+      const data =
+        await PanelUpgradeReplacementService.getMyAllPanelUpgradeReplacementsFromDB(
+          req.user._id.toString(),
+        );
+
+      sendResponse(res, {
+        statusCode: httpStatus.OK,
+        message: 'Your panel requests retrieved successfully!',
+        data,
+      });
+    },
+  ),
+
+  getSinglePanelUpgradeReplacement: asyncHandler(async (req: Request, res: Response) => {
+    const data =
+      await PanelUpgradeReplacementService.getSinglePanelUpgradeReplacementFromDB(
+        req.user._id.toString(),
+        req.params.id as string,
+      );
 
     sendResponse(res, {
       statusCode: httpStatus.OK,
@@ -44,12 +64,13 @@ export const PanelUpgradeReplacementController = {
     });
   }),
 
-  updateSingle: asyncHandler(async (req: Request, res: Response) => {
-    const data = await PanelUpgradeReplacementService.updateSinglePanelUpgradeReplacementIntoDB(
-      req.user._id.toString(),
-      req.params.id as string,
-      req.body as Partial<IPanelUpgradeReplacement>,
-    );
+  updateSinglePanelUpgradeReplacement: asyncHandler(async (req: Request, res: Response) => {
+    const data =
+      await PanelUpgradeReplacementService.updateSinglePanelUpgradeReplacementIntoDB(
+        req.user._id.toString(),
+        req.params.id as string,
+        req.body as Partial<IPanelUpgradeReplacement>,
+      );
 
     sendResponse(res, {
       statusCode: httpStatus.OK,

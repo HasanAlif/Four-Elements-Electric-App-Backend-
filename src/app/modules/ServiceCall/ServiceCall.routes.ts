@@ -12,10 +12,7 @@ router
     auth(ROLE.USER),
     validateRequest(ServiceCallValidation.createServiceCallSchema),
     ServiceCallController.createServiceCall,
-  );
-
-router
-  .route('/')
+  )
   .get(
     auth(ROLE.ADMIN, ROLE.SUPER_ADMIN),
     ServiceCallController.getAllServiceCalls,
@@ -23,7 +20,7 @@ router
 
 router
   .route('/my')
-  .get(auth(ROLE.USER), ServiceCallController.getMyServiceCalls);
+  .get(auth(ROLE.USER), ServiceCallController.getMyAllServiceCalls);
 
 router
   .route('/:id')

@@ -30,10 +30,10 @@ export const ServiceCallController = {
     });
   }),
 
-  // getMyServiceCalls
-  getMyServiceCalls: asyncHandler(async (req: Request, res: Response) => {
+  // getMyAllServiceCalls
+  getMyAllServiceCalls: asyncHandler(async (req: Request, res: Response) => {
     const userId = req.user?._id?.toString();
-    const data = await ServiceCallService.getServiceCallsByUserFromDB(userId);
+    const data = await ServiceCallService.getMyAllServiceCallsFromDB(userId);
 
     sendResponse(res, {
       statusCode: httpStatus.OK,

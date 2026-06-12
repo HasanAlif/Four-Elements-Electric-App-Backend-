@@ -21,6 +21,14 @@ const createRemodelingIntoDB = async (
   return sanitizedData;
 };
 
+const getAllRemodelingsFromDB = async () => {
+  return await RemodelingModel.find()
+    .sort({
+      createdAt: -1,
+    })
+    .select('-createdAt -updatedAt');
+};
+
 const getMyAllRemodelingsFromDB = async (userId: string) => {
   return await RemodelingModel.find({ createdBy: userId })
     .sort({
@@ -62,6 +70,7 @@ const updateSingleRemodelingIntoDB = async (
 
 export const RemodelingService = {
   createRemodelingIntoDB,
+  getAllRemodelingsFromDB,
   getMyAllRemodelingsFromDB,
   getSingleRemodelingFromDB,
   updateSingleRemodelingIntoDB,

@@ -21,17 +21,27 @@ const createDockPowerIntoDB = async (
   return sanitizedData;
 };
 
+const getAllDockPowersFromDB = async () => {
+  return await DockPowerModel.find()
+    .sort({
+      createdAt: -1,
+    })
+    .select('-createdAt -updatedAt');
+};
+
 const getMyAllDockPowersFromDB = async (userId: string) => {
-  return await DockPowerModel.find({ createdBy: userId }).sort({
-    createdAt: -1,
-  });
+  return await DockPowerModel.find({ createdBy: userId })
+    .sort({
+      createdAt: -1,
+    })
+    .select('-createdAt -updatedAt');
 };
 
 const getSingleDockPowerFromDB = async (userId: string, id: string) => {
   const data = await DockPowerModel.findOne({
     _id: id,
     createdBy: userId,
-  });
+  }).select('-createdAt -updatedAt');
 
   if (!data) {
     throw new AppError(httpStatus.NOT_FOUND, 'Dock power request not found!');
@@ -60,6 +70,7 @@ const updateSingleDockPowerIntoDB = async (
 
 export const DockPowerService = {
   createDockPowerIntoDB,
+  getAllDockPowersFromDB,
   getMyAllDockPowersFromDB,
   getSingleDockPowerFromDB,
   updateSingleDockPowerIntoDB,

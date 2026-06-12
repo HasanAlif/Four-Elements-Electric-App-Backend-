@@ -21,6 +21,14 @@ const createEVChargerInstallationIntoDB = async (
   return sanitizedData;
 };
 
+const getAllEVChargerInstallationsFromDB = async () => {
+  return await EVChargerInstallationModel.find()
+    .sort({
+      createdAt: -1,
+    })
+    .select('-createdAt -updatedAt');
+};
+
 const getMyAllEVChargerInstallationsFromDB = async (userId: string) => {
   return await EVChargerInstallationModel.find({ createdBy: userId })
     .sort({
@@ -71,6 +79,7 @@ const updateSingleEVChargerInstallationIntoDB = async (
 
 export const EVChargerInstallationService = {
   createEVChargerInstallationIntoDB,
+  getAllEVChargerInstallationsFromDB,
   getMyAllEVChargerInstallationsFromDB,
   getSingleEVChargerInstallationFromDB,
   updateSingleEVChargerInstallationIntoDB,

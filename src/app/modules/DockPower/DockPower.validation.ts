@@ -57,7 +57,7 @@ const dockPowerBodySchema = z.object({
   hasPlansDrawings: z.boolean({
     error: 'Please choose whether you have plans/drawings!',
   }),
-  plansDrawings: z.array(z.string()).optional(),
+  plansDrawingsPhotos: z.array(z.string()).optional(),
   permitApplied: z.boolean({
     error: 'Please choose whether a permit has been applied for!',
   }),
@@ -87,7 +87,7 @@ const validateDockPowerConditionalFields = (
     panelLocation?: (typeof DOCK_POWER_PANEL_LOCATIONS)[number];
     panelLocationOther?: string;
     hasPlansDrawings?: boolean;
-    plansDrawings?: string[];
+    plansDrawingsPhotos?: string[];
     permitApplied?: boolean;
     permitNumber?: string;
   },
@@ -153,10 +153,10 @@ const validateDockPowerConditionalFields = (
     });
   }
 
-  if (data.hasPlansDrawings === true && !data.plansDrawings?.length) {
+  if (data.hasPlansDrawings === true && !data.plansDrawingsPhotos?.length) {
     ctx.addIssue({
       code: 'custom',
-      path: ['plansDrawings'],
+      path: ['plansDrawingsPhotos'],
       message: 'Please upload the plans/drawings!',
     });
   }

@@ -11,21 +11,26 @@ router
   .post(
     auth(ROLE.USER),
     validateRequest(DockPowerValidation.createSchema),
-    DockPowerController.create,
+    DockPowerController.createDockPower,
   )
-  .get(auth(ROLE.USER), DockPowerController.getMyAll);
+  .get(
+    auth(ROLE.ADMIN, ROLE.SUPER_ADMIN),
+    DockPowerController.getAllDockPowers,
+  );
+
+router.get('/my', auth(ROLE.USER), DockPowerController.getMyAllDockPowers);
 
 router
   .route('/:id')
   .get(
     auth(ROLE.USER),
     validateRequest(DockPowerValidation.idParamsSchema),
-    DockPowerController.getSingle,
+    DockPowerController.getSingleDockPower,
   )
   .patch(
     auth(ROLE.USER),
     validateRequest(DockPowerValidation.updateSchema),
-    DockPowerController.updateSingle,
+    DockPowerController.updateSingleDockPower,
   );
 
 export const DockPowerRoutes = router;
