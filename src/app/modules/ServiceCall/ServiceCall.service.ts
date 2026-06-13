@@ -2,13 +2,13 @@ import httpStatus from 'http-status';
 import { AppError } from '../../utils';
 import { IServiceCall } from './ServiceCall.interface';
 import ServiceCallModel from './ServiceCall.model';
-import { TServiceStatus } from '../../constants';
+import { DEFAULT_REQUEST_STATUS } from '../../constants';
 
 // createServiceCallIntoDB
 const createServiceCallIntoDB = async (payload: Partial<IServiceCall>) => {
   const newDoc = await ServiceCallModel.create({
     ...payload,
-    status: payload.status ?? 'submitted',
+    status: payload.status ?? DEFAULT_REQUEST_STATUS,
   });
 
   const { createdAt, updatedAt, ...sanitizedData } = newDoc.toObject();
@@ -63,10 +63,25 @@ const updateServiceCallIntoDB = async (
   return updatedData;
 };
 
+// deleteServiceCallFromDB
+const deleteServiceCallFromDB = async (userId: string, id: string) => {
+  const deletedData = await ServiceCallModel.findOneAndDelete({
+    _id: id,
+    createdBy: userId,
+  }).select('-createdAt -updatedAt');
+
+  if (!deletedData) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Service call not found!');
+  }
+
+  return deletedData;
+};
+
 export const ServiceCallService = {
   createServiceCallIntoDB,
   getAllServiceCallsFromDB,
   getMyAllServiceCallsFromDB,
   getSingleServiceCallFromDB,
   updateServiceCallIntoDB,
+  deleteServiceCallFromDB,
 };

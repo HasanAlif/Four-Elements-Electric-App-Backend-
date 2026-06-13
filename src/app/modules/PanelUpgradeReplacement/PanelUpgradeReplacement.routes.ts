@@ -36,6 +36,11 @@ router
     auth(ROLE.USER),
     validateRequest(PanelUpgradeReplacementValidation.updateSchema),
     PanelUpgradeReplacementController.updateSinglePanelUpgradeReplacement,
+  )
+  .delete(
+    auth(ROLE.USER),
+    validateRequest(PanelUpgradeReplacementValidation.idParamsSchema),
+    PanelUpgradeReplacementController.deleteSinglePanelUpgradeReplacement,
   );
 
 export const PanelUpgradeReplacementRoutes = router;

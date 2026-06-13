@@ -28,6 +28,11 @@ router
     auth(ROLE.USER),
     validateRequest(HotTubValidation.updateSchema),
     HotTubController.updateSingleHotTub,
+  )
+  .delete(
+    auth(ROLE.USER),
+    validateRequest(HotTubValidation.idParamsSchema),
+    HotTubController.deleteSingleHotTub,
   );
 
 export const HotTubRoutes = router;

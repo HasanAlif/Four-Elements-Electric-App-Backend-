@@ -2,6 +2,7 @@ import httpStatus from 'http-status';
 import { AppError } from '../../utils';
 import { IRemodeling } from './Remodeling.interface';
 import RemodelingModel from './Remodeling.model';
+import { DEFAULT_REQUEST_STATUS } from '../../constants';
 
 const createRemodelingIntoDB = async (
   userId: string,
@@ -14,7 +15,7 @@ const createRemodelingIntoDB = async (
     plansDrawings: payload.plansDrawings ?? [],
     existingSpacePhotos: payload.existingSpacePhotos ?? [],
     panelPhotos: payload.panelPhotos ?? [],
-    status: payload.status ?? 'submitted',
+    status: payload.status ?? DEFAULT_REQUEST_STATUS,
   });
 
   const { createdAt, updatedAt, ...sanitizedData } = newDoc.toObject();
@@ -68,10 +69,25 @@ const updateSingleRemodelingIntoDB = async (
   return updatedData;
 };
 
+// deleteSingleRemodelingFromDB
+const deleteSingleRemodelingFromDB = async (userId: string, id: string) => {
+  const deletedData = await RemodelingModel.findOneAndDelete({
+    _id: id,
+    createdBy: userId,
+  }).select('-createdAt -updatedAt');
+
+  if (!deletedData) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Remodeling request not found!');
+  }
+
+  return deletedData;
+};
+
 export const RemodelingService = {
   createRemodelingIntoDB,
   getAllRemodelingsFromDB,
   getMyAllRemodelingsFromDB,
   getSingleRemodelingFromDB,
   updateSingleRemodelingIntoDB,
+  deleteSingleRemodelingFromDB,
 };

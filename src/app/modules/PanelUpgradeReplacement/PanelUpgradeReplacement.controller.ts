@@ -78,4 +78,18 @@ export const PanelUpgradeReplacementController = {
       data,
     });
   }),
+
+  deleteSinglePanelUpgradeReplacement: asyncHandler(async (req: Request, res: Response) => {
+    const data =
+      await PanelUpgradeReplacementService.deleteSinglePanelUpgradeReplacementFromDB(
+        req.user._id.toString(),
+        req.params.id as string,
+      );
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      message: 'Panel request deleted successfully!',
+      data,
+    });
+  }),
 };

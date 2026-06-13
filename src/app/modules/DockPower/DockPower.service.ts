@@ -2,6 +2,7 @@ import httpStatus from 'http-status';
 import { AppError } from '../../utils';
 import { IDockPower } from './DockPower.interface';
 import DockPowerModel from './DockPower.model';
+import { DEFAULT_REQUEST_STATUS } from '../../constants';
 
 const createDockPowerIntoDB = async (
   userId: string,
@@ -14,7 +15,7 @@ const createDockPowerIntoDB = async (
     panelPhotos: payload.panelPhotos ?? [],
     existingSpacePhotos: payload.existingSpacePhotos ?? [],
     plansDrawingsPhotos: payload.plansDrawingsPhotos ?? [],
-    status: payload.status ?? 'submitted',
+    status: payload.status ?? DEFAULT_REQUEST_STATUS,
   });
 
   const { createdAt, updatedAt, ...sanitizedData } = newDoc.toObject();
@@ -68,10 +69,24 @@ const updateSingleDockPowerIntoDB = async (
   return updatedData;
 };
 
+const deleteSingleDockPowerFromDB = async (userId: string, id: string) => {
+  const deletedData = await DockPowerModel.findOneAndDelete({
+    _id: id,
+    createdBy: userId,
+  }).select('-createdAt -updatedAt');
+
+  if (!deletedData) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Dock power request not found!');
+  }
+
+  return deletedData;
+};
+
 export const DockPowerService = {
   createDockPowerIntoDB,
   getAllDockPowersFromDB,
   getMyAllDockPowersFromDB,
   getSingleDockPowerFromDB,
   updateSingleDockPowerIntoDB,
+  deleteSingleDockPowerFromDB,
 };

@@ -67,4 +67,17 @@ export const HotTubController = {
       data,
     });
   }),
+
+  deleteSingleHotTub: asyncHandler(async (req: Request, res: Response) => {
+    const data = await HotTubService.deleteSingleHotTubFromDB(
+      req.user._id.toString(),
+      req.params.id as string,
+    );
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      message: 'Hot tub installation request deleted successfully!',
+      data,
+    });
+  }),
 };

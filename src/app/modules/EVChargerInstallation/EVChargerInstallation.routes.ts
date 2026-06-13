@@ -36,6 +36,11 @@ router
     auth(ROLE.USER),
     validateRequest(EVChargerInstallationValidation.updateSchema),
     EVChargerInstallationController.updateSingleEVChargerInstallation,
+  )
+  .delete(
+    auth(ROLE.USER),
+    validateRequest(EVChargerInstallationValidation.idParamsSchema),
+    EVChargerInstallationController.deleteSingleEVChargerInstallation,
   );
 
 export const EVChargerInstallationRoutes = router;

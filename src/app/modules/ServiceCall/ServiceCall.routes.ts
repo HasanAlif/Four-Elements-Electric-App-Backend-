@@ -32,6 +32,11 @@ router
     auth(ROLE.USER),
     validateRequest(ServiceCallValidation.updateServiceCallSchema),
     ServiceCallController.updateServiceCall,
+  )
+  .delete(
+    auth(ROLE.USER),
+    validateRequest(ServiceCallValidation.serviceCallIdParamsSchema),
+    ServiceCallController.deleteServiceCall,
   );
 
 export const ServiceCallRoutes = router;

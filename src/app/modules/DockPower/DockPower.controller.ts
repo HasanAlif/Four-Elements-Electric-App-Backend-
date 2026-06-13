@@ -67,4 +67,17 @@ export const DockPowerController = {
       data,
     });
   }),
+
+  deleteSingleDockPower: asyncHandler(async (req: Request, res: Response) => {
+    const data = await DockPowerService.deleteSingleDockPowerFromDB(
+      req.user._id.toString(),
+      req.params.id as string,
+    );
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      message: 'Dock power request deleted successfully!',
+      data,
+    });
+  }),
 };

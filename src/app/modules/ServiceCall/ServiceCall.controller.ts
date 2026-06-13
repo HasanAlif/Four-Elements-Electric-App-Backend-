@@ -69,6 +69,20 @@ export const ServiceCallController = {
       data,
     });
   }),
+
+  // deleteServiceCall
+  deleteServiceCall: asyncHandler(async (req: Request, res: Response) => {
+    const data = await ServiceCallService.deleteServiceCallFromDB(
+      req.user._id.toString(),
+      req.params.id as string,
+    );
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      message: 'Service call deleted successfully!',
+      data,
+    });
+  }),
 };
 
 // import httpStatus from 'http-status';

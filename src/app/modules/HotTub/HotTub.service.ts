@@ -2,6 +2,7 @@ import httpStatus from 'http-status';
 import { AppError } from '../../utils';
 import { IHotTub } from './HotTub.interface';
 import HotTubModel from './HotTub.model';
+import { DEFAULT_REQUEST_STATUS } from '../../constants';
 
 const createHotTubIntoDB = async (
   userId: string,
@@ -14,7 +15,7 @@ const createHotTubIntoDB = async (
     panelPhotos: payload.panelPhotos ?? [],
     hotTubPhotos: payload.hotTubPhotos ?? [],
     receptaclePhotos: payload.receptaclePhotos ?? [],
-    status: payload.status ?? 'submitted',
+    status: payload.status ?? DEFAULT_REQUEST_STATUS,
   });
 
   const { createdAt, updatedAt, ...sanitizedData } = newDoc.toObject();
@@ -68,10 +69,24 @@ const updateSingleHotTubIntoDB = async (
   return updatedData;
 };
 
+const deleteSingleHotTubFromDB = async (userId: string, id: string) => {
+  const deletedData = await HotTubModel.findOneAndDelete({
+    _id: id,
+    createdBy: userId,
+  }).select('-createdAt -updatedAt');
+
+  if (!deletedData) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Hot tub request not found!');
+  }
+
+  return deletedData;
+};
+
 export const HotTubService = {
   createHotTubIntoDB,
   getAllHotTubsFromDB,
   getMyAllHotTubsFromDB,
   getSingleHotTubFromDB,
   updateSingleHotTubIntoDB,
+  deleteSingleHotTubFromDB,
 };

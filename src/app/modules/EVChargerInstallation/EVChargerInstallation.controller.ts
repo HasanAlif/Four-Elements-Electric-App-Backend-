@@ -83,4 +83,20 @@ export const EVChargerInstallationController = {
       });
     },
   ),
+
+  deleteSingleEVChargerInstallation: asyncHandler(
+    async (req: Request, res: Response) => {
+      const data =
+        await EVChargerInstallationService.deleteSingleEVChargerInstallationFromDB(
+          req.user._id.toString(),
+          req.params.id as string,
+        );
+
+      sendResponse(res, {
+        statusCode: httpStatus.OK,
+        message: 'EV charger installation request deleted successfully!',
+        data,
+      });
+    },
+  ),
 };

@@ -67,4 +67,17 @@ export const RemodelingController = {
       data,
     });
   }),
+
+  deleteSingleRemodeling: asyncHandler(async (req: Request, res: Response) => {
+    const data = await RemodelingService.deleteSingleRemodelingFromDB(
+      req.user._id.toString(),
+      req.params.id as string,
+    );
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      message: 'Remodeling request deleted successfully!',
+      data,
+    });
+  }),
 };

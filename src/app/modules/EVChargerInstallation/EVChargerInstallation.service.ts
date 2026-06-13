@@ -77,10 +77,30 @@ const updateSingleEVChargerInstallationIntoDB = async (
   return updatedData;
 };
 
+const deleteSingleEVChargerInstallationFromDB = async (
+  userId: string,
+  id: string,
+) => {
+  const deletedData = await EVChargerInstallationModel.findOneAndDelete({
+    _id: id,
+    createdBy: userId,
+  }).select('-createdAt -updatedAt');
+
+  if (!deletedData) {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      'EV charger installation not found!',
+    );
+  }
+
+  return deletedData;
+};
+
 export const EVChargerInstallationService = {
   createEVChargerInstallationIntoDB,
   getAllEVChargerInstallationsFromDB,
   getMyAllEVChargerInstallationsFromDB,
   getSingleEVChargerInstallationFromDB,
   updateSingleEVChargerInstallationIntoDB,
+  deleteSingleEVChargerInstallationFromDB,
 };

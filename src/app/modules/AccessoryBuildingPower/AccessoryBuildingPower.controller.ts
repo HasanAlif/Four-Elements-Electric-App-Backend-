@@ -81,4 +81,20 @@ export const AccessoryBuildingPowerController = {
       });
     },
   ),
+
+  deleteSingleAccessoryBuilding: asyncHandler(
+    async (req: Request, res: Response) => {
+      const data =
+        await AccessoryBuildingPowerService.deleteSingleAccessoryBuildingPowerFromDB(
+          req.user._id.toString(),
+          req.params.id as string,
+        );
+
+      sendResponse(res, {
+        statusCode: httpStatus.OK,
+        message: 'Accessory building power request deleted successfully!',
+        data,
+      });
+    },
+  ),
 };

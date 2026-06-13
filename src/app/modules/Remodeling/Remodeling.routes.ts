@@ -3,6 +3,7 @@ import { auth, validateRequest } from '../../middlewares';
 import { ROLE } from '../User/user.constant';
 import { RemodelingController } from './Remodeling.controller';
 import { RemodelingValidation } from './Remodeling.validation';
+import { ServiceCallController } from '../ServiceCall/ServiceCall.controller';
 
 const router = Router();
 
@@ -33,6 +34,11 @@ router
     auth(ROLE.USER),
     validateRequest(RemodelingValidation.updateSchema),
     RemodelingController.updateSingleRemodeling,
-  );
+  )
+  .delete(
+    auth(ROLE.USER),
+    validateRequest(RemodelingValidation.idParamsSchema),
+    RemodelingController.deleteSingleRemodeling,
+  );;
 
 export const RemodelingRoutes = router;

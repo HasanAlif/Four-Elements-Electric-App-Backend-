@@ -35,6 +35,11 @@ router
     auth(ROLE.USER),
     validateRequest(AccessoryBuildingPowerValidation.updateSchema),
     AccessoryBuildingPowerController.updateSingleAccessoryBuilding,
+  )
+  .delete(
+    auth(ROLE.USER),
+    validateRequest(AccessoryBuildingPowerValidation.idParamsSchema),
+    AccessoryBuildingPowerController.deleteSingleAccessoryBuilding,
   );
 
 export const AccessoryBuildingPowerRoutes = router;

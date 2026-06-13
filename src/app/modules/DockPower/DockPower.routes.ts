@@ -31,6 +31,11 @@ router
     auth(ROLE.USER),
     validateRequest(DockPowerValidation.updateSchema),
     DockPowerController.updateSingleDockPower,
+  )
+  .delete(
+    auth(ROLE.USER),
+    validateRequest(DockPowerValidation.idParamsSchema),
+    DockPowerController.deleteSingleDockPower,
   );
 
 export const DockPowerRoutes = router;
