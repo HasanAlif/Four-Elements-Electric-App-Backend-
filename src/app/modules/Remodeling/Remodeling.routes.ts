@@ -39,6 +39,6 @@ router
     auth(ROLE.USER),
     validateRequest(RemodelingValidation.idParamsSchema),
     RemodelingController.deleteSingleRemodeling,
-  );;
+  );
 
 export const RemodelingRoutes = router;

@@ -18,7 +18,9 @@ router
     DockPowerController.getAllDockPowers,
   );
 
-router.get('/my', auth(ROLE.USER), DockPowerController.getMyAllDockPowers);
+router
+  .route('/my')
+  .get(auth(ROLE.USER), DockPowerController.getMyAllDockPowers);
 
 router
   .route('/:id')

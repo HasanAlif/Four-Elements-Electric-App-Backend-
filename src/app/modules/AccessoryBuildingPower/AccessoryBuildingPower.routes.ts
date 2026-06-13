@@ -18,11 +18,12 @@ router
     AccessoryBuildingPowerController.getAllAccessoryBuildings,
   );
 
-router.get(
-  '/my',
-  auth(ROLE.USER),
-  AccessoryBuildingPowerController.getMyAllAccessoryBuildings,
-);
+router
+  .route('/my')
+  .get(
+    auth(ROLE.USER),
+    AccessoryBuildingPowerController.getMyAllAccessoryBuildings,
+  );
 
 router
   .route('/:id')

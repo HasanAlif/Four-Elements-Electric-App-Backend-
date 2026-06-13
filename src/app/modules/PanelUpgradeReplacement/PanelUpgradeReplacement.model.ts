@@ -1,16 +1,12 @@
 import { model, Schema } from 'mongoose';
 import {
-  PANEL_CONTACT_METHODS,
   IPanelUpgradeReplacement,
   PANEL_AMPERAGES,
   PANEL_LOCATIONS,
-  PANEL_OWNERSHIP_STATUSES,
   PANEL_POWER_FEEDS,
-  PANEL_PROPERTY_TYPES,
   PANEL_SERVICE_TYPES,
-  PANEL_TIMELINE_URGENCIES,
 } from './PanelUpgradeReplacement.interface';
-import { DEFAULT_REQUEST_STATUS, Service_STATUSES } from '../../constants';
+import { CONTACT_METHODS, DEFAULT_REQUEST_STATUS, OWNERSHIP_STATUSES, PROPERTY_TYPES, Service_STATUSES, TIMELINE_URGENCIES } from '../../constants';
 
 const panelUpgradeReplacementSchema = new Schema<IPanelUpgradeReplacement>(
   {
@@ -52,7 +48,7 @@ const panelUpgradeReplacementSchema = new Schema<IPanelUpgradeReplacement>(
     },
     preferredContactMethod: {
       type: String,
-      enum: PANEL_CONTACT_METHODS,
+      enum: CONTACT_METHODS,
       default: 'Call',
     },
     streetAddress: {
@@ -101,7 +97,7 @@ const panelUpgradeReplacementSchema = new Schema<IPanelUpgradeReplacement>(
     },
     propertyType: {
       type: String,
-      enum: PANEL_PROPERTY_TYPES,
+      enum: PROPERTY_TYPES,
       required: [
         function (this: any) {
           return this.status !== Service_STATUSES.DRAFT;
@@ -111,7 +107,7 @@ const panelUpgradeReplacementSchema = new Schema<IPanelUpgradeReplacement>(
     },
     ownershipStatus: {
       type: String,
-      enum: PANEL_OWNERSHIP_STATUSES,
+      enum: OWNERSHIP_STATUSES,
       required: [
         function (this: any) {
           return this.status !== Service_STATUSES.DRAFT;
@@ -121,7 +117,7 @@ const panelUpgradeReplacementSchema = new Schema<IPanelUpgradeReplacement>(
     },
     timelineUrgency: {
       type: String,
-      enum: PANEL_TIMELINE_URGENCIES,
+      enum: TIMELINE_URGENCIES,
       required: [
         function (this: any) {
           return this.status !== Service_STATUSES.DRAFT;
@@ -201,6 +197,8 @@ const panelUpgradeReplacementSchema = new Schema<IPanelUpgradeReplacement>(
     versionKey: false,
   },
 );
+
+panelUpgradeReplacementSchema.index({ createdBy: 1, status: 1 });
 
 const PanelUpgradeReplacementModel = model<IPanelUpgradeReplacement>(
   'PanelUpgradeReplacement',

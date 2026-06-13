@@ -1,18 +1,21 @@
 import { model, Schema } from 'mongoose';
-import { DEFAULT_REQUEST_STATUS, Service_STATUSES } from '../../constants';
+import {
+  CONTACT_METHODS,
+  DEFAULT_REQUEST_STATUS,
+  OWNERSHIP_STATUSES,
+  PROPERTY_TYPES,
+  Service_STATUSES,
+  TIMELINE_URGENCIES,
+} from '../../constants';
 import {
   ACCESSORY_BUILDING_CIRCUIT_AMP_RATINGS,
   ACCESSORY_BUILDING_CIRCUIT_COUNTS,
   ACCESSORY_BUILDING_CONSTRUCTION_TYPES,
-  ACCESSORY_BUILDING_CONTACT_METHODS,
   ACCESSORY_BUILDING_FLOOR_TYPES,
-  ACCESSORY_BUILDING_OWNERSHIP_STATUSES,
   ACCESSORY_BUILDING_PANEL_LOCATIONS,
-  ACCESSORY_BUILDING_PROPERTY_TYPES,
   ACCESSORY_BUILDING_SERVICE_SIZES,
   ACCESSORY_BUILDING_SERVICE_TYPES,
   ACCESSORY_BUILDING_STATUSES,
-  ACCESSORY_BUILDING_TIMELINE_URGENCIES,
   IAccessoryBuildingPower,
 } from './AccessoryBuildingPower.interface';
 
@@ -56,7 +59,7 @@ const accessoryBuildingPowerSchema = new Schema<IAccessoryBuildingPower>(
     },
     preferredContactMethod: {
       type: String,
-      enum: ACCESSORY_BUILDING_CONTACT_METHODS,
+      enum: CONTACT_METHODS,
       default: 'Call',
     },
     streetAddress: {
@@ -105,7 +108,7 @@ const accessoryBuildingPowerSchema = new Schema<IAccessoryBuildingPower>(
     },
     propertyType: {
       type: String,
-      enum: ACCESSORY_BUILDING_PROPERTY_TYPES,
+      enum: PROPERTY_TYPES,
       required: [
         function (this: any) {
           return this.status !== Service_STATUSES.DRAFT;
@@ -115,7 +118,7 @@ const accessoryBuildingPowerSchema = new Schema<IAccessoryBuildingPower>(
     },
     ownershipStatus: {
       type: String,
-      enum: ACCESSORY_BUILDING_OWNERSHIP_STATUSES,
+      enum: OWNERSHIP_STATUSES,
       required: [
         function (this: any) {
           return this.status !== Service_STATUSES.DRAFT;
@@ -125,7 +128,7 @@ const accessoryBuildingPowerSchema = new Schema<IAccessoryBuildingPower>(
     },
     timelineUrgency: {
       type: String,
-      enum: ACCESSORY_BUILDING_TIMELINE_URGENCIES,
+      enum: TIMELINE_URGENCIES,
       required: [
         function (this: any) {
           return this.status !== Service_STATUSES.DRAFT;
@@ -287,6 +290,8 @@ const accessoryBuildingPowerSchema = new Schema<IAccessoryBuildingPower>(
     versionKey: false,
   },
 );
+
+accessoryBuildingPowerSchema.index({ createdBy: 1, status: 1 });
 
 const AccessoryBuildingPowerModel = model<IAccessoryBuildingPower>(
   'AccessoryBuildingPower',

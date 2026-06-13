@@ -1,36 +1,11 @@
 import { Document, Types } from 'mongoose';
-import { TServiceStatus } from '../../constants';
-
-export const SERVICE_CALL_CONTACT_METHODS = ['Call', 'Text', 'Email'] as const;
-export type TServiceCallPreferredContactMethod =
-  (typeof SERVICE_CALL_CONTACT_METHODS)[number];
-
-export const SERVICE_CALL_PROPERTY_TYPES = [
-  'House',
-  'Condo',
-  'Apartment',
-  'Commercial',
-] as const;
-export type TServiceCallPropertyType =
-  (typeof SERVICE_CALL_PROPERTY_TYPES)[number];
-
-export const SERVICE_CALL_OWNERSHIP_STATUSES = [
-  'Owner',
-  'Tenant',
-  'Property Manager',
-  'Other',
-] as const;
-export type TServiceCallOwnershipStatus =
-  (typeof SERVICE_CALL_OWNERSHIP_STATUSES)[number];
-
-export const SERVICE_CALL_TIMELINE_URGENCIES = [
-  'As soon as possible',
-  'This week',
-  'This month',
-  'Flexible',
-] as const;
-export type TServiceCallTimelineUrgency =
-  (typeof SERVICE_CALL_TIMELINE_URGENCIES)[number];
+import {
+  TContactMethod,
+  TOwnershipStatus,
+  TPropertyType,
+  TServiceStatus,
+  TTimelineUrgency,
+} from '../../constants';
 
 export const SERVICE_CALL_PREFERRED_TIMES = [
   'AM (8-11)',
@@ -49,7 +24,7 @@ export interface IServiceCall extends Document {
   fullName: string;
   phoneNumber: string;
   emailAddress?: string;
-  preferredContactMethod: TServiceCallPreferredContactMethod;
+  preferredContactMethod: TContactMethod;
 
   streetAddress: string;
   apartmentUnit?: string;
@@ -57,9 +32,9 @@ export interface IServiceCall extends Document {
   state: string;
   zipCode: string;
 
-  propertyType: TServiceCallPropertyType;
-  ownershipStatus: TServiceCallOwnershipStatus;
-  timelineUrgency: TServiceCallTimelineUrgency;
+  propertyType: TPropertyType;
+  ownershipStatus: TOwnershipStatus;
+  timelineUrgency: TTimelineUrgency;
 
   issueDescription: string;
   preferredTime?: TServiceCallPreferredTime;

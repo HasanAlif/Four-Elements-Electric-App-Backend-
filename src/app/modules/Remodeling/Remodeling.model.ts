@@ -1,12 +1,8 @@
 import { model, Schema } from 'mongoose';
-import { DEFAULT_REQUEST_STATUS, Service_STATUSES } from '../../constants';
+import { CONTACT_METHODS, DEFAULT_REQUEST_STATUS, OWNERSHIP_STATUSES, PROPERTY_TYPES, Service_STATUSES, TIMELINE_URGENCIES } from '../../constants';
 import {
   IRemodeling,
-  REMODELING_CONTACT_METHODS,
-  REMODELING_OWNERSHIP_STATUSES,
   REMODELING_PANEL_LOCATIONS,
-  REMODELING_PROPERTY_TYPES,
-  REMODELING_TIMELINE_URGENCIES,
 } from './Remodeling.interface';
 
 const remodelingSchema = new Schema<IRemodeling>(
@@ -49,7 +45,7 @@ const remodelingSchema = new Schema<IRemodeling>(
     },
     preferredContactMethod: {
       type: String,
-      enum: REMODELING_CONTACT_METHODS,
+      enum: CONTACT_METHODS,
       default: 'Call',
     },
     streetAddress: {
@@ -98,7 +94,7 @@ const remodelingSchema = new Schema<IRemodeling>(
     },
     propertyType: {
       type: String,
-      enum: REMODELING_PROPERTY_TYPES,
+      enum: PROPERTY_TYPES,
       required: [
         function (this: any) {
           return this.status !== Service_STATUSES.DRAFT;
@@ -108,7 +104,7 @@ const remodelingSchema = new Schema<IRemodeling>(
     },
     ownershipStatus: {
       type: String,
-      enum: REMODELING_OWNERSHIP_STATUSES,
+      enum: OWNERSHIP_STATUSES,
       required: [
         function (this: any) {
           return this.status !== Service_STATUSES.DRAFT;
@@ -118,7 +114,7 @@ const remodelingSchema = new Schema<IRemodeling>(
     },
     timelineUrgency: {
       type: String,
-      enum: REMODELING_TIMELINE_URGENCIES,
+      enum: TIMELINE_URGENCIES,
       required: [
         function (this: any) {
           return this.status !== Service_STATUSES.DRAFT;
@@ -209,6 +205,8 @@ const remodelingSchema = new Schema<IRemodeling>(
     versionKey: false,
   },
 );
+
+remodelingSchema.index({ createdBy: 1, status: 1 });
 
 const RemodelingModel = model<IRemodeling>('Remodeling', remodelingSchema);
 

@@ -1,16 +1,19 @@
 import { model, Schema } from 'mongoose';
-import { DEFAULT_REQUEST_STATUS, Service_STATUSES } from '../../constants';
+import {
+  CONTACT_METHODS,
+  DEFAULT_REQUEST_STATUS,
+  OWNERSHIP_STATUSES,
+  PROPERTY_TYPES,
+  Service_STATUSES,
+  TIMELINE_URGENCIES,
+} from '../../constants';
 import { IEVChargerInstallation } from './EVChargerInstallation.interface';
 import {
-  EV_CHARGER_CONTACT_METHODS,
   EV_CHARGER_CONNECTION_TYPES,
   EV_CHARGER_DISTANCES,
   EV_CHARGER_INSTALLATION_LOCATIONS,
-  EV_CHARGER_OWNERSHIP_STATUSES,
   EV_CHARGER_PANEL_LOCATIONS,
-  EV_CHARGER_PROPERTY_TYPES,
   EV_CHARGER_STATUSES,
-  EV_CHARGER_TIMELINE_URGENCIES,
 } from './EVChargerInstallation.interface';
 
 const evChargerInstallationSchema = new Schema<IEVChargerInstallation>(
@@ -53,7 +56,7 @@ const evChargerInstallationSchema = new Schema<IEVChargerInstallation>(
     },
     preferredContactMethod: {
       type: String,
-      enum: EV_CHARGER_CONTACT_METHODS,
+      enum: CONTACT_METHODS,
       default: 'Call',
     },
     streetAddress: {
@@ -102,7 +105,7 @@ const evChargerInstallationSchema = new Schema<IEVChargerInstallation>(
     },
     propertyType: {
       type: String,
-      enum: EV_CHARGER_PROPERTY_TYPES,
+      enum: PROPERTY_TYPES,
       required: [
         function (this: any) {
           return this.status !== Service_STATUSES.DRAFT;
@@ -112,7 +115,7 @@ const evChargerInstallationSchema = new Schema<IEVChargerInstallation>(
     },
     ownershipStatus: {
       type: String,
-      enum: EV_CHARGER_OWNERSHIP_STATUSES,
+      enum: OWNERSHIP_STATUSES,
       required: [
         function (this: any) {
           return this.status !== Service_STATUSES.DRAFT;
@@ -122,7 +125,7 @@ const evChargerInstallationSchema = new Schema<IEVChargerInstallation>(
     },
     timelineUrgency: {
       type: String,
-      enum: EV_CHARGER_TIMELINE_URGENCIES,
+      enum: TIMELINE_URGENCIES,
       required: [
         function (this: any) {
           return this.status !== Service_STATUSES.DRAFT;
@@ -223,6 +226,8 @@ const evChargerInstallationSchema = new Schema<IEVChargerInstallation>(
     versionKey: false,
   },
 );
+
+evChargerInstallationSchema.index({ createdBy: 1, status: 1 });
 
 const EVChargerInstallationModel = model<IEVChargerInstallation>(
   'EVChargerInstallation',

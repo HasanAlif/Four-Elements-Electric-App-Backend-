@@ -1,9 +1,11 @@
 import { Document, Types } from 'mongoose';
-import { TServiceStatus } from '../../constants';
-
-export const EV_CHARGER_CONTACT_METHODS = ['Call', 'Text', 'Email'] as const;
-export type TEVChargerPreferredContactMethod =
-  (typeof EV_CHARGER_CONTACT_METHODS)[number];
+import {
+  TContactMethod,
+  TOwnershipStatus,
+  TPropertyType,
+  TServiceStatus,
+  TTimelineUrgency,
+} from '../../constants';
 
 export const EV_CHARGER_CONNECTION_TYPES = [
   'Plug-in',
@@ -49,32 +51,6 @@ export const EV_CHARGER_DISTANCES = [
 ] as const;
 export type TEVChargerDistance = (typeof EV_CHARGER_DISTANCES)[number];
 
-export const EV_CHARGER_PROPERTY_TYPES = [
-  'House',
-  'Condo',
-  'Apartment',
-  'Commercial',
-] as const;
-export type TEVChargerPropertyType = (typeof EV_CHARGER_PROPERTY_TYPES)[number];
-
-export const EV_CHARGER_OWNERSHIP_STATUSES = [
-  'Owner',
-  'Tenant',
-  'Property Manager',
-  'Other',
-] as const;
-export type TEVChargerOwnershipStatus =
-  (typeof EV_CHARGER_OWNERSHIP_STATUSES)[number];
-
-export const EV_CHARGER_TIMELINE_URGENCIES = [
-  'As soon as possible',
-  'This week',
-  'This month',
-  'Flexible',
-] as const;
-export type TEVChargerTimelineUrgency =
-  (typeof EV_CHARGER_TIMELINE_URGENCIES)[number];
-
 export interface IEVChargerInstallation extends Document {
   _id: Types.ObjectId;
 
@@ -84,7 +60,7 @@ export interface IEVChargerInstallation extends Document {
   fullName: string;
   phoneNumber: string;
   emailAddress?: string;
-  preferredContactMethod: TEVChargerPreferredContactMethod;
+  preferredContactMethod: TContactMethod;
 
   streetAddress: string;
   apartmentUnit?: string;
@@ -92,9 +68,9 @@ export interface IEVChargerInstallation extends Document {
   state: string;
   zipCode: string;
 
-  propertyType: TEVChargerPropertyType;
-  ownershipStatus: TEVChargerOwnershipStatus;
-  timelineUrgency: TEVChargerTimelineUrgency;
+  propertyType: TPropertyType;
+  ownershipStatus: TOwnershipStatus;
+  timelineUrgency: TTimelineUrgency;
 
   chargerConnectionType: TEVChargerConnectionType;
   nemaConfiguration?: string;

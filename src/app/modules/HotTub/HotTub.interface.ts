@@ -1,35 +1,11 @@
 import { Document, Types } from 'mongoose';
-import { TServiceStatus } from '../../constants';
-
-export const HOT_TUB_CONTACT_METHODS = ['Call', 'Text', 'Email'] as const;
-export type THotTubPreferredContactMethod =
-  (typeof HOT_TUB_CONTACT_METHODS)[number];
-
-export const HOT_TUB_PROPERTY_TYPES = [
-  'House',
-  'Condo',
-  'Apartment',
-  'Commercial',
-] as const;
-export type THotTubPropertyType = (typeof HOT_TUB_PROPERTY_TYPES)[number];
-
-export const HOT_TUB_OWNERSHIP_STATUSES = [
-  'Owner',
-  'Tenant',
-  'Property Manager',
-  'Other',
-] as const;
-export type THotTubOwnershipStatus =
-  (typeof HOT_TUB_OWNERSHIP_STATUSES)[number];
-
-export const HOT_TUB_TIMELINE_URGENCIES = [
-  'As soon as possible',
-  'This week',
-  'This month',
-  'Flexible',
-] as const;
-export type THotTubTimelineUrgency =
-  (typeof HOT_TUB_TIMELINE_URGENCIES)[number];
+import {
+  TContactMethod,
+  TOwnershipStatus,
+  TPropertyType,
+  TServiceStatus,
+  TTimelineUrgency,
+} from '../../constants';
 
 export const HOT_TUB_AMPERAGES = [
   '20 amps',
@@ -75,7 +51,7 @@ export interface IHotTub extends Document {
   fullName: string;
   phoneNumber: string;
   emailAddress?: string;
-  preferredContactMethod: THotTubPreferredContactMethod;
+  preferredContactMethod: TContactMethod;
 
   streetAddress: string;
   apartmentUnit?: string;
@@ -83,9 +59,9 @@ export interface IHotTub extends Document {
   state: string;
   zipCode: string;
 
-  propertyType: THotTubPropertyType;
-  ownershipStatus: THotTubOwnershipStatus;
-  timelineUrgency: THotTubTimelineUrgency;
+  propertyType: TPropertyType;
+  ownershipStatus: TOwnershipStatus;
+  timelineUrgency: TTimelineUrgency;
 
   hasDigitalManual: boolean;
   manualDocument?: string;

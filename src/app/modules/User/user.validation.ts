@@ -117,39 +117,42 @@ const socialSigninSchema = z.object({
 
 // 7. updateUserDataSchema
 const updateUserDataSchema = z.object({
-  body: z.object({
-    name: z.string().optional(),
+  body: z
+    .object({
+      name: z.string().optional(),
 
-    address: z.string().optional(),
+      address: z.string().optional(),
 
-    phone: z.string().optional(),
+      phone: z.string().optional(),
 
-    addresses: z
-      .array(
-        z.object({
-          _id: z.string().optional(),
-          addressName: z.string({ error: 'Address name is required!' }).min(1),
-          streetAddress: z
-            .string({ error: 'Street address is required!' })
-            .min(1),
-          apartmentUnit: z.string().optional(),
-          city: z.string({ error: 'City is required!' }).min(1),
-          state: z.string({ error: 'State is required!' }).min(1),
-          zipCode: z.string({ error: 'ZIP code is required!' }).min(1),
-          isDefault: z.boolean().optional(),
-        }),
-      )
-      .optional(),
-  })
-  .refine(
-    data =>
-      Object.values(data).some(
-        value => value !== undefined && value !== null,
-      ),
-    {
-      message: 'At least one field is required to update!',
-    },
-  ),
+      addresses: z
+        .array(
+          z.object({
+            _id: z.string().optional(),
+            addressName: z
+              .string({ error: 'Address name is required!' })
+              .min(1),
+            streetAddress: z
+              .string({ error: 'Street address is required!' })
+              .min(1),
+            apartmentUnit: z.string().optional(),
+            city: z.string({ error: 'City is required!' }).min(1),
+            state: z.string({ error: 'State is required!' }).min(1),
+            zipCode: z.string({ error: 'ZIP code is required!' }).min(1),
+            isDefault: z.boolean().optional(),
+          }),
+        )
+        .optional(),
+    })
+    .refine(
+      data =>
+        Object.values(data).some(
+          value => value !== undefined && value !== null,
+        ),
+      {
+        message: 'At least one field is required to update!',
+      },
+    ),
 });
 
 // 8. changePasswordSchema

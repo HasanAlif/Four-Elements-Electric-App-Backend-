@@ -1,14 +1,10 @@
 import { model, Schema } from 'mongoose';
-import { DEFAULT_REQUEST_STATUS, Service_STATUSES } from '../../constants';
+import { CONTACT_METHODS, DEFAULT_REQUEST_STATUS, OWNERSHIP_STATUSES, PROPERTY_TYPES, Service_STATUSES, TIMELINE_URGENCIES } from '../../constants';
 import {
   HOT_TUB_AMPERAGES,
-  HOT_TUB_CONTACT_METHODS,
   HOT_TUB_LOCATIONS,
-  HOT_TUB_OWNERSHIP_STATUSES,
   HOT_TUB_PANEL_DISTANCE,
   HOT_TUB_PANEL_LOCATIONS,
-  HOT_TUB_PROPERTY_TYPES,
-  HOT_TUB_TIMELINE_URGENCIES,
   IHotTub,
 } from './HotTub.interface';
 
@@ -52,7 +48,7 @@ const hotTubSchema = new Schema<IHotTub>(
     },
     preferredContactMethod: {
       type: String,
-      enum: HOT_TUB_CONTACT_METHODS,
+      enum: CONTACT_METHODS,
       default: 'Call',
     },
     streetAddress: {
@@ -101,7 +97,7 @@ const hotTubSchema = new Schema<IHotTub>(
     },
     propertyType: {
       type: String,
-      enum: HOT_TUB_PROPERTY_TYPES,
+      enum: PROPERTY_TYPES,
       required: [
         function (this: any) {
           return this.status !== Service_STATUSES.DRAFT;
@@ -111,7 +107,7 @@ const hotTubSchema = new Schema<IHotTub>(
     },
     ownershipStatus: {
       type: String,
-      enum: HOT_TUB_OWNERSHIP_STATUSES,
+      enum: OWNERSHIP_STATUSES,
       required: [
         function (this: any) {
           return this.status !== Service_STATUSES.DRAFT;
@@ -121,7 +117,7 @@ const hotTubSchema = new Schema<IHotTub>(
     },
     timelineUrgency: {
       type: String,
-      enum: HOT_TUB_TIMELINE_URGENCIES,
+      enum: TIMELINE_URGENCIES,
       required: [
         function (this: any) {
           return this.status !== Service_STATUSES.DRAFT;
@@ -203,6 +199,8 @@ const hotTubSchema = new Schema<IHotTub>(
     versionKey: false,
   },
 );
+
+hotTubSchema.index({ createdBy: 1, status: 1 });
 
 const HotTubModel = model<IHotTub>('HotTub', hotTubSchema);
 

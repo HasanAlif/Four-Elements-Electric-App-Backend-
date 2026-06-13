@@ -1,13 +1,16 @@
 import { model, Schema } from 'mongoose';
 import {
   IServiceCall,
-  SERVICE_CALL_CONTACT_METHODS,
-  SERVICE_CALL_OWNERSHIP_STATUSES,
   SERVICE_CALL_PREFERRED_TIMES,
-  SERVICE_CALL_PROPERTY_TYPES,
-  SERVICE_CALL_TIMELINE_URGENCIES,
 } from './ServiceCall.interface';
-import { DEFAULT_REQUEST_STATUS, Service_STATUSES } from '../../constants';
+import {
+  CONTACT_METHODS,
+  DEFAULT_REQUEST_STATUS,
+  OWNERSHIP_STATUSES,
+  PROPERTY_TYPES,
+  Service_STATUSES,
+  TIMELINE_URGENCIES,
+} from '../../constants';
 
 const serviceCallSchema = new Schema<IServiceCall>(
   {
@@ -50,7 +53,7 @@ const serviceCallSchema = new Schema<IServiceCall>(
     },
     preferredContactMethod: {
       type: String,
-      enum: SERVICE_CALL_CONTACT_METHODS,
+      enum: CONTACT_METHODS,
       default: 'Call',
     },
 
@@ -101,7 +104,7 @@ const serviceCallSchema = new Schema<IServiceCall>(
 
     propertyType: {
       type: String,
-      enum: SERVICE_CALL_PROPERTY_TYPES,
+      enum: PROPERTY_TYPES,
       required: [
         function (this: any) {
           return this.status !== Service_STATUSES.DRAFT;
@@ -111,7 +114,7 @@ const serviceCallSchema = new Schema<IServiceCall>(
     },
     ownershipStatus: {
       type: String,
-      enum: SERVICE_CALL_OWNERSHIP_STATUSES,
+      enum: OWNERSHIP_STATUSES,
       required: [
         function (this: any) {
           return this.status !== Service_STATUSES.DRAFT;
@@ -121,7 +124,7 @@ const serviceCallSchema = new Schema<IServiceCall>(
     },
     timelineUrgency: {
       type: String,
-      enum: SERVICE_CALL_TIMELINE_URGENCIES,
+      enum: TIMELINE_URGENCIES,
       required: [
         function (this: any) {
           return this.status !== Service_STATUSES.DRAFT;
@@ -214,6 +217,8 @@ const serviceCallSchema = new Schema<IServiceCall>(
     versionKey: false,
   },
 );
+
+serviceCallSchema.index({ createdBy: 1, status: 1 });
 
 const ServiceCallModel = model<IServiceCall>('ServiceCall', serviceCallSchema);
 

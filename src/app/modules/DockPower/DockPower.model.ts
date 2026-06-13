@@ -1,16 +1,12 @@
 import { model, Schema } from 'mongoose';
-import { DEFAULT_REQUEST_STATUS, Service_STATUSES } from '../../constants';
+import { CONTACT_METHODS, DEFAULT_REQUEST_STATUS, OWNERSHIP_STATUSES, PROPERTY_TYPES, Service_STATUSES, TIMELINE_URGENCIES } from '../../constants';
 import {
   DOCK_POWER_CIRCUIT_AMP_RATINGS,
   DOCK_POWER_CIRCUIT_COUNTS,
-  DOCK_POWER_CONTACT_METHODS,
   DOCK_POWER_NEW_SERVICE_SIZES,
-  DOCK_POWER_OWNERSHIP_STATUSES,
   DOCK_POWER_PANEL_LOCATIONS,
-  DOCK_POWER_PROPERTY_TYPES,
   DOCK_POWER_SERVICE_TYPES,
   DOCK_POWER_SUB_PANEL_SIZES,
-  DOCK_POWER_TIMELINE_URGENCIES,
   IDockPower,
 } from './DockPower.interface';
 
@@ -55,7 +51,7 @@ const dockPowerSchema = new Schema<IDockPower>(
     },
     preferredContactMethod: {
       type: String,
-      enum: DOCK_POWER_CONTACT_METHODS,
+      enum: CONTACT_METHODS,
       default: 'Call',
     },
 
@@ -106,7 +102,7 @@ const dockPowerSchema = new Schema<IDockPower>(
 
     propertyType: {
       type: String,
-      enum: DOCK_POWER_PROPERTY_TYPES,
+      enum: PROPERTY_TYPES,
       required: [
         function (this: any) {
           return this.status !== Service_STATUSES.DRAFT;
@@ -116,7 +112,7 @@ const dockPowerSchema = new Schema<IDockPower>(
     },
     ownershipStatus: {
       type: String,
-      enum: DOCK_POWER_OWNERSHIP_STATUSES,
+      enum: OWNERSHIP_STATUSES,
       required: [
         function (this: any) {
           return this.status !== Service_STATUSES.DRAFT;
@@ -126,7 +122,7 @@ const dockPowerSchema = new Schema<IDockPower>(
     },
     timelineUrgency: {
       type: String,
-      enum: DOCK_POWER_TIMELINE_URGENCIES,
+      enum: TIMELINE_URGENCIES,
       required: [
         function (this: any) {
           return this.status !== Service_STATUSES.DRAFT;
@@ -278,6 +274,8 @@ const dockPowerSchema = new Schema<IDockPower>(
     versionKey: false,
   },
 );
+
+dockPowerSchema.index({ createdBy: 1, status: 1 });
 
 const DockPowerModel = model<IDockPower>('DockPower', dockPowerSchema);
 

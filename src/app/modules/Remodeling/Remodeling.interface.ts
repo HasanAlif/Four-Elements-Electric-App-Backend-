@@ -1,36 +1,11 @@
 import { Document, Types } from 'mongoose';
-import { TServiceStatus } from '../../constants';
-
-export const REMODELING_CONTACT_METHODS = ['Call', 'Text', 'Email'] as const;
-export type TRemodelingPreferredContactMethod =
-  (typeof REMODELING_CONTACT_METHODS)[number];
-
-export const REMODELING_PROPERTY_TYPES = [
-  'House',
-  'Condo',
-  'Apartment',
-  'Commercial',
-] as const;
-export type TRemodelingPropertyType =
-  (typeof REMODELING_PROPERTY_TYPES)[number];
-
-export const REMODELING_OWNERSHIP_STATUSES = [
-  'Owner',
-  'Tenant',
-  'Property Manager',
-  'Other',
-] as const;
-export type TRemodelingOwnershipStatus =
-  (typeof REMODELING_OWNERSHIP_STATUSES)[number];
-
-export const REMODELING_TIMELINE_URGENCIES = [
-  'As soon as possible',
-  'This week',
-  'This month',
-  'Flexible',
-] as const;
-export type TRemodelingTimelineUrgency =
-  (typeof REMODELING_TIMELINE_URGENCIES)[number];
+import {
+  TContactMethod,
+  TOwnershipStatus,
+  TPropertyType,
+  TServiceStatus,
+  TTimelineUrgency,
+} from '../../constants';
 
 export const REMODELING_PANEL_LOCATIONS = [
   'Basement (Finished)',
@@ -51,7 +26,7 @@ export interface IRemodeling extends Document {
   fullName: string;
   phoneNumber: string;
   emailAddress?: string;
-  preferredContactMethod: TRemodelingPreferredContactMethod;
+  preferredContactMethod: TContactMethod;
 
   streetAddress: string;
   apartmentUnit?: string;
@@ -59,9 +34,9 @@ export interface IRemodeling extends Document {
   state: string;
   zipCode: string;
 
-  propertyType: TRemodelingPropertyType;
-  ownershipStatus: TRemodelingOwnershipStatus;
-  timelineUrgency: TRemodelingTimelineUrgency;
+  propertyType: TPropertyType;
+  ownershipStatus: TOwnershipStatus;
+  timelineUrgency: TTimelineUrgency;
 
   panelLocation: TRemodelingPanelLocation;
   remodelingAreas: string;

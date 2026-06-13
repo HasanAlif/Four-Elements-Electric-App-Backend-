@@ -15,7 +15,7 @@ router
   )
   .get(auth(ROLE.ADMIN, ROLE.SUPER_ADMIN), HotTubController.getAllHotTubs);
 
-router.get('/my', auth(ROLE.USER), HotTubController.getMyAllHotTubs);
+router.route('/my').get(auth(ROLE.USER), HotTubController.getMyAllHotTubs);
 
 router
   .route('/:id')
