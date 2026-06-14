@@ -1,16 +1,27 @@
 import { Router } from 'express';
-import { auth, validateRequest } from '../../middlewares';
+import {
+  auth,
+  validateRequest,
+  validateRequestFromFormData,
+} from '../../middlewares';
 import { ROLE } from '../User/user.constant';
 import { EVChargerInstallationController } from './EVChargerInstallation.controller';
 import { EVChargerInstallationValidation } from './EVChargerInstallation.validation';
+import { multerUpload } from '../../lib';
 
 const router = Router();
+
+const uploadEVChargerImages = multerUpload.fields([
+  { name: 'areaPhoto', maxCount: 1 },
+  { name: 'panelPhotos', maxCount: 10 },
+]);
 
 router
   .route('/')
   .post(
     auth(ROLE.USER),
-    validateRequest(EVChargerInstallationValidation.createSchema),
+    uploadEVChargerImages,
+    validateRequestFromFormData(EVChargerInstallationValidation.createSchema),
     EVChargerInstallationController.createEVChargerInstallation,
   )
   .get(
@@ -34,7 +45,8 @@ router
   )
   .patch(
     auth(ROLE.USER),
-    validateRequest(EVChargerInstallationValidation.updateSchema),
+    uploadEVChargerImages,
+    validateRequestFromFormData(EVChargerInstallationValidation.updateSchema),
     EVChargerInstallationController.updateSingleEVChargerInstallation,
   )
   .delete(

@@ -1,5 +1,11 @@
 import { Document, Types } from 'mongoose';
-import { TContactMethod, TOwnershipStatus, TPropertyType, TServiceStatus, TTimelineUrgency } from '../../constants';
+import {
+  TContactMethod,
+  TOwnershipStatus,
+  TPropertyType,
+  TServiceStatus,
+  TTimelineUrgency,
+} from '../../constants';
 
 export const PANEL_SERVICE_TYPES = ['Replacement', 'Upgrade'] as const;
 export type TPanelServiceType = (typeof PANEL_SERVICE_TYPES)[number];

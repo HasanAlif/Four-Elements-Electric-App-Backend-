@@ -1,16 +1,27 @@
 import { Router } from 'express';
-import { auth, validateRequest } from '../../middlewares';
+import {
+  auth,
+  validateRequest,
+  validateRequestFromFormData,
+} from '../../middlewares';
 import { ROLE } from '../User/user.constant';
 import { PanelUpgradeReplacementController } from './PanelUpgradeReplacement.controller';
 import { PanelUpgradeReplacementValidation } from './PanelUpgradeReplacement.validation';
+import { multerUpload } from '../../lib';
 
 const router = Router();
+
+const uploadPanelImages = multerUpload.fields([
+  { name: 'meterPhotos', maxCount: 10 },
+  { name: 'panelPhotos', maxCount: 10 },
+]);
 
 router
   .route('/')
   .post(
     auth(ROLE.USER),
-    validateRequest(PanelUpgradeReplacementValidation.createSchema),
+    uploadPanelImages,
+    validateRequestFromFormData(PanelUpgradeReplacementValidation.createSchema),
     PanelUpgradeReplacementController.createPanelUpgradeReplacement,
   )
   .get(
@@ -34,7 +45,8 @@ router
   )
   .patch(
     auth(ROLE.USER),
-    validateRequest(PanelUpgradeReplacementValidation.updateSchema),
+    uploadPanelImages,
+    validateRequestFromFormData(PanelUpgradeReplacementValidation.updateSchema),
     PanelUpgradeReplacementController.updateSinglePanelUpgradeReplacement,
   )
   .delete(

@@ -9,6 +9,7 @@ export const RemodelingController = {
     const data = await RemodelingService.createRemodelingIntoDB(
       req.user,
       req.body,
+      req.files,
     );
 
     sendResponse(res, {
@@ -58,6 +59,7 @@ export const RemodelingController = {
       req.user._id.toString(),
       req.params.id as string,
       req.body as Partial<IRemodeling>,
+      req.files,
     );
 
     sendResponse(res, {

@@ -11,6 +11,7 @@ export const PanelUpgradeReplacementController = {
         await PanelUpgradeReplacementService.createPanelUpgradeReplacementIntoDB(
           req.user,
           req.body,
+          req.files,
         );
 
       sendResponse(res, {
@@ -72,6 +73,7 @@ export const PanelUpgradeReplacementController = {
           req.user._id.toString(),
           req.params.id as string,
           req.body as Partial<IPanelUpgradeReplacement>,
+          req.files,
         );
 
       sendResponse(res, {

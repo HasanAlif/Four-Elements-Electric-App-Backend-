@@ -51,7 +51,10 @@ const evChargerBodySchema = z.object({
   completionPercentage: z.number().optional(),
 });
 
-const validateEVChargerConditionalFields = (data: any, ctx: z.RefinementCtx) => {
+const validateEVChargerConditionalFields = (
+  data: any,
+  ctx: z.RefinementCtx,
+) => {
   if (
     data.chargerConnectionType !== 'I want help deciding' &&
     data.chargerProvidedByUser === undefined
@@ -74,10 +77,7 @@ const validateEVChargerConditionalFields = (data: any, ctx: z.RefinementCtx) => 
     });
   }
 
-  if (
-    data.chargerConnectionType === 'Plug-in' &&
-    !data.nemaConfiguration
-  ) {
+  if (data.chargerConnectionType === 'Plug-in' && !data.nemaConfiguration) {
     ctx.addIssue({
       code: 'custom',
       path: ['nemaConfiguration'],
@@ -88,33 +88,38 @@ const validateEVChargerConditionalFields = (data: any, ctx: z.RefinementCtx) => 
 
 export const EVChargerInstallationValidation = {
   createSchema: z.object({
-    body: z.any().transform((data) => {
-      if (typeof data !== 'object' || data === null) return data;
-      const cleanData = { ...data };
-      for (const key in cleanData) {
-        if (cleanData[key] === '' || cleanData[key] === null) {
-          delete cleanData[key];
-        } else if (Array.isArray(cleanData[key])) {
-          cleanData[key] = cleanData[key].filter((v: any) => v !== '' && v !== null);
-          if (cleanData[key].length === 0) delete cleanData[key];
+    body: z
+      .any()
+      .transform(data => {
+        if (typeof data !== 'object' || data === null) return data;
+        const cleanData = { ...data };
+        for (const key in cleanData) {
+          if (cleanData[key] === '' || cleanData[key] === null) {
+            delete cleanData[key];
+          } else if (Array.isArray(cleanData[key])) {
+            cleanData[key] = cleanData[key].filter(
+              (v: any) => v !== '' && v !== null,
+            );
+            if (cleanData[key].length === 0) delete cleanData[key];
+          }
         }
-      }
-      return cleanData;
-    }).superRefine((data, ctx) => {
-      if (data.status === Service_STATUSES.DRAFT) {
-        const res = evChargerBodySchema.partial().safeParse(data);
-        if (!res.success) {
-          res.error.issues.forEach(i => ctx.addIssue(i as z.IssueData));
-        }
-      } else {
-        const res = evChargerBodySchema.safeParse(data);
-        if (res.success) {
-          validateEVChargerConditionalFields(data, ctx);
+        return cleanData;
+      })
+      .superRefine((data, ctx) => {
+        if (data.status === Service_STATUSES.DRAFT) {
+          const res = evChargerBodySchema.partial().safeParse(data);
+          if (!res.success) {
+            res.error.issues.forEach(i => ctx.addIssue(i as z.IssueData));
+          }
         } else {
-          res.error.issues.forEach(i => ctx.addIssue(i as z.IssueData));
+          const res = evChargerBodySchema.safeParse(data);
+          if (res.success) {
+            validateEVChargerConditionalFields(data, ctx);
+          } else {
+            res.error.issues.forEach(i => ctx.addIssue(i as z.IssueData));
+          }
         }
-      }
-    }),
+      }),
   }),
 
   idParamsSchema: z.object({
@@ -165,15 +170,6 @@ export const EVChargerInstallationValidation = {
         panelPhotos: z.array(z.string()).optional(),
         status: z.enum(Service_STATUSES).optional(),
       })
-      .refine(
-        data =>
-          Object.values(data).some(
-            value => value !== undefined && value !== null,
-          ),
-        {
-          message: 'At least one field is required to update!',
-        },
-      )
       .superRefine((data, ctx) => {
         if (
           data.chargerConnectionType !== 'I want help deciding' &&

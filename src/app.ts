@@ -69,11 +69,6 @@ app.get('/', (req: Request, res: Response) => {
         (serverUptime / 60) % 60,
       )} minutes`,
     },
-    developerContact: {
-      name: 'Khaled Siddique',
-      email: 'khaledssbd@gmail.com',
-      website: 'https://khaled-siddique.vercel.app',
-    },
   });
 });
 

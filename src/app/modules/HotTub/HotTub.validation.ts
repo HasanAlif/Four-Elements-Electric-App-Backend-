@@ -49,63 +49,43 @@ const hotTubBodySchema = z.object({
   completionPercentage: z.number().optional(),
 });
 
-const hotTubCreateBodySchema = hotTubBodySchema.extend({
-  panelPhotos: z
-    .array(z.string())
-    .min(1, 'Please upload photo(s) of electrical panel!'),
-  hotTubPhotos: z
-    .array(z.string())
-    .min(1, 'Please upload photo(s) of the hot tub!'),
-});
-
-const validateHotTubConditionalFields = (
-  data: {
-    amperageNeeded?: (typeof HOT_TUB_AMPERAGES)[number];
-    panelLocation?: (typeof HOT_TUB_PANEL_LOCATIONS)[number];
-    panelDistance?: (typeof HOT_TUB_PANEL_DISTANCE)[number];
-    hasDigitalManual?: boolean;
-    manualDocument?: string;
-  },
-  ctx: z.RefinementCtx,
-) => {
-  if (data.hasDigitalManual === true && !data.manualDocument) {
-    ctx.addIssue({
-      code: 'custom',
-      path: ['manualDocument'],
-      message: 'Please upload the digital manual!',
-    });
-  }
-};
+// Photo presence (panelPhotos, hotTubPhotos) and manualDocument (when
+// hasDigitalManual) are enforced in the service because images now arrive as
+// form-data files, not in `data`.
+const hotTubCreateBodySchema = hotTubBodySchema;
 
 export const HotTubValidation = {
   createSchema: z.object({
-    body: z.any().transform((data) => {
-      if (typeof data !== 'object' || data === null) return data;
-      const cleanData = { ...data };
-      for (const key in cleanData) {
-        if (cleanData[key] === '' || cleanData[key] === null) {
-          delete cleanData[key];
-        } else if (Array.isArray(cleanData[key])) {
-          cleanData[key] = cleanData[key].filter((v: any) => v !== '' && v !== null);
-          if (cleanData[key].length === 0) delete cleanData[key];
+    body: z
+      .any()
+      .transform(data => {
+        if (typeof data !== 'object' || data === null) return data;
+        const cleanData = { ...data };
+        for (const key in cleanData) {
+          if (cleanData[key] === '' || cleanData[key] === null) {
+            delete cleanData[key];
+          } else if (Array.isArray(cleanData[key])) {
+            cleanData[key] = cleanData[key].filter(
+              (v: any) => v !== '' && v !== null,
+            );
+            if (cleanData[key].length === 0) delete cleanData[key];
+          }
         }
-      }
-      return cleanData;
-    }).superRefine((data, ctx) => {
-      if (data.status === Service_STATUSES.DRAFT) {
-        const res = hotTubBodySchema.partial().safeParse(data);
-        if (!res.success) {
-          res.error.issues.forEach(i => ctx.addIssue(i as z.IssueData));
-        }
-      } else {
-        const res = hotTubCreateBodySchema.safeParse(data);
-        if (res.success) {
-          validateHotTubConditionalFields(data, ctx);
+        return cleanData;
+      })
+      .superRefine((data, ctx) => {
+        if (data.status === Service_STATUSES.DRAFT) {
+          const res = hotTubBodySchema.partial().safeParse(data);
+          if (!res.success) {
+            res.error.issues.forEach(i => ctx.addIssue(i as z.IssueData));
+          }
         } else {
-          res.error.issues.forEach(i => ctx.addIssue(i as z.IssueData));
+          const res = hotTubCreateBodySchema.safeParse(data);
+          if (!res.success) {
+            res.error.issues.forEach(i => ctx.addIssue(i as z.IssueData));
+          }
         }
-      }
-    }),
+      }),
   }),
 
   idParamsSchema: z.object({
@@ -120,14 +100,6 @@ export const HotTubValidation = {
     }),
     body: hotTubBodySchema
       .partial()
-      .extend({ status: z.enum(Service_STATUSES).optional() })
-      .refine(
-        data =>
-          Object.values(data).some(
-            value => value !== undefined && value !== null,
-          ),
-        { message: 'At least one field is required to update!' },
-      )
-      .superRefine(validateHotTubConditionalFields),
+      .extend({ status: z.enum(Service_STATUSES).optional() }),
   }),
 };

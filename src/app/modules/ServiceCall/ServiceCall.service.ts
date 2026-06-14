@@ -1,29 +1,36 @@
 import httpStatus from 'http-status';
-import { AppError } from '../../utils';
+import { Request } from 'express';
+import {
+  AppError,
+  uploadServiceImages,
+  collectImageUrls,
+  deleteServiceImages,
+} from '../../utils';
+import { TImageFieldConfig } from '../../utils/serviceImages';
 import { IServiceCall } from './ServiceCall.interface';
 import ServiceCallModel from './ServiceCall.model';
-import { DEFAULT_REQUEST_STATUS, Service_STATUSES } from '../../constants';
+import { DEFAULT_REQUEST_STATUS } from '../../constants';
 import { IUser } from '../User/user.interface';
+
+// Image fields uploaded as files (form-data) and stored as Cloudinary URLs
+const IMAGE_FIELDS: TImageFieldConfig[] = [
+  { name: 'panelPhotos', multiple: true },
+  { name: 'workAreaPhotos', multiple: true },
+  { name: 'extraReferencePhotos', multiple: true },
+];
+const IMAGE_FIELD_NAMES = IMAGE_FIELDS.map(field => field.name);
 
 // createServiceCallIntoDB
 const createServiceCallIntoDB = async (
   user: IUser,
   payload: Partial<IServiceCall>,
+  files: Request['files'],
 ) => {
-  // const drafts = await ServiceCallModel.find({
-  //   createdBy: user._id.toString(),
-  //   status: Service_STATUSES.DRAFT,
-  // });
-
-  // if (drafts.length > 0) {
-  //   throw new AppError(
-  //     httpStatus.BAD_REQUEST,
-  //     'You can only have 1 draft Service call request. Please submit or delete existing draft before creating new one.',
-  //   );
-  // }
+  const uploaded = await uploadServiceImages(files, IMAGE_FIELDS);
 
   const newDoc = await ServiceCallModel.create({
     ...payload,
+    ...uploaded,
     createdBy: user._id.toString(),
     status: payload.status ?? DEFAULT_REQUEST_STATUS,
   });
@@ -42,9 +49,7 @@ const getAllServiceCallsFromDB = async () => {
 // getMyAllServiceCallsFromDB
 const getMyAllServiceCallsFromDB = async (userId: string) => {
   return await ServiceCallModel.find({ createdBy: userId })
-    .sort({
-      createdAt: -1,
-    })
+    .sort({ createdAt: -1 })
     .select('-createdAt -updatedAt');
 };
 
@@ -61,37 +66,54 @@ const getSingleServiceCallFromDB = async (id: string) => {
   return serviceCall;
 };
 
-// updateServiceCallStatusIntoDB
+// updateServiceCallIntoDB
 const updateServiceCallIntoDB = async (
   userId: string,
   id: string,
   payload: Partial<IServiceCall>,
+  files: Request['files'],
 ) => {
-  const updatedData = await ServiceCallModel.findOneAndUpdate(
-    { _id: id, createdBy: userId },
-    payload,
-    { new: true, runValidators: true },
-  ).select('-createdAt -updatedAt');
+  const existing = await ServiceCallModel.findOne({
+    _id: id,
+    createdBy: userId,
+  });
 
-  if (!updatedData) {
+  if (!existing) {
     throw new AppError(httpStatus.NOT_FOUND, 'Service call not found!');
   }
 
-  return updatedData;
+  const uploaded = await uploadServiceImages(files, IMAGE_FIELDS);
+
+  if (Object.keys(payload).length === 0 && Object.keys(uploaded).length === 0) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Nothing to update!');
+  }
+
+  // old images for the fields being replaced (deleted after a successful save)
+  const oldUrls = collectImageUrls(existing.toObject(), Object.keys(uploaded));
+
+  Object.assign(existing, payload, uploaded);
+  const updated = await existing.save();
+
+  if (oldUrls.length) await deleteServiceImages(oldUrls);
+
+  const { createdAt, updatedAt, ...sanitizedData } = updated.toObject();
+  return sanitizedData;
 };
 
 // deleteServiceCallFromDB
 const deleteServiceCallFromDB = async (userId: string, id: string) => {
-  const deletedData = await ServiceCallModel.findOneAndDelete({
-    _id: id,
-    createdBy: userId,
-  }).select('-createdAt -updatedAt');
+  const doc = await ServiceCallModel.findOne({ _id: id, createdBy: userId });
 
-  if (!deletedData) {
+  if (!doc) {
     throw new AppError(httpStatus.NOT_FOUND, 'Service call not found!');
   }
 
-  return deletedData;
+  const urls = collectImageUrls(doc.toObject(), IMAGE_FIELD_NAMES);
+  await doc.deleteOne();
+  if (urls.length) await deleteServiceImages(urls);
+
+  const { createdAt, updatedAt, ...sanitizedData } = doc.toObject();
+  return sanitizedData;
 };
 
 export const ServiceCallService = {

@@ -1,5 +1,11 @@
 import { Document, Types } from 'mongoose';
-import { TContactMethod, TOwnershipStatus, TPropertyType, TServiceStatus, TTimelineUrgency } from '../../constants';
+import {
+  TContactMethod,
+  TOwnershipStatus,
+  TPropertyType,
+  TServiceStatus,
+  TTimelineUrgency,
+} from '../../constants';
 
 export const ACCESSORY_BUILDING_STATUSES = [
   'Already built or delivered on site',

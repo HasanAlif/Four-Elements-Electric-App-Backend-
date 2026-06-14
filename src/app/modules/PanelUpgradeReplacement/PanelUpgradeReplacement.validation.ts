@@ -54,33 +54,38 @@ const validatePanelConditionalFields = (data: any, ctx: z.RefinementCtx) => {
 
 export const PanelUpgradeReplacementValidation = {
   createSchema: z.object({
-    body: z.any().transform((data) => {
-      if (typeof data !== 'object' || data === null) return data;
-      const cleanData = { ...data };
-      for (const key in cleanData) {
-        if (cleanData[key] === '' || cleanData[key] === null) {
-          delete cleanData[key];
-        } else if (Array.isArray(cleanData[key])) {
-          cleanData[key] = cleanData[key].filter((v: any) => v !== '' && v !== null);
-          if (cleanData[key].length === 0) delete cleanData[key];
+    body: z
+      .any()
+      .transform(data => {
+        if (typeof data !== 'object' || data === null) return data;
+        const cleanData = { ...data };
+        for (const key in cleanData) {
+          if (cleanData[key] === '' || cleanData[key] === null) {
+            delete cleanData[key];
+          } else if (Array.isArray(cleanData[key])) {
+            cleanData[key] = cleanData[key].filter(
+              (v: any) => v !== '' && v !== null,
+            );
+            if (cleanData[key].length === 0) delete cleanData[key];
+          }
         }
-      }
-      return cleanData;
-    }).superRefine((data, ctx) => {
-      if (data.status === Service_STATUSES.DRAFT) {
-        const res = panelBodySchema.partial().safeParse(data);
-        if (!res.success) {
-          res.error.issues.forEach(i => ctx.addIssue(i as z.IssueData));
-        }
-      } else {
-        const res = panelBodySchema.safeParse(data);
-        if (res.success) {
-          validatePanelConditionalFields(data, ctx);
+        return cleanData;
+      })
+      .superRefine((data, ctx) => {
+        if (data.status === Service_STATUSES.DRAFT) {
+          const res = panelBodySchema.partial().safeParse(data);
+          if (!res.success) {
+            res.error.issues.forEach(i => ctx.addIssue(i as z.IssueData));
+          }
         } else {
-          res.error.issues.forEach(i => ctx.addIssue(i as z.IssueData));
+          const res = panelBodySchema.safeParse(data);
+          if (res.success) {
+            validatePanelConditionalFields(data, ctx);
+          } else {
+            res.error.issues.forEach(i => ctx.addIssue(i as z.IssueData));
+          }
         }
-      }
-    }),
+      }),
   }),
 
   idParamsSchema: z.object({
@@ -122,13 +127,6 @@ export const PanelUpgradeReplacementValidation = {
         status: z.enum(Service_STATUSES).optional(),
         completionPercentage: z.number().optional(),
       })
-      .refine(
-        data =>
-          Object.values(data).some(
-            value => value !== undefined && value !== null,
-          ),
-        { message: 'At least one field is required to update!' },
-      )
       .superRefine((data, ctx) => {
         if (data.panelServiceType === 'Upgrade' && !data.desiredPanelAmperage) {
           ctx.addIssue({

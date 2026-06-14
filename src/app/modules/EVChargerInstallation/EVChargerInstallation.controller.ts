@@ -11,6 +11,7 @@ export const EVChargerInstallationController = {
         await EVChargerInstallationService.createEVChargerInstallationIntoDB(
           req.user,
           req.body,
+          req.files,
         );
 
       sendResponse(res, {
@@ -73,6 +74,7 @@ export const EVChargerInstallationController = {
           req.user._id.toString(),
           req.params.id as string,
           req.body as Partial<IEVChargerInstallation>,
+          req.files,
         );
 
       sendResponse(res, {

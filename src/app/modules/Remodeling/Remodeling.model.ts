@@ -1,5 +1,12 @@
 import { model, Schema } from 'mongoose';
-import { CONTACT_METHODS, DEFAULT_REQUEST_STATUS, OWNERSHIP_STATUSES, PROPERTY_TYPES, Service_STATUSES, TIMELINE_URGENCIES } from '../../constants';
+import {
+  CONTACT_METHODS,
+  DEFAULT_REQUEST_STATUS,
+  OWNERSHIP_STATUSES,
+  PROPERTY_TYPES,
+  Service_STATUSES,
+  TIMELINE_URGENCIES,
+} from '../../constants';
 import {
   IRemodeling,
   REMODELING_PANEL_LOCATIONS,

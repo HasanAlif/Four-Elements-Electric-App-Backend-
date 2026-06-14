@@ -9,6 +9,7 @@ export const DockPowerController = {
     const data = await DockPowerService.createDockPowerIntoDB(
       req.user,
       req.body,
+      req.files,
     );
 
     sendResponse(res, {
@@ -58,6 +59,7 @@ export const DockPowerController = {
       req.user._id.toString(),
       req.params.id as string,
       req.body as Partial<IDockPower>,
+      req.files,
     );
 
     sendResponse(res, {

@@ -73,15 +73,9 @@ const accessoryBuildingPowerBodySchema = z.object({
   completionPercentage: z.number().optional(),
 });
 
-const accessoryBuildingPowerCreateBodySchema =
-  accessoryBuildingPowerBodySchema.extend({
-    panelPhotos: z
-      .array(z.string())
-      .min(1, 'Please upload clear photo(s) of electrical panel!'),
-    existingSpacePhotos: z
-      .array(z.string())
-      .min(1, 'Please upload photo(s) of the existing space!'),
-  });
+// Photo presence (panelPhotos, existingSpacePhotos, plansDrawings) is enforced in
+// the service because images now arrive as form-data files, not in `data`.
+const accessoryBuildingPowerCreateBodySchema = accessoryBuildingPowerBodySchema;
 
 const validateAccessoryBuildingPowerConditionalFields = (
   data: {
@@ -152,14 +146,6 @@ const validateAccessoryBuildingPowerConditionalFields = (
     });
   }
 
-  if (data.hasPlansDrawings === true && !data.plansDrawings?.length) {
-    ctx.addIssue({
-      code: 'custom',
-      path: ['plansDrawings'],
-      message: 'Please upload the plans/drawings!',
-    });
-  }
-
   if (data.permitApplied === true && !data.permitNumber) {
     ctx.addIssue({
       code: 'custom',
@@ -171,33 +157,40 @@ const validateAccessoryBuildingPowerConditionalFields = (
 
 export const AccessoryBuildingPowerValidation = {
   createSchema: z.object({
-    body: z.any().transform((data) => {
-      if (typeof data !== 'object' || data === null) return data;
-      const cleanData = { ...data };
-      for (const key in cleanData) {
-        if (cleanData[key] === '' || cleanData[key] === null) {
-          delete cleanData[key];
-        } else if (Array.isArray(cleanData[key])) {
-          cleanData[key] = cleanData[key].filter((v: any) => v !== '' && v !== null);
-          if (cleanData[key].length === 0) delete cleanData[key];
+    body: z
+      .any()
+      .transform(data => {
+        if (typeof data !== 'object' || data === null) return data;
+        const cleanData = { ...data };
+        for (const key in cleanData) {
+          if (cleanData[key] === '' || cleanData[key] === null) {
+            delete cleanData[key];
+          } else if (Array.isArray(cleanData[key])) {
+            cleanData[key] = cleanData[key].filter(
+              (v: any) => v !== '' && v !== null,
+            );
+            if (cleanData[key].length === 0) delete cleanData[key];
+          }
         }
-      }
-      return cleanData;
-    }).superRefine((data, ctx) => {
-      if (data.status === Service_STATUSES.DRAFT) {
-        const res = accessoryBuildingPowerBodySchema.partial().safeParse(data);
-        if (!res.success) {
-          res.error.issues.forEach(i => ctx.addIssue(i as z.IssueData));
-        }
-      } else {
-        const res = accessoryBuildingPowerCreateBodySchema.safeParse(data);
-        if (res.success) {
-          validateAccessoryBuildingPowerConditionalFields(data, ctx);
+        return cleanData;
+      })
+      .superRefine((data, ctx) => {
+        if (data.status === Service_STATUSES.DRAFT) {
+          const res = accessoryBuildingPowerBodySchema
+            .partial()
+            .safeParse(data);
+          if (!res.success) {
+            res.error.issues.forEach(i => ctx.addIssue(i as z.IssueData));
+          }
         } else {
-          res.error.issues.forEach(i => ctx.addIssue(i as z.IssueData));
+          const res = accessoryBuildingPowerCreateBodySchema.safeParse(data);
+          if (res.success) {
+            validateAccessoryBuildingPowerConditionalFields(data, ctx);
+          } else {
+            res.error.issues.forEach(i => ctx.addIssue(i as z.IssueData));
+          }
         }
-      }
-    }),
+      }),
   }),
 
   idParamsSchema: z.object({
@@ -223,13 +216,6 @@ export const AccessoryBuildingPowerValidation = {
       .extend({
         status: z.enum(Service_STATUSES).optional(),
       })
-      .refine(
-        data =>
-          Object.values(data).some(
-            value => value !== undefined && value !== null,
-          ),
-        { message: 'At least one field is required to update!' },
-      )
       .superRefine(validateAccessoryBuildingPowerConditionalFields),
   }),
 };

@@ -1,16 +1,29 @@
 import { Router } from 'express';
 import { ServiceCallController } from './ServiceCall.controller';
-import { validateRequest, auth } from '../../middlewares';
+import {
+  validateRequest,
+  validateRequestFromFormData,
+  auth,
+} from '../../middlewares';
 import { ServiceCallValidation } from './ServiceCall.validation';
 import { ROLE } from '../User/user.constant';
+import { multerUpload } from '../../lib';
 
 const router = Router();
+
+// image files accepted on create/update (uploaded to Cloudinary in the service)
+const uploadServiceCallImages = multerUpload.fields([
+  { name: 'panelPhotos', maxCount: 10 },
+  { name: 'workAreaPhotos', maxCount: 10 },
+  { name: 'extraReferencePhotos', maxCount: 10 },
+]);
 
 router
   .route('/')
   .post(
     auth(ROLE.USER),
-    validateRequest(ServiceCallValidation.createServiceCallSchema),
+    uploadServiceCallImages,
+    validateRequestFromFormData(ServiceCallValidation.createServiceCallSchema),
     ServiceCallController.createServiceCall,
   )
   .get(
@@ -30,7 +43,8 @@ router
   )
   .patch(
     auth(ROLE.USER),
-    validateRequest(ServiceCallValidation.updateServiceCallSchema),
+    uploadServiceCallImages,
+    validateRequestFromFormData(ServiceCallValidation.updateServiceCallSchema),
     ServiceCallController.updateServiceCall,
   )
   .delete(

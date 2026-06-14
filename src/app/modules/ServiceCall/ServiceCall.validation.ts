@@ -38,31 +38,36 @@ const serviceCallBodySchema = z.object({
 
 export const ServiceCallValidation = {
   createServiceCallSchema: z.object({
-    body: z.any().transform((data) => {
-      if (typeof data !== 'object' || data === null) return data;
-      const cleanData = { ...data };
-      for (const key in cleanData) {
-        if (cleanData[key] === '' || cleanData[key] === null) {
-          delete cleanData[key];
-        } else if (Array.isArray(cleanData[key])) {
-          cleanData[key] = cleanData[key].filter((v: any) => v !== '' && v !== null);
-          if (cleanData[key].length === 0) delete cleanData[key];
+    body: z
+      .any()
+      .transform(data => {
+        if (typeof data !== 'object' || data === null) return data;
+        const cleanData = { ...data };
+        for (const key in cleanData) {
+          if (cleanData[key] === '' || cleanData[key] === null) {
+            delete cleanData[key];
+          } else if (Array.isArray(cleanData[key])) {
+            cleanData[key] = cleanData[key].filter(
+              (v: any) => v !== '' && v !== null,
+            );
+            if (cleanData[key].length === 0) delete cleanData[key];
+          }
         }
-      }
-      return cleanData;
-    }).superRefine((data, ctx) => {
-      if (data.status === Service_STATUSES.DRAFT) {
-        const res = serviceCallBodySchema.partial().safeParse(data);
-        if (!res.success) {
-          res.error.issues.forEach(i => ctx.addIssue(i as z.IssueData));
+        return cleanData;
+      })
+      .superRefine((data, ctx) => {
+        if (data.status === Service_STATUSES.DRAFT) {
+          const res = serviceCallBodySchema.partial().safeParse(data);
+          if (!res.success) {
+            res.error.issues.forEach(i => ctx.addIssue(i as z.IssueData));
+          }
+        } else {
+          const res = serviceCallBodySchema.safeParse(data);
+          if (!res.success) {
+            res.error.issues.forEach(i => ctx.addIssue(i as z.IssueData));
+          }
         }
-      } else {
-        const res = serviceCallBodySchema.safeParse(data);
-        if (!res.success) {
-          res.error.issues.forEach(i => ctx.addIssue(i as z.IssueData));
-        }
-      }
-    }),
+      }),
   }),
 
   serviceCallIdParamsSchema: z.object({
@@ -99,14 +104,6 @@ export const ServiceCallValidation = {
       quickTags: z.array(z.string()).optional(),
       status: z.enum(Service_STATUSES).optional(),
       completionPercentage: z.number().optional(),
-    }).refine(
-      data =>
-        Object.values(data).some(
-          value => value !== undefined && value !== null,
-        ),
-      {
-        message: 'At least one field is required to update!',
-      },
-    ),
+    }),
   }),
 };

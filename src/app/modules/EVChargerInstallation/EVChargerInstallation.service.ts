@@ -1,32 +1,36 @@
 import httpStatus from 'http-status';
-import { AppError } from '../../utils';
+import { Request } from 'express';
+import {
+  AppError,
+  uploadServiceImages,
+  collectImageUrls,
+  deleteServiceImages,
+} from '../../utils';
+import { TImageFieldConfig } from '../../utils/serviceImages';
 import { IEVChargerInstallation } from './EVChargerInstallation.interface';
 import EVChargerInstallationModel from './EVChargerInstallation.model';
-import { DEFAULT_REQUEST_STATUS, Service_STATUSES } from '../../constants';
+import { DEFAULT_REQUEST_STATUS } from '../../constants';
 import { IUser } from '../User/user.interface';
+
+// Image fields uploaded as files (form-data) and stored as Cloudinary URLs
+const IMAGE_FIELDS: TImageFieldConfig[] = [
+  { name: 'areaPhoto', multiple: false },
+  { name: 'panelPhotos', multiple: true },
+];
+const IMAGE_FIELD_NAMES = IMAGE_FIELDS.map(field => field.name);
 
 const createEVChargerInstallationIntoDB = async (
   user: IUser,
   payload: Partial<IEVChargerInstallation>,
+  files: Request['files'],
 ) => {
-  // const drafts = await EVChargerInstallationModel.find({
-  //   createdBy: user._id.toString(),
-  //   status: Service_STATUSES.DRAFT,
-  // });
-
-  // if (drafts.length > 0) {
-  //   throw new AppError(
-  //     httpStatus.BAD_REQUEST,
-  //     'You can only have 1 draft EV charger installation request. Please submit or delete existing draft before creating new one.',
-  //   );
-  // }
+  const uploaded = await uploadServiceImages(files, IMAGE_FIELDS);
 
   const newDoc = await EVChargerInstallationModel.create({
     ...payload,
+    ...uploaded,
     createdBy: user._id.toString(),
     serviceType: 'EV Charger Installation',
-    // chargerProvidedByUser: payload.chargerProvidedByUser ?? false,
-    panelPhotos: payload.panelPhotos ?? [],
     status: payload.status ?? DEFAULT_REQUEST_STATUS,
   });
 
@@ -36,17 +40,13 @@ const createEVChargerInstallationIntoDB = async (
 
 const getAllEVChargerInstallationsFromDB = async () => {
   return await EVChargerInstallationModel.find()
-    .sort({
-      createdAt: -1,
-    })
+    .sort({ createdAt: -1 })
     .select('-createdAt -updatedAt');
 };
 
 const getMyAllEVChargerInstallationsFromDB = async (userId: string) => {
   return await EVChargerInstallationModel.find({ createdBy: userId })
-    .sort({
-      createdAt: -1,
-    })
+    .sort({ createdAt: -1 })
     .select('-createdAt -updatedAt');
 };
 
@@ -73,40 +73,59 @@ const updateSingleEVChargerInstallationIntoDB = async (
   userId: string,
   id: string,
   payload: Partial<IEVChargerInstallation>,
+  files: Request['files'],
 ) => {
-  const updatedData = await EVChargerInstallationModel.findOneAndUpdate(
-    { _id: id, createdBy: userId },
-    payload,
-    { new: true, runValidators: true },
-  ).select('-createdAt -updatedAt');
+  const existing = await EVChargerInstallationModel.findOne({
+    _id: id,
+    createdBy: userId,
+  });
 
-  if (!updatedData) {
+  if (!existing) {
     throw new AppError(
       httpStatus.NOT_FOUND,
       'EV charger installation not found!',
     );
   }
 
-  return updatedData;
+  const uploaded = await uploadServiceImages(files, IMAGE_FIELDS);
+
+  if (Object.keys(payload).length === 0 && Object.keys(uploaded).length === 0) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Nothing to update!');
+  }
+
+  const oldUrls = collectImageUrls(existing.toObject(), Object.keys(uploaded));
+
+  Object.assign(existing, payload, uploaded);
+  const updated = await existing.save();
+
+  if (oldUrls.length) await deleteServiceImages(oldUrls);
+
+  const { createdAt, updatedAt, ...sanitizedData } = updated.toObject();
+  return sanitizedData;
 };
 
 const deleteSingleEVChargerInstallationFromDB = async (
   userId: string,
   id: string,
 ) => {
-  const deletedData = await EVChargerInstallationModel.findOneAndDelete({
+  const doc = await EVChargerInstallationModel.findOne({
     _id: id,
     createdBy: userId,
-  }).select('-createdAt -updatedAt');
+  });
 
-  if (!deletedData) {
+  if (!doc) {
     throw new AppError(
       httpStatus.NOT_FOUND,
       'EV charger installation not found!',
     );
   }
 
-  return deletedData;
+  const urls = collectImageUrls(doc.toObject(), IMAGE_FIELD_NAMES);
+  await doc.deleteOne();
+  if (urls.length) await deleteServiceImages(urls);
+
+  const { createdAt, updatedAt, ...sanitizedData } = doc.toObject();
+  return sanitizedData;
 };
 
 export const EVChargerInstallationService = {

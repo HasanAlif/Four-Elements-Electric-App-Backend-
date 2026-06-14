@@ -12,7 +12,7 @@ class QueryBuilder<T> {
   search(searchableFields: string[]) {
     const searchTerm = this?.query?.searchTerm;
     if (searchTerm) {
-      const searchConditions = searchableFields.map((field) => ({
+      const searchConditions = searchableFields.map(field => ({
         [field]: { $regex: searchTerm, $options: 'i' },
       })) as Record<string, unknown>[];
 
@@ -32,7 +32,7 @@ class QueryBuilder<T> {
       'minPrice',
       'maxPrice',
     ];
-    excludeableFields.forEach((field) => delete queryObject[field]);
+    excludeableFields.forEach(field => delete queryObject[field]);
 
     this.modelQuery = this?.modelQuery.find(
       queryObject as Record<string, unknown>,

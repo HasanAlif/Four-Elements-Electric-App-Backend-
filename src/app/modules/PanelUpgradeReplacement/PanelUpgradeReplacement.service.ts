@@ -1,32 +1,35 @@
 import httpStatus from 'http-status';
-import { AppError } from '../../utils';
+import { Request } from 'express';
+import {
+  AppError,
+  uploadServiceImages,
+  collectImageUrls,
+  deleteServiceImages,
+} from '../../utils';
+import { TImageFieldConfig } from '../../utils/serviceImages';
 import { IPanelUpgradeReplacement } from './PanelUpgradeReplacement.interface';
 import PanelUpgradeReplacementModel from './PanelUpgradeReplacement.model';
-import { DEFAULT_REQUEST_STATUS, Service_STATUSES } from '../../constants';
+import { DEFAULT_REQUEST_STATUS } from '../../constants';
 import { IUser } from '../User/user.interface';
+
+const IMAGE_FIELDS: TImageFieldConfig[] = [
+  { name: 'meterPhotos', multiple: true },
+  { name: 'panelPhotos', multiple: true },
+];
+const IMAGE_FIELD_NAMES = IMAGE_FIELDS.map(field => field.name);
 
 const createPanelUpgradeReplacementIntoDB = async (
   user: IUser,
   payload: Partial<IPanelUpgradeReplacement>,
+  files: Request['files'],
 ) => {
-  // const drafts = await PanelUpgradeReplacementModel.find({
-  //   createdBy: user._id.toString(),
-  //   status: Service_STATUSES.DRAFT,
-  // });
-
-  // if (drafts.length > 0) {
-  //   throw new AppError(
-  //     httpStatus.BAD_REQUEST,
-  //     'You can only have 1 draft Panel upgrade/replacement request. Please submit or delete existing draft before creating new one.',
-  //   );
-  // }
+  const uploaded = await uploadServiceImages(files, IMAGE_FIELDS);
 
   const newDoc = await PanelUpgradeReplacementModel.create({
     ...payload,
+    ...uploaded,
     createdBy: user._id.toString(),
     serviceType: 'Panel Upgrade / Replacement',
-    meterPhotos: payload.meterPhotos ?? [],
-    panelPhotos: payload.panelPhotos ?? [],
     status: payload.status ?? DEFAULT_REQUEST_STATUS,
   });
 
@@ -36,17 +39,13 @@ const createPanelUpgradeReplacementIntoDB = async (
 
 const getAllPanelUpgradeReplacementsFromDB = async () => {
   return await PanelUpgradeReplacementModel.find()
-    .sort({
-      createdAt: -1,
-    })
+    .sort({ createdAt: -1 })
     .select('-createdAt -updatedAt');
 };
 
 const getMyAllPanelUpgradeReplacementsFromDB = async (userId: string) => {
   return await PanelUpgradeReplacementModel.find({ createdBy: userId })
-    .sort({
-      createdAt: -1,
-    })
+    .sort({ createdAt: -1 })
     .select('-createdAt -updatedAt');
 };
 
@@ -73,40 +72,59 @@ const updateSinglePanelUpgradeReplacementIntoDB = async (
   userId: string,
   id: string,
   payload: Partial<IPanelUpgradeReplacement>,
+  files: Request['files'],
 ) => {
-  const updatedData = await PanelUpgradeReplacementModel.findOneAndUpdate(
-    { _id: id, createdBy: userId },
-    payload,
-    { new: true, runValidators: true },
-  ).select('-createdAt -updatedAt');
+  const existing = await PanelUpgradeReplacementModel.findOne({
+    _id: id,
+    createdBy: userId,
+  });
 
-  if (!updatedData) {
+  if (!existing) {
     throw new AppError(
       httpStatus.NOT_FOUND,
       'Panel upgrade/replacement request not found!',
     );
   }
 
-  return updatedData;
+  const uploaded = await uploadServiceImages(files, IMAGE_FIELDS);
+
+  if (Object.keys(payload).length === 0 && Object.keys(uploaded).length === 0) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Nothing to update!');
+  }
+
+  const oldUrls = collectImageUrls(existing.toObject(), Object.keys(uploaded));
+
+  Object.assign(existing, payload, uploaded);
+  const updated = await existing.save();
+
+  if (oldUrls.length) await deleteServiceImages(oldUrls);
+
+  const { createdAt, updatedAt, ...sanitizedData } = updated.toObject();
+  return sanitizedData;
 };
 
 const deleteSinglePanelUpgradeReplacementFromDB = async (
   userId: string,
   id: string,
 ) => {
-  const deletedData = await PanelUpgradeReplacementModel.findOneAndDelete({
+  const doc = await PanelUpgradeReplacementModel.findOne({
     _id: id,
     createdBy: userId,
-  }).select('-createdAt -updatedAt');
+  });
 
-  if (!deletedData) {
+  if (!doc) {
     throw new AppError(
       httpStatus.NOT_FOUND,
       'Panel upgrade/replacement request not found!',
     );
   }
 
-  return deletedData;
+  const urls = collectImageUrls(doc.toObject(), IMAGE_FIELD_NAMES);
+  await doc.deleteOne();
+  if (urls.length) await deleteServiceImages(urls);
+
+  const { createdAt, updatedAt, ...sanitizedData } = doc.toObject();
+  return sanitizedData;
 };
 
 export const PanelUpgradeReplacementService = {

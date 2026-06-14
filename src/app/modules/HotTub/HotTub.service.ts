@@ -1,31 +1,66 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import httpStatus from 'http-status';
-import { AppError } from '../../utils';
+import { Request } from 'express';
+import {
+  AppError,
+  uploadServiceImages,
+  collectImageUrls,
+  deleteServiceImages,
+} from '../../utils';
+import { TImageFieldConfig } from '../../utils/serviceImages';
 import { IHotTub } from './HotTub.interface';
 import HotTubModel from './HotTub.model';
 import { DEFAULT_REQUEST_STATUS, Service_STATUSES } from '../../constants';
 import { IUser } from '../User/user.interface';
 
-const createHotTubIntoDB = async (user: IUser, payload: Partial<IHotTub>) => {
-  // const drafts = await HotTubModel.find({
-  //   createdBy: user._id.toString(),
-  //   status: Service_STATUSES.DRAFT,
-  // });
+const IMAGE_FIELDS: TImageFieldConfig[] = [
+  { name: 'manualDocument', multiple: false },
+  { name: 'panelPhotos', multiple: true },
+  { name: 'hotTubPhotos', multiple: true },
+  { name: 'receptaclePhotos', multiple: true },
+];
+const IMAGE_FIELD_NAMES = IMAGE_FIELDS.map(field => field.name);
 
-  // if (drafts.length > 0) {
-  //   throw new AppError(
-  //     httpStatus.BAD_REQUEST,
-  //     'You can only have 1 draft Hot tub request. Please submit or delete existing draft before creating new one.',
-  //   );
-  // }
+// Required-image rules enforced on submit (skipped for drafts).
+const assertRequiredImages = (data: Record<string, any>) => {
+  if (!data.panelPhotos?.length) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Please upload photo(s) of electrical panel!',
+    );
+  }
+  if (!data.hotTubPhotos?.length) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Please upload photo(s) of the hot tub!',
+    );
+  }
+  if (data.hasDigitalManual === true && !data.manualDocument) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Please upload the digital manual!',
+    );
+  }
+};
+
+const createHotTubIntoDB = async (
+  user: IUser,
+  payload: Partial<IHotTub>,
+  files: Request['files'],
+) => {
+  const uploaded = await uploadServiceImages(files, IMAGE_FIELDS);
+  const merged: Record<string, any> = { ...payload, ...uploaded };
+  const status = merged.status ?? DEFAULT_REQUEST_STATUS;
+
+  if (status !== Service_STATUSES.DRAFT) {
+    assertRequiredImages(merged);
+  }
 
   const newDoc = await HotTubModel.create({
-    ...payload,
+    ...merged,
     createdBy: user._id.toString(),
     serviceType: 'Hot tub installation',
-    panelPhotos: payload.panelPhotos ?? [],
-    hotTubPhotos: payload.hotTubPhotos ?? [],
-    receptaclePhotos: payload.receptaclePhotos ?? [],
-    status: payload.status ?? DEFAULT_REQUEST_STATUS,
+    status,
   });
 
   const { createdAt, updatedAt, ...sanitizedData } = newDoc.toObject();
@@ -34,17 +69,13 @@ const createHotTubIntoDB = async (user: IUser, payload: Partial<IHotTub>) => {
 
 const getAllHotTubsFromDB = async () => {
   return await HotTubModel.find()
-    .sort({
-      createdAt: -1,
-    })
+    .sort({ createdAt: -1 })
     .select('-createdAt -updatedAt');
 };
 
 const getMyAllHotTubsFromDB = async (userId: string) => {
   return await HotTubModel.find({ createdBy: userId })
-    .sort({
-      createdAt: -1,
-    })
+    .sort({ createdAt: -1 })
     .select('-createdAt -updatedAt');
 };
 
@@ -65,31 +96,44 @@ const updateSingleHotTubIntoDB = async (
   userId: string,
   id: string,
   payload: Partial<IHotTub>,
+  files: Request['files'],
 ) => {
-  const updatedData = await HotTubModel.findOneAndUpdate(
-    { _id: id, createdBy: userId },
-    payload,
-    { new: true, runValidators: true },
-  ).select('-createdAt -updatedAt');
+  const existing = await HotTubModel.findOne({ _id: id, createdBy: userId });
 
-  if (!updatedData) {
+  if (!existing) {
     throw new AppError(httpStatus.NOT_FOUND, 'Hot tub request not found!');
   }
 
-  return updatedData;
+  const uploaded = await uploadServiceImages(files, IMAGE_FIELDS);
+
+  if (Object.keys(payload).length === 0 && Object.keys(uploaded).length === 0) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Nothing to update!');
+  }
+
+  const oldUrls = collectImageUrls(existing.toObject(), Object.keys(uploaded));
+
+  Object.assign(existing, payload, uploaded);
+  const updated = await existing.save();
+
+  if (oldUrls.length) await deleteServiceImages(oldUrls);
+
+  const { createdAt, updatedAt, ...sanitizedData } = updated.toObject();
+  return sanitizedData;
 };
 
 const deleteSingleHotTubFromDB = async (userId: string, id: string) => {
-  const deletedData = await HotTubModel.findOneAndDelete({
-    _id: id,
-    createdBy: userId,
-  }).select('-createdAt -updatedAt');
+  const doc = await HotTubModel.findOne({ _id: id, createdBy: userId });
 
-  if (!deletedData) {
+  if (!doc) {
     throw new AppError(httpStatus.NOT_FOUND, 'Hot tub request not found!');
   }
 
-  return deletedData;
+  const urls = collectImageUrls(doc.toObject(), IMAGE_FIELD_NAMES);
+  await doc.deleteOne();
+  if (urls.length) await deleteServiceImages(urls);
+
+  const { createdAt, updatedAt, ...sanitizedData } = doc.toObject();
+  return sanitizedData;
 };
 
 export const HotTubService = {

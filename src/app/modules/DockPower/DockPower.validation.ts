@@ -69,14 +69,9 @@ const dockPowerBodySchema = z.object({
   completionPercentage: z.number().optional(),
 });
 
-const dockPowerCreateBodySchema = dockPowerBodySchema.extend({
-  panelPhotos: z
-    .array(z.string())
-    .min(1, 'Please upload clear photo(s) of electrical panel!'),
-  existingSpacePhotos: z
-    .array(z.string())
-    .min(1, 'Please upload photo(s) of the existing space!'),
-});
+// Photo presence (panelPhotos, existingSpacePhotos, plansDrawingsPhotos) is
+// enforced in the service because images now arrive as form-data files.
+const dockPowerCreateBodySchema = dockPowerBodySchema;
 
 const validateDockPowerConditionalFields = (
   data: {
@@ -155,14 +150,6 @@ const validateDockPowerConditionalFields = (
     });
   }
 
-  if (data.hasPlansDrawings === true && !data.plansDrawingsPhotos?.length) {
-    ctx.addIssue({
-      code: 'custom',
-      path: ['plansDrawingsPhotos'],
-      message: 'Please upload the plans/drawings!',
-    });
-  }
-
   if (data.permitApplied === true && !data.permitNumber) {
     ctx.addIssue({
       code: 'custom',
@@ -174,33 +161,38 @@ const validateDockPowerConditionalFields = (
 
 export const DockPowerValidation = {
   createSchema: z.object({
-    body: z.any().transform((data) => {
-      if (typeof data !== 'object' || data === null) return data;
-      const cleanData = { ...data };
-      for (const key in cleanData) {
-        if (cleanData[key] === '' || cleanData[key] === null) {
-          delete cleanData[key];
-        } else if (Array.isArray(cleanData[key])) {
-          cleanData[key] = cleanData[key].filter((v: any) => v !== '' && v !== null);
-          if (cleanData[key].length === 0) delete cleanData[key];
+    body: z
+      .any()
+      .transform(data => {
+        if (typeof data !== 'object' || data === null) return data;
+        const cleanData = { ...data };
+        for (const key in cleanData) {
+          if (cleanData[key] === '' || cleanData[key] === null) {
+            delete cleanData[key];
+          } else if (Array.isArray(cleanData[key])) {
+            cleanData[key] = cleanData[key].filter(
+              (v: any) => v !== '' && v !== null,
+            );
+            if (cleanData[key].length === 0) delete cleanData[key];
+          }
         }
-      }
-      return cleanData;
-    }).superRefine((data, ctx) => {
-      if (data.status === Service_STATUSES.DRAFT) {
-        const res = dockPowerBodySchema.partial().safeParse(data);
-        if (!res.success) {
-          res.error.issues.forEach(i => ctx.addIssue(i as z.IssueData));
-        }
-      } else {
-        const res = dockPowerCreateBodySchema.safeParse(data);
-        if (res.success) {
-          validateDockPowerConditionalFields(data, ctx);
+        return cleanData;
+      })
+      .superRefine((data, ctx) => {
+        if (data.status === Service_STATUSES.DRAFT) {
+          const res = dockPowerBodySchema.partial().safeParse(data);
+          if (!res.success) {
+            res.error.issues.forEach(i => ctx.addIssue(i as z.IssueData));
+          }
         } else {
-          res.error.issues.forEach(i => ctx.addIssue(i as z.IssueData));
+          const res = dockPowerCreateBodySchema.safeParse(data);
+          if (res.success) {
+            validateDockPowerConditionalFields(data, ctx);
+          } else {
+            res.error.issues.forEach(i => ctx.addIssue(i as z.IssueData));
+          }
         }
-      }
-    }),
+      }),
   }),
 
   idParamsSchema: z.object({
@@ -226,13 +218,6 @@ export const DockPowerValidation = {
       .extend({
         status: z.enum(Service_STATUSES).optional(),
       })
-      .refine(
-        data =>
-          Object.values(data).some(
-            value => value !== undefined && value !== null,
-          ),
-        { message: 'At least one field is required to update!' },
-      )
       .superRefine(validateDockPowerConditionalFields),
   }),
 };

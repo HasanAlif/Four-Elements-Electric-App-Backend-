@@ -4,12 +4,14 @@ Base path: `/api/v1/user`
 
 ## Overview
 
-Account lifecycle: signup with OTP, signin, profile, password management, deactivation and admin listing.
+Account lifecycle: signup with OTP, signin, profile, password management,
+deactivation and admin listing.
 
 ## REST Endpoints
 
 - POST `/signup` – Create user with email + password.
-- POST `/driver/signup` – Create DRIVER user + upload onboarding images (multipart/form-data).
+- POST `/driver/signup` – Create DRIVER user + upload onboarding images
+  (multipart/form-data).
 - POST `/send-signup-otp-again` – Resend OTP.
 - POST `/verify-signup-otp` – Verify OTP.
 - POST `/signin` – Login and receive tokens.

@@ -10,6 +10,7 @@ export const ServiceCallController = {
     const data = await ServiceCallService.createServiceCallIntoDB(
       req.user,
       req.body,
+      req.files,
     );
 
     sendResponse(res, {
@@ -61,6 +62,7 @@ export const ServiceCallController = {
       req.user._id.toString(),
       req.params.id as string,
       req.body as Partial<IServiceCall>,
+      req.files,
     );
 
     sendResponse(res, {

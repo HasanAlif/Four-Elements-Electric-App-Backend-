@@ -1,16 +1,28 @@
 import { Router } from 'express';
-import { auth, validateRequest } from '../../middlewares';
+import {
+  auth,
+  validateRequest,
+  validateRequestFromFormData,
+} from '../../middlewares';
 import { ROLE } from '../User/user.constant';
 import { AccessoryBuildingPowerController } from './AccessoryBuildingPower.controller';
 import { AccessoryBuildingPowerValidation } from './AccessoryBuildingPower.validation';
+import { multerUpload } from '../../lib';
 
 const router = Router();
+
+const uploadAccessoryBuildingImages = multerUpload.fields([
+  { name: 'panelPhotos', maxCount: 10 },
+  { name: 'existingSpacePhotos', maxCount: 10 },
+  { name: 'plansDrawings', maxCount: 10 },
+]);
 
 router
   .route('/')
   .post(
     auth(ROLE.USER),
-    validateRequest(AccessoryBuildingPowerValidation.createSchema),
+    uploadAccessoryBuildingImages,
+    validateRequestFromFormData(AccessoryBuildingPowerValidation.createSchema),
     AccessoryBuildingPowerController.createAccessoryBuilding,
   )
   .get(
@@ -34,7 +46,8 @@ router
   )
   .patch(
     auth(ROLE.USER),
-    validateRequest(AccessoryBuildingPowerValidation.updateSchema),
+    uploadAccessoryBuildingImages,
+    validateRequestFromFormData(AccessoryBuildingPowerValidation.updateSchema),
     AccessoryBuildingPowerController.updateSingleAccessoryBuilding,
   )
   .delete(

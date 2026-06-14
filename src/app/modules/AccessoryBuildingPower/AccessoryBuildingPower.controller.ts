@@ -10,6 +10,7 @@ export const AccessoryBuildingPowerController = {
       await AccessoryBuildingPowerService.createAccessoryBuildingPowerIntoDB(
         req.user,
         req.body,
+        req.files,
       );
 
     sendResponse(res, {
@@ -71,6 +72,7 @@ export const AccessoryBuildingPowerController = {
           req.user._id.toString(),
           req.params.id as string,
           req.body as Partial<IAccessoryBuildingPower>,
+          req.files,
         );
 
       sendResponse(res, {

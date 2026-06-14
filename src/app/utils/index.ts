@@ -6,6 +6,11 @@ import notFoundHandler from './notFound';
 import sendContactUsEmail from './sendContactUsEmail';
 import sendOtpEmail from './sendOtpEmail';
 import sendResponse from './sendResponse';
+import {
+  uploadServiceImages,
+  collectImageUrls,
+  deleteServiceImages,
+} from './serviceImages';
 
 // JWT configuration
 const options = {
@@ -25,4 +30,7 @@ export {
   deleteFile,
   sendContactUsEmail,
   sendResponse,
+  uploadServiceImages,
+  collectImageUrls,
+  deleteServiceImages,
 };

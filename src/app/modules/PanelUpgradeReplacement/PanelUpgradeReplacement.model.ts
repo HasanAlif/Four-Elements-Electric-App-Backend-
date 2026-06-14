@@ -6,7 +6,14 @@ import {
   PANEL_POWER_FEEDS,
   PANEL_SERVICE_TYPES,
 } from './PanelUpgradeReplacement.interface';
-import { CONTACT_METHODS, DEFAULT_REQUEST_STATUS, OWNERSHIP_STATUSES, PROPERTY_TYPES, Service_STATUSES, TIMELINE_URGENCIES } from '../../constants';
+import {
+  CONTACT_METHODS,
+  DEFAULT_REQUEST_STATUS,
+  OWNERSHIP_STATUSES,
+  PROPERTY_TYPES,
+  Service_STATUSES,
+  TIMELINE_URGENCIES,
+} from '../../constants';
 
 const panelUpgradeReplacementSchema = new Schema<IPanelUpgradeReplacement>(
   {
