@@ -1,23 +1,25 @@
 import { z } from 'zod';
-import { Service_STATUSES } from '../../constants';
+import {
+  CONTACT_METHODS,
+  OWNERSHIP_STATUSES,
+  PROPERTY_TYPES,
+  TIMELINE_URGENCIES,
+  Service_STATUSES,
+} from '../../constants';
 import {
   DOCK_POWER_CIRCUIT_AMP_RATINGS,
   DOCK_POWER_CIRCUIT_COUNTS,
-  DOCK_POWER_CONTACT_METHODS,
   DOCK_POWER_NEW_SERVICE_SIZES,
-  DOCK_POWER_OWNERSHIP_STATUSES,
   DOCK_POWER_PANEL_LOCATIONS,
-  DOCK_POWER_PROPERTY_TYPES,
   DOCK_POWER_SERVICE_TYPES,
   DOCK_POWER_SUB_PANEL_SIZES,
-  DOCK_POWER_TIMELINE_URGENCIES,
 } from './DockPower.interface';
 
 const dockPowerBodySchema = z.object({
   fullName: z.string({ error: 'Full name is required!' }).min(1),
   phoneNumber: z.string({ error: 'Phone number is required!' }).min(1),
   emailAddress: z.string().email('Invalid email format!').optional(),
-  preferredContactMethod: z.enum(DOCK_POWER_CONTACT_METHODS).optional(),
+  preferredContactMethod: z.enum(CONTACT_METHODS).optional(),
 
   streetAddress: z.string({ error: 'Street address is required!' }).min(1),
   apartmentUnit: z.string().optional(),
@@ -25,9 +27,9 @@ const dockPowerBodySchema = z.object({
   state: z.string({ error: 'State is required!' }).min(1),
   zipCode: z.string({ error: 'ZIP code is required!' }).min(1),
 
-  propertyType: z.enum(DOCK_POWER_PROPERTY_TYPES),
-  ownershipStatus: z.enum(DOCK_POWER_OWNERSHIP_STATUSES),
-  timelineUrgency: z.enum(DOCK_POWER_TIMELINE_URGENCIES),
+  propertyType: z.enum(PROPERTY_TYPES),
+  ownershipStatus: z.enum(OWNERSHIP_STATUSES),
+  timelineUrgency: z.enum(TIMELINE_URGENCIES),
 
   isDockBuilt: z.boolean({
     error: 'Please choose whether your dock is already built!',

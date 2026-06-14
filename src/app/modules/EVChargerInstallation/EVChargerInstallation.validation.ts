@@ -1,22 +1,24 @@
 import { z } from 'zod';
 import {
-  EV_CHARGER_CONTACT_METHODS,
   EV_CHARGER_CONNECTION_TYPES,
   EV_CHARGER_DISTANCES,
   EV_CHARGER_INSTALLATION_LOCATIONS,
-  EV_CHARGER_OWNERSHIP_STATUSES,
   EV_CHARGER_PANEL_LOCATIONS,
-  EV_CHARGER_PROPERTY_TYPES,
   EV_CHARGER_STATUSES,
-  EV_CHARGER_TIMELINE_URGENCIES,
 } from './EVChargerInstallation.interface';
-import { Service_STATUSES } from '../../constants';
+import {
+  CONTACT_METHODS,
+  OWNERSHIP_STATUSES,
+  PROPERTY_TYPES,
+  TIMELINE_URGENCIES,
+  Service_STATUSES,
+} from '../../constants';
 
 const evChargerBodySchema = z.object({
   fullName: z.string({ error: 'Full name is required!' }).min(1),
   phoneNumber: z.string({ error: 'Phone number is required!' }).min(1),
   emailAddress: z.string().email('Invalid email format!').optional(),
-  preferredContactMethod: z.enum(EV_CHARGER_CONTACT_METHODS).optional(),
+  preferredContactMethod: z.enum(CONTACT_METHODS).optional(),
 
   streetAddress: z.string({ error: 'Street address is required!' }).min(1),
   apartmentUnit: z.string().optional(),
@@ -24,9 +26,9 @@ const evChargerBodySchema = z.object({
   state: z.string({ error: 'State is required!' }).min(1),
   zipCode: z.string({ error: 'ZIP code is required!' }).min(1),
 
-  propertyType: z.enum(EV_CHARGER_PROPERTY_TYPES),
-  ownershipStatus: z.enum(EV_CHARGER_OWNERSHIP_STATUSES),
-  timelineUrgency: z.enum(EV_CHARGER_TIMELINE_URGENCIES),
+  propertyType: z.enum(PROPERTY_TYPES),
+  ownershipStatus: z.enum(OWNERSHIP_STATUSES),
+  timelineUrgency: z.enum(TIMELINE_URGENCIES),
 
   chargerConnectionType: z.enum(EV_CHARGER_CONNECTION_TYPES),
   nemaConfiguration: z.string().optional(),
@@ -130,7 +132,7 @@ export const EVChargerInstallationValidation = {
         fullName: z.string().optional(),
         phoneNumber: z.string().optional(),
         emailAddress: z.string().email('Invalid email format!').optional(),
-        preferredContactMethod: z.enum(EV_CHARGER_CONTACT_METHODS).optional(),
+        preferredContactMethod: z.enum(CONTACT_METHODS).optional(),
 
         streetAddress: z.string().optional(),
         apartmentUnit: z.string().optional(),
@@ -138,9 +140,9 @@ export const EVChargerInstallationValidation = {
         state: z.string().optional(),
         zipCode: z.string().optional(),
 
-        propertyType: z.enum(EV_CHARGER_PROPERTY_TYPES).optional(),
-        ownershipStatus: z.enum(EV_CHARGER_OWNERSHIP_STATUSES).optional(),
-        timelineUrgency: z.enum(EV_CHARGER_TIMELINE_URGENCIES).optional(),
+        propertyType: z.enum(PROPERTY_TYPES).optional(),
+        ownershipStatus: z.enum(OWNERSHIP_STATUSES).optional(),
+        timelineUrgency: z.enum(TIMELINE_URGENCIES).optional(),
 
         chargerConnectionType: z.enum(EV_CHARGER_CONNECTION_TYPES).optional(),
         nemaConfiguration: z.string().optional(),

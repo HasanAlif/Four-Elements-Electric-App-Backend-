@@ -1,25 +1,27 @@
 import { z } from 'zod';
-import { Service_STATUSES } from '../../constants';
+import {
+  CONTACT_METHODS,
+  OWNERSHIP_STATUSES,
+  PROPERTY_TYPES,
+  TIMELINE_URGENCIES,
+  Service_STATUSES,
+} from '../../constants';
 import {
   ACCESSORY_BUILDING_CIRCUIT_AMP_RATINGS,
   ACCESSORY_BUILDING_CIRCUIT_COUNTS,
   ACCESSORY_BUILDING_CONSTRUCTION_TYPES,
-  ACCESSORY_BUILDING_CONTACT_METHODS,
   ACCESSORY_BUILDING_FLOOR_TYPES,
-  ACCESSORY_BUILDING_OWNERSHIP_STATUSES,
   ACCESSORY_BUILDING_PANEL_LOCATIONS,
-  ACCESSORY_BUILDING_PROPERTY_TYPES,
   ACCESSORY_BUILDING_SERVICE_SIZES,
   ACCESSORY_BUILDING_SERVICE_TYPES,
   ACCESSORY_BUILDING_STATUSES,
-  ACCESSORY_BUILDING_TIMELINE_URGENCIES,
 } from './AccessoryBuildingPower.interface';
 
 const accessoryBuildingPowerBodySchema = z.object({
   fullName: z.string({ error: 'Full name is required!' }).min(1),
   phoneNumber: z.string({ error: 'Phone number is required!' }).min(1),
   emailAddress: z.string().email('Invalid email format!').optional(),
-  preferredContactMethod: z.enum(ACCESSORY_BUILDING_CONTACT_METHODS).optional(),
+  preferredContactMethod: z.enum(CONTACT_METHODS).optional(),
 
   streetAddress: z.string({ error: 'Street address is required!' }).min(1),
   apartmentUnit: z.string().optional(),
@@ -27,9 +29,9 @@ const accessoryBuildingPowerBodySchema = z.object({
   state: z.string({ error: 'State is required!' }).min(1),
   zipCode: z.string({ error: 'ZIP code is required!' }).min(1),
 
-  propertyType: z.enum(ACCESSORY_BUILDING_PROPERTY_TYPES),
-  ownershipStatus: z.enum(ACCESSORY_BUILDING_OWNERSHIP_STATUSES),
-  timelineUrgency: z.enum(ACCESSORY_BUILDING_TIMELINE_URGENCIES),
+  propertyType: z.enum(PROPERTY_TYPES),
+  ownershipStatus: z.enum(OWNERSHIP_STATUSES),
+  timelineUrgency: z.enum(TIMELINE_URGENCIES),
 
   entireSquareFootage: z.coerce
     .number({ error: 'Entire square footage is required!' })

@@ -1,20 +1,22 @@
 import { z } from 'zod';
-import { Service_STATUSES } from '../../constants';
+import {
+  CONTACT_METHODS,
+  PROPERTY_TYPES,
+  TIMELINE_URGENCIES,
+  Service_STATUSES,
+} from '../../constants';
 import {
   HOT_TUB_AMPERAGES,
-  HOT_TUB_CONTACT_METHODS,
   HOT_TUB_LOCATIONS,
   HOT_TUB_PANEL_DISTANCE,
   HOT_TUB_PANEL_LOCATIONS,
-  HOT_TUB_PROPERTY_TYPES,
-  HOT_TUB_TIMELINE_URGENCIES,
 } from './HotTub.interface';
 
 const hotTubBodySchema = z.object({
   fullName: z.string({ error: 'Full name is required!' }).min(1),
   phoneNumber: z.string({ error: 'Phone number is required!' }).min(1),
   emailAddress: z.string().email('Invalid email format!').optional(),
-  preferredContactMethod: z.enum(HOT_TUB_CONTACT_METHODS).optional(),
+  preferredContactMethod: z.enum(CONTACT_METHODS).optional(),
 
   streetAddress: z.string({ error: 'Street address is required!' }).min(1),
   apartmentUnit: z.string().optional(),
@@ -22,9 +24,9 @@ const hotTubBodySchema = z.object({
   state: z.string({ error: 'State is required!' }).min(1),
   zipCode: z.string({ error: 'ZIP code is required!' }).min(1),
 
-  propertyType: z.enum(HOT_TUB_PROPERTY_TYPES),
+  propertyType: z.enum(PROPERTY_TYPES),
   ownershipStatus: z.enum(['Owner', 'Tenant', 'Property Manager', 'Other']),
-  timelineUrgency: z.enum(HOT_TUB_TIMELINE_URGENCIES),
+  timelineUrgency: z.enum(TIMELINE_URGENCIES),
 
   hasDigitalManual: z.boolean({
     error: 'Please choose whether you have a digital manual!',

@@ -1,27 +1,27 @@
 import { z } from 'zod';
+import { SERVICE_CALL_PREFERRED_TIMES } from './ServiceCall.interface';
 import {
-  SERVICE_CALL_CONTACT_METHODS,
-  SERVICE_CALL_OWNERSHIP_STATUSES,
-  SERVICE_CALL_PREFERRED_TIMES,
-  SERVICE_CALL_PROPERTY_TYPES,
-  SERVICE_CALL_TIMELINE_URGENCIES,
-} from './ServiceCall.interface';
-import { Service_STATUSES } from '../../constants';
+  CONTACT_METHODS,
+  OWNERSHIP_STATUSES,
+  PROPERTY_TYPES,
+  TIMELINE_URGENCIES,
+  Service_STATUSES,
+} from '../../constants';
 
 const serviceCallBodySchema = z.object({
   serviceType: z.string().optional(),
   fullName: z.string({ error: 'Full name is required!' }).min(1),
   phoneNumber: z.string({ error: 'Phone number is required!' }).min(1),
   emailAddress: z.string().email('Invalid email format!').optional(),
-  preferredContactMethod: z.enum(SERVICE_CALL_CONTACT_METHODS).optional(),
+  preferredContactMethod: z.enum(CONTACT_METHODS).optional(),
   streetAddress: z.string({ error: 'Street address is required!' }).min(1),
   apartmentUnit: z.string().optional(),
   city: z.string({ error: 'City is required!' }).min(1),
   state: z.string({ error: 'State is required!' }).min(1),
   zipCode: z.string({ error: 'ZIP code is required!' }).min(1),
-  propertyType: z.enum(SERVICE_CALL_PROPERTY_TYPES),
-  ownershipStatus: z.enum(SERVICE_CALL_OWNERSHIP_STATUSES),
-  timelineUrgency: z.enum(SERVICE_CALL_TIMELINE_URGENCIES),
+  propertyType: z.enum(PROPERTY_TYPES),
+  ownershipStatus: z.enum(OWNERSHIP_STATUSES),
+  timelineUrgency: z.enum(TIMELINE_URGENCIES),
   issueDescription: z
     .string({ error: 'Issue description is required!' })
     .min(1),
@@ -80,15 +80,15 @@ export const ServiceCallValidation = {
       fullName: z.string().optional(),
       phoneNumber: z.string().optional(),
       emailAddress: z.string().email('Invalid email format!').optional(),
-      preferredContactMethod: z.enum(SERVICE_CALL_CONTACT_METHODS).optional(),
+      preferredContactMethod: z.enum(CONTACT_METHODS).optional(),
       streetAddress: z.string().optional(),
       apartmentUnit: z.string().optional(),
       city: z.string().optional(),
       state: z.string().optional(),
       zipCode: z.string().optional(),
-      propertyType: z.enum(SERVICE_CALL_PROPERTY_TYPES).optional(),
-      ownershipStatus: z.enum(SERVICE_CALL_OWNERSHIP_STATUSES).optional(),
-      timelineUrgency: z.enum(SERVICE_CALL_TIMELINE_URGENCIES).optional(),
+      propertyType: z.enum(PROPERTY_TYPES).optional(),
+      ownershipStatus: z.enum(OWNERSHIP_STATUSES).optional(),
+      timelineUrgency: z.enum(TIMELINE_URGENCIES).optional(),
       issueDescription: z.string().optional(),
       preferredTime: z.enum(SERVICE_CALL_PREFERRED_TIMES).optional(),
       schedulingPreference: z.array(z.string()).optional(),
