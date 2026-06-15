@@ -35,13 +35,13 @@ router
     ElectricController.getSingleElectric,
   )
   .patch(
-    auth(ROLE.ADMIN, ROLE.SUPER_ADMIN),
+    auth(ROLE.USER),
     uploadElectricImages,
     validateRequestFromFormData(ElectricValidation.updateSchema),
     ElectricController.updateSingleElectric,
   )
   .delete(
-    auth(ROLE.ADMIN, ROLE.SUPER_ADMIN),
+    auth(ROLE.USER),
     validateRequest(ElectricValidation.idParamsSchema),
     ElectricController.deleteSingleElectric,
   );

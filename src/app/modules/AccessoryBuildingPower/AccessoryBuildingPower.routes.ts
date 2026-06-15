@@ -45,13 +45,13 @@ router
     AccessoryBuildingPowerController.getSingleAccessoryBuilding,
   )
   .patch(
-    auth(ROLE.ADMIN, ROLE.SUPER_ADMIN),
+    auth(ROLE.USER),
     uploadAccessoryBuildingImages,
     validateRequestFromFormData(AccessoryBuildingPowerValidation.updateSchema),
     AccessoryBuildingPowerController.updateSingleAccessoryBuilding,
   )
   .delete(
-    auth(ROLE.ADMIN, ROLE.SUPER_ADMIN),
+    auth(ROLE.USER),
     validateRequest(AccessoryBuildingPowerValidation.idParamsSchema),
     AccessoryBuildingPowerController.deleteSingleAccessoryBuilding,
   );

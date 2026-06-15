@@ -38,13 +38,13 @@ router
     HotTubController.getSingleHotTub,
   )
   .patch(
-    auth(ROLE.ADMIN, ROLE.SUPER_ADMIN),
+    auth(ROLE.USER),
     uploadHotTubImages,
     validateRequestFromFormData(HotTubValidation.updateSchema),
     HotTubController.updateSingleHotTub,
   )
   .delete(
-    auth(ROLE.ADMIN, ROLE.SUPER_ADMIN),
+    auth(ROLE.USER),
     validateRequest(HotTubValidation.idParamsSchema),
     HotTubController.deleteSingleHotTub,
   );

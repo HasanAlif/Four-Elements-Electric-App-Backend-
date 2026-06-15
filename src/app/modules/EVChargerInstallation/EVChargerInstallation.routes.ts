@@ -44,13 +44,13 @@ router
     EVChargerInstallationController.getSingleEVChargerInstallation,
   )
   .patch(
-    auth(ROLE.ADMIN, ROLE.SUPER_ADMIN),
+    auth(ROLE.USER),
     uploadEVChargerImages,
     validateRequestFromFormData(EVChargerInstallationValidation.updateSchema),
     EVChargerInstallationController.updateSingleEVChargerInstallation,
   )
   .delete(
-    auth(ROLE.ADMIN, ROLE.SUPER_ADMIN),
+    auth(ROLE.USER),
     validateRequest(EVChargerInstallationValidation.idParamsSchema),
     EVChargerInstallationController.deleteSingleEVChargerInstallation,
   );
