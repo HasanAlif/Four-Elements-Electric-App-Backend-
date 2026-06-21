@@ -8,6 +8,7 @@ import {
   Service_STATUSES,
   TIMELINE_URGENCIES,
 } from '../../constants';
+import { qIdPlugin } from '../../lib/qId';
 import { IGenarator } from './Genarator.interface';
 
 const GenaratorSchema = new Schema<IGenarator>(
@@ -209,6 +210,8 @@ const GenaratorSchema = new Schema<IGenarator>(
 );
 
 GenaratorSchema.index({ createdBy: 1, status: 1 });
+
+GenaratorSchema.plugin(qIdPlugin);
 
 const GenaratorModel = model<IGenarator>('Genarator', GenaratorSchema);
 

@@ -19,6 +19,7 @@ export type TRemodelingPanelLocation =
 
 export interface IRemodeling extends Document {
   _id: Types.ObjectId;
+  qId?: string;
 
   serviceType: string;
   createdBy: Types.ObjectId;

@@ -7,6 +7,7 @@ import {
   Service_STATUSES,
   TIMELINE_URGENCIES,
 } from '../../constants';
+import { qIdPlugin } from '../../lib/qId';
 import { IEVChargerInstallation } from './EVChargerInstallation.interface';
 // import {
 //   EV_CHARGER_CONNECTION_TYPES,
@@ -210,6 +211,8 @@ const evChargerInstallationSchema = new Schema<IEVChargerInstallation>(
 );
 
 evChargerInstallationSchema.index({ createdBy: 1, status: 1 });
+
+evChargerInstallationSchema.plugin(qIdPlugin);
 
 const EVChargerInstallationModel = model<IEVChargerInstallation>(
   'EVChargerInstallation',

@@ -53,6 +53,7 @@ import {
 
 export interface IEVChargerInstallation extends Document {
   _id: Types.ObjectId;
+  qId?: string;
 
   serviceType: string;
   createdBy: Types.ObjectId;

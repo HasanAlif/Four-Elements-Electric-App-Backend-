@@ -11,6 +11,7 @@ import {
   Service_STATUSES,
   TIMELINE_URGENCIES,
 } from '../../constants';
+import { qIdPlugin } from '../../lib/qId';
 
 const serviceCallSchema = new Schema<IServiceCall>(
   {
@@ -219,6 +220,8 @@ const serviceCallSchema = new Schema<IServiceCall>(
 );
 
 serviceCallSchema.index({ createdBy: 1, status: 1 });
+
+serviceCallSchema.plugin(qIdPlugin);
 
 const ServiceCallModel = model<IServiceCall>('ServiceCall', serviceCallSchema);
 

@@ -8,6 +8,7 @@ import {
   Service_STATUSES,
   TIMELINE_URGENCIES,
 } from '../../constants';
+import { qIdPlugin } from '../../lib/qId';
 import { IHomeSurgeProtection } from './HomeSurgeProtection.interface';
 
 const HomeSurgeProtectionSchema = new Schema<IHomeSurgeProtection>(
@@ -163,6 +164,8 @@ const HomeSurgeProtectionSchema = new Schema<IHomeSurgeProtection>(
 );
 
 HomeSurgeProtectionSchema.index({ createdBy: 1, status: 1 });
+
+HomeSurgeProtectionSchema.plugin(qIdPlugin);
 
 const HomeSurgeProtectionModel = model<IHomeSurgeProtection>(
   'HomeSurgeProtection',

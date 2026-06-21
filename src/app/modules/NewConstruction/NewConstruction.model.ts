@@ -8,6 +8,7 @@ import {
   Service_STATUSES,
   TIMELINE_URGENCIES,
 } from '../../constants';
+import { qIdPlugin } from '../../lib/qId';
 import { INewConstruction } from './NewConstruction.interface';
 
 const NewConstructionSchema = new Schema<INewConstruction>(
@@ -169,6 +170,8 @@ const NewConstructionSchema = new Schema<INewConstruction>(
 );
 
 NewConstructionSchema.index({ createdBy: 1, status: 1 });
+
+NewConstructionSchema.plugin(qIdPlugin);
 
 const NewConstructionModel = model<INewConstruction>(
   'NewConstruction',

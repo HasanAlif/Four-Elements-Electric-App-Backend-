@@ -8,6 +8,7 @@ import {
   Service_STATUSES,
   TIMELINE_URGENCIES,
 } from '../../constants';
+import { qIdPlugin } from '../../lib/qId';
 import {
   CEILING_FAN_INSTALL_TYPES,
   ICellingFans,
@@ -207,6 +208,8 @@ const CellingFansSchema = new Schema<ICellingFans>(
 );
 
 CellingFansSchema.index({ createdBy: 1, status: 1 });
+
+CellingFansSchema.plugin(qIdPlugin);
 
 const CellingFansModel = model<ICellingFans>('CellingFans', CellingFansSchema);
 

@@ -8,6 +8,7 @@ import {
   Service_STATUSES,
   TIMELINE_URGENCIES,
 } from '../../constants';
+import { qIdPlugin } from '../../lib/qId';
 import { IElectric } from './Electric.interface';
 import { string } from 'zod';
 
@@ -177,6 +178,8 @@ const electricSchema = new Schema<IElectric>(
 );
 
 electricSchema.index({ createdBy: 1, status: 1 });
+
+electricSchema.plugin(qIdPlugin);
 
 const ElectricModel = model<IElectric>('Electric', electricSchema);
 

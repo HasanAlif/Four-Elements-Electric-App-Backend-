@@ -19,6 +19,7 @@ export type TLightingSwitchConnection =
 
 export interface ILighting extends Document {
   _id: Types.ObjectId;
+  qId?: string;
 
   serviceType: string;
   createdBy: Types.ObjectId;

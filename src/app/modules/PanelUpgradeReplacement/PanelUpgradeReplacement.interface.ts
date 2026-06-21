@@ -37,6 +37,7 @@ export type TPowerFeedType = (typeof PANEL_POWER_FEEDS)[number];
 
 export interface IPanelUpgradeReplacement extends Document {
   _id: Types.ObjectId;
+  qId?: string;
 
   serviceType: string;
   createdBy: Types.ObjectId;

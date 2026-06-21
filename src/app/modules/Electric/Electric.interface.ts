@@ -9,6 +9,7 @@ import {
 
 export interface IElectric extends Document {
   _id: Types.ObjectId;
+  qId?: string;
 
   serviceType: string;
   createdBy: Types.ObjectId;

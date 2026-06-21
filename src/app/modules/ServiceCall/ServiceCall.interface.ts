@@ -17,6 +17,7 @@ export type TServiceCallPreferredTime =
 
 export interface IServiceCall extends Document {
   _id: Types.ObjectId;
+  qId?: string;
 
   serviceType: string;
   createdBy: Types.ObjectId;

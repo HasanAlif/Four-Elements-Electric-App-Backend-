@@ -8,6 +8,7 @@ import {
   Service_STATUSES,
   TIMELINE_URGENCIES,
 } from '../../constants';
+import { qIdPlugin } from '../../lib/qId';
 import {
   EXHAUST_FAN_INSTALL_TYPES,
   IExhaustFans,
@@ -236,6 +237,8 @@ const ExhaustFansSchema = new Schema<IExhaustFans>(
 );
 
 ExhaustFansSchema.index({ createdBy: 1, status: 1 });
+
+ExhaustFansSchema.plugin(qIdPlugin);
 
 const ExhaustFansModel = model<IExhaustFans>('ExhaustFans', ExhaustFansSchema);
 

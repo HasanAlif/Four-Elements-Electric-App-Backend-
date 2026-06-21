@@ -8,6 +8,7 @@ import {
   Service_STATUSES,
   TIMELINE_URGENCIES,
 } from '../../constants';
+import { qIdPlugin } from '../../lib/qId';
 import { IDedicatedCircuit } from './DedicatedCircuit.interface';
 
 const DedicatedCircuitSchema = new Schema<IDedicatedCircuit>(
@@ -199,6 +200,8 @@ const DedicatedCircuitSchema = new Schema<IDedicatedCircuit>(
 );
 
 DedicatedCircuitSchema.index({ createdBy: 1, status: 1 });
+
+DedicatedCircuitSchema.plugin(qIdPlugin);
 
 const DedicatedCircuitModel = model<IDedicatedCircuit>(
   'DedicatedCircuit',

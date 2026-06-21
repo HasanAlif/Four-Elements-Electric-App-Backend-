@@ -44,6 +44,7 @@ export type THotTubPanelDistance = (typeof HOT_TUB_PANEL_DISTANCE)[number];
 
 export interface IHotTub extends Document {
   _id: Types.ObjectId;
+  qId?: string;
 
   serviceType: string;
   createdBy: Types.ObjectId;

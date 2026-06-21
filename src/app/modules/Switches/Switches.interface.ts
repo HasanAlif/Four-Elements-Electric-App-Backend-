@@ -12,6 +12,7 @@ export type TSwitchInstallType = (typeof SWITCH_INSTALL_TYPES)[number];
 
 export interface ISwitches extends Document {
   _id: Types.ObjectId;
+  qId?: string;
 
   serviceType: string;
   createdBy: Types.ObjectId;

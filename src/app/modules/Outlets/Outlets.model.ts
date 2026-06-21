@@ -8,6 +8,7 @@ import {
   Service_STATUSES,
   TIMELINE_URGENCIES,
 } from '../../constants';
+import { qIdPlugin } from '../../lib/qId';
 import { IOutlets, OUTLET_INSTALL_TYPES } from './Outlets.interface';
 
 const OutletsSchema = new Schema<IOutlets>(
@@ -195,6 +196,8 @@ const OutletsSchema = new Schema<IOutlets>(
 );
 
 OutletsSchema.index({ createdBy: 1, status: 1 });
+
+OutletsSchema.plugin(qIdPlugin);
 
 const OutletsModel = model<IOutlets>('Outlets', OutletsSchema);
 

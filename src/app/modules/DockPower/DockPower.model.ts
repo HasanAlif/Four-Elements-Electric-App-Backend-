@@ -7,6 +7,7 @@ import {
   Service_STATUSES,
   TIMELINE_URGENCIES,
 } from '../../constants';
+import { qIdPlugin } from '../../lib/qId';
 import {
   DOCK_POWER_CIRCUIT_AMP_RATINGS,
   DOCK_POWER_CIRCUIT_COUNTS,
@@ -249,6 +250,8 @@ const dockPowerSchema = new Schema<IDockPower>(
 );
 
 dockPowerSchema.index({ createdBy: 1, status: 1 });
+
+dockPowerSchema.plugin(qIdPlugin);
 
 const DockPowerModel = model<IDockPower>('DockPower', dockPowerSchema);
 

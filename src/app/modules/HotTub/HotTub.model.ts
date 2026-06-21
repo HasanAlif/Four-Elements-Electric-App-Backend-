@@ -7,6 +7,7 @@ import {
   Service_STATUSES,
   TIMELINE_URGENCIES,
 } from '../../constants';
+import { qIdPlugin } from '../../lib/qId';
 import {
   HOT_TUB_AMPERAGES,
   HOT_TUB_LOCATIONS,
@@ -202,6 +203,8 @@ const hotTubSchema = new Schema<IHotTub>(
 );
 
 hotTubSchema.index({ createdBy: 1, status: 1 });
+
+hotTubSchema.plugin(qIdPlugin);
 
 const HotTubModel = model<IHotTub>('HotTub', hotTubSchema);
 

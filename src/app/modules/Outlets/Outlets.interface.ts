@@ -12,6 +12,7 @@ export type TOutletInstallType = (typeof OUTLET_INSTALL_TYPES)[number];
 
 export interface IOutlets extends Document {
   _id: Types.ObjectId;
+  qId?: string;
 
   serviceType: string;
   createdBy: Types.ObjectId;

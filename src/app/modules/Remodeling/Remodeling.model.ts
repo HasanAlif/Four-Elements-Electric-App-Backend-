@@ -7,6 +7,7 @@ import {
   Service_STATUSES,
   TIMELINE_URGENCIES,
 } from '../../constants';
+import { qIdPlugin } from '../../lib/qId';
 import {
   IRemodeling,
   REMODELING_PANEL_LOCATIONS,
@@ -190,6 +191,8 @@ const remodelingSchema = new Schema<IRemodeling>(
 );
 
 remodelingSchema.index({ createdBy: 1, status: 1 });
+
+remodelingSchema.plugin(qIdPlugin);
 
 const RemodelingModel = model<IRemodeling>('Remodeling', remodelingSchema);
 

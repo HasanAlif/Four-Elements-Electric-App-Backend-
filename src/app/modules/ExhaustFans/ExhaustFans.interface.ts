@@ -15,6 +15,7 @@ export type TExhaustFanInstallType = (typeof EXHAUST_FAN_INSTALL_TYPES)[number];
 
 export interface IExhaustFans extends Document {
   _id: Types.ObjectId;
+  qId?: string;
 
   serviceType: string;
   createdBy: Types.ObjectId;

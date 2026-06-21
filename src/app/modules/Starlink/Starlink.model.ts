@@ -8,6 +8,7 @@ import {
   Service_STATUSES,
   TIMELINE_URGENCIES,
 } from '../../constants';
+import { qIdPlugin } from '../../lib/qId';
 import { IStarlink } from './Starlink.interface';
 
 const StarlinkSchema = new Schema<IStarlink>(
@@ -189,6 +190,8 @@ const StarlinkSchema = new Schema<IStarlink>(
 );
 
 StarlinkSchema.index({ createdBy: 1, status: 1 });
+
+StarlinkSchema.plugin(qIdPlugin);
 
 const StarlinkModel = model<IStarlink>('Starlink', StarlinkSchema);
 

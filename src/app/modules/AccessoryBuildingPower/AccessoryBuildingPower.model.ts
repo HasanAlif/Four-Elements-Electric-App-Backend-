@@ -7,6 +7,7 @@ import {
   Service_STATUSES,
   TIMELINE_URGENCIES,
 } from '../../constants';
+import { qIdPlugin } from '../../lib/qId';
 import {
   // ACCESSORY_BUILDING_CIRCUIT_AMP_RATINGS,
   // ACCESSORY_BUILDING_CIRCUIT_COUNTS,
@@ -240,6 +241,8 @@ const accessoryBuildingPowerSchema = new Schema<IAccessoryBuildingPower>(
 );
 
 accessoryBuildingPowerSchema.index({ createdBy: 1, status: 1 });
+
+accessoryBuildingPowerSchema.plugin(qIdPlugin);
 
 const AccessoryBuildingPowerModel = model<IAccessoryBuildingPower>(
   'AccessoryBuildingPower',

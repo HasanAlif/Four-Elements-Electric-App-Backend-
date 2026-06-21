@@ -78,6 +78,7 @@ export type TAccessoryBuildingPanelLocation =
 
 export interface IAccessoryBuildingPower extends Document {
   _id: Types.ObjectId;
+  qId?: string;
 
   serviceType: string;
   createdBy: Types.ObjectId;

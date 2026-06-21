@@ -14,6 +14,7 @@ import {
   Service_STATUSES,
   TIMELINE_URGENCIES,
 } from '../../constants';
+import { qIdPlugin } from '../../lib/qId';
 
 const panelUpgradeReplacementSchema = new Schema<IPanelUpgradeReplacement>(
   {
@@ -188,6 +189,8 @@ const panelUpgradeReplacementSchema = new Schema<IPanelUpgradeReplacement>(
 );
 
 panelUpgradeReplacementSchema.index({ createdBy: 1, status: 1 });
+
+panelUpgradeReplacementSchema.plugin(qIdPlugin);
 
 const PanelUpgradeReplacementModel = model<IPanelUpgradeReplacement>(
   'PanelUpgradeReplacement',

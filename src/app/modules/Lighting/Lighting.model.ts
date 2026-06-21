@@ -8,6 +8,7 @@ import {
   Service_STATUSES,
   TIMELINE_URGENCIES,
 } from '../../constants';
+import { qIdPlugin } from '../../lib/qId';
 import {
   ILighting,
   LIGHTING_INSTALL_TYPES,
@@ -282,6 +283,8 @@ const LightingSchema = new Schema<ILighting>(
 );
 
 LightingSchema.index({ createdBy: 1, status: 1 });
+
+LightingSchema.plugin(qIdPlugin);
 
 const LightingModel = model<ILighting>('Lighting', LightingSchema);
 

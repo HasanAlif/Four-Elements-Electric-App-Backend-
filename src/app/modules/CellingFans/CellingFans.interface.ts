@@ -15,6 +15,7 @@ export type TCeilingFanInstallType = (typeof CEILING_FAN_INSTALL_TYPES)[number];
 
 export interface ICellingFans extends Document {
   _id: Types.ObjectId;
+  qId?: string;
 
   serviceType: string;
   createdBy: Types.ObjectId;

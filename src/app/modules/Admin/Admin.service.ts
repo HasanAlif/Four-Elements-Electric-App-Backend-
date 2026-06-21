@@ -22,6 +22,7 @@ import SwitchesModel from '../Switches/Switches.model';
 
 type QuoteRow = {
   _id: unknown;
+  qId?: string;
   fullName?: string;
   phoneNumber?: string;
   emailAddress?: string;
@@ -68,7 +69,7 @@ const quoteModels: QuoteModel[] = [
 ].map(model => model as unknown as QuoteModel);
 
 const QUOTE_FIELDS =
-  'fullName phoneNumber emailAddress serviceType createdAt status additionalInformation';
+  'qId fullName phoneNumber emailAddress serviceType createdAt status additionalInformation';
 
 // Status badges shown in meta — every status except draft, in enum order.
 const COUNTED_STATUSES = Object.values(Service_STATUSES).filter(
@@ -266,6 +267,7 @@ const getQouteForUpdate = async (quoteId: string) => {
   // Minimal shape for prefilling the status-update form.
   return {
     id: String(quote._id),
+    qId: quote.qId,
     currentStatus: quote.status,
   };
 };

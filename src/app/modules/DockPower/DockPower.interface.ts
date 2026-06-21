@@ -60,6 +60,7 @@ export type TDockPowerPanelLocation =
 
 export interface IDockPower extends Document {
   _id: Types.ObjectId;
+  qId?: string;
 
   serviceType: string;
   createdBy: Types.ObjectId;
