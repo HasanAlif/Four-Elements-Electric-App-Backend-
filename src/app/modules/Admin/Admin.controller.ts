@@ -241,6 +241,19 @@ const createAdminUserBySuperAdmin = asyncHandler(
   },
 );
 
+const getAllAdmins = asyncHandler(async (req: Request, res: Response) => {
+  const { status } = req.query;
+
+  const result = await AdminService.getAllAdmins(status as string | undefined);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    message: 'Admin users retrieved successfully!',
+    meta: result.meta,
+    data: result.data,
+  });
+});
+
 export const AdminController = {
   getAllQuotes,
   searchByNameQidOrEmail,
@@ -262,4 +275,5 @@ export const AdminController = {
   changePassword,
   getAdminProfile,
   createAdminUserBySuperAdmin,
+  getAllAdmins,
 };

@@ -124,4 +124,8 @@ router
     AdminController.createAdminUserBySuperAdmin,
   );
 
+router
+  .route('/all-admins')
+  .get(auth(ROLE.SUPER_ADMIN), AdminController.getAllAdmins);
+
 export const AdminRoutes = router;

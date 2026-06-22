@@ -691,6 +691,36 @@ const createAdminUserBySuperAdmin = async (payload: {
   };
 };
 
+const getAllAdmins = async (status?: string) => {
+  const normalized = (status ?? 'all').trim().toLowerCase();
+
+  if (!['all', 'active', 'suspended'].includes(normalized)) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "status must be 'all', 'active', or 'suspended'!",
+    );
+  }
+
+  const admins = await User.find({
+    $or: [{ role: ROLE.ADMIN }, { role: ROLE.SUSPENDED_ADMIN }],
+  })
+    .select('name email phone createdAt role isSuspended image')
+    .sort({ createdAt: -1 })
+    .lean();
+
+  const activeAdmin = admins.filter(admin => !admin.isSuspended).length;
+  const suspendedAdmin = admins.filter(admin => admin.isSuspended).length;
+
+  const data =
+    normalized === 'active'
+      ? admins.filter(admin => !admin.isSuspended)
+      : normalized === 'suspended'
+        ? admins.filter(admin => admin.isSuspended)
+        : admins;
+
+  return { meta: { activeAdmin, suspendedAdmin }, data };
+};
+
 export const AdminService = {
   getAllQuotes,
   searchByNameQidOrEmail,
@@ -712,4 +742,5 @@ export const AdminService = {
   changePassword,
   getAdminProfile,
   createAdminUserBySuperAdmin,
+  getAllAdmins,
 };
