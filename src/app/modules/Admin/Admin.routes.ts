@@ -129,6 +129,10 @@ router
   .get(auth(ROLE.SUPER_ADMIN), AdminController.getAllAdmins);
 
 router
+  .route('/dashboard-stats')
+  .get(auth(ROLE.ADMIN, ROLE.SUPER_ADMIN), AdminController.getDashboardStats);
+
+router
   .route('/:id/status')
   .patch(auth(ROLE.SUPER_ADMIN), AdminController.updateAdminUserStatus);
 

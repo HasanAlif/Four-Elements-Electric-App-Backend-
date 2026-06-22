@@ -292,6 +292,16 @@ const deleteAdminUserBySuperAdmin = asyncHandler(
   },
 );
 
+const getDashboardStats = asyncHandler(async (req: Request, res: Response) => {
+  const data = await AdminService.getDashboardStats();
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    message: 'Dashboard stats retrieved successfully!',
+    data,
+  });
+});
+
 export const AdminController = {
   getAllQuotes,
   searchByNameQidOrEmail,
@@ -317,4 +327,5 @@ export const AdminController = {
   getSingleAdmin,
   updateAdminUserStatus,
   deleteAdminUserBySuperAdmin,
+  getDashboardStats,
 };

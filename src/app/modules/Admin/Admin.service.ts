@@ -778,6 +778,49 @@ const deleteAdminUserBySuperAdmin = async (id: string) => {
   return { message: 'Admin user deleted successfully!' };
 };
 
+const getDashboardStats = async () => {
+  // Non-draft status rows across every quote collection.
+  const rowsPerModel = await Promise.all(
+    quoteModels.map(model =>
+      model
+        .find({ status: { $ne: Service_STATUSES.DRAFT } })
+        .select('status')
+        .lean(),
+    ),
+  );
+  const rows = rowsPerModel.flat();
+
+  let pendingQuotes = 0;
+  let InReviewQuotes = 0;
+  let contacted = 0;
+  let closedQuotes = 0;
+
+  rows.forEach(row => {
+    if (row.status === Service_STATUSES.PENDING) pendingQuotes += 1;
+    else if (row.status === Service_STATUSES.IN_REVIEW) InReviewQuotes += 1;
+    else if (row.status === Service_STATUSES.SEND) contacted += 1;
+    else if (row.status === Service_STATUSES.CLOSED) closedQuotes += 1;
+  });
+
+  const [partnerCategories, totalPartners, verifiedPartners] =
+    await Promise.all([
+      CategoryModel.countDocuments(),
+      PartnerModel.countDocuments(),
+      PartnerModel.countDocuments({ isVerified: true }),
+    ]);
+
+  return {
+    totalQuotes: rows.length,
+    pendingQuotes,
+    InReviewQuotes,
+    contacted,
+    closedQuotes,
+    partnerCategories,
+    totalPartners,
+    verifiedPartners,
+  };
+};
+
 export const AdminService = {
   getAllQuotes,
   searchByNameQidOrEmail,
@@ -803,4 +846,5 @@ export const AdminService = {
   getSingleAdmin,
   updateAdminUserStatus,
   deleteAdminUserBySuperAdmin,
+  getDashboardStats,
 };
