@@ -326,6 +326,18 @@ const quoteSubmissionTrend = asyncHandler(
   },
 );
 
+const serviceTypeDistribution = asyncHandler(
+  async (req: Request, res: Response) => {
+    const data = await AdminService.serviceTypeDistribution();
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      message: 'Service type distribution retrieved successfully!',
+      data,
+    });
+  },
+);
+
 export const AdminController = {
   getAllQuotes,
   searchByNameQidOrEmail,
@@ -354,4 +366,5 @@ export const AdminController = {
   getDashboardStats,
   getQouteStatsOverview,
   quoteSubmissionTrend,
+  serviceTypeDistribution,
 };

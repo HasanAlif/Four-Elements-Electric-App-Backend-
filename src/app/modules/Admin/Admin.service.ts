@@ -909,6 +909,57 @@ const quoteSubmissionTrend = async () => {
   return trend;
 };
 
+const serviceTypeDistribution = async () => {
+  // Non-draft quotes' serviceType across every collection.
+  const rowsPerModel = await Promise.all(
+    quoteModels.map(model =>
+      model
+        .find({ status: { $ne: Service_STATUSES.DRAFT } })
+        .select('serviceType')
+        .lean(),
+    ),
+  );
+  const rows = rowsPerModel.flat();
+
+  // Tally quotes per serviceType label.
+  const counts: Record<string, number> = {};
+  rows.forEach(row => {
+    if (row.serviceType) {
+      counts[row.serviceType] = (counts[row.serviceType] || 0) + 1;
+    }
+  });
+
+  const total = Object.values(counts).reduce((sum, c) => sum + c, 0);
+  if (total === 0) return [];
+
+  // Rank by count desc (name tie-break); keep top 5, fold the rest into "others".
+  const ranked = Object.entries(counts).sort(
+    (a, b) => b[1] - a[1] || a[0].localeCompare(b[0]),
+  );
+  const buckets = ranked
+    .slice(0, 5)
+    .map(([serviceType, count]) => ({ serviceType, count }));
+  const othersCount = ranked
+    .slice(5)
+    .reduce((sum, [, count]) => sum + count, 0);
+  if (othersCount > 0) {
+    buckets.push({ serviceType: 'others', count: othersCount });
+  }
+
+  // Whole-number share of all quotes; the last bucket ("others" when present)
+  // absorbs rounding drift so the column totals exactly 100%.
+  const result = buckets.map(bucket => ({
+    serviceType: bucket.serviceType,
+    percentage: Math.round((bucket.count / total) * 100),
+  }));
+  const drift = 100 - result.reduce((sum, item) => sum + item.percentage, 0);
+  if (drift !== 0) {
+    result[result.length - 1].percentage += drift;
+  }
+
+  return result;
+};
+
 export const AdminService = {
   getAllQuotes,
   searchByNameQidOrEmail,
@@ -937,4 +988,5 @@ export const AdminService = {
   getDashboardStats,
   getQouteStatsOverview,
   quoteSubmissionTrend,
+  serviceTypeDistribution,
 };
