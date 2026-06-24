@@ -345,7 +345,22 @@ const createCategory = async (payload: TCategoryPayload) => {
 };
 
 const getAllCategories = async () => {
-  return CategoryModel.find().sort({ name: 1 });
+  const [categories, partnerCounts] = await Promise.all([
+    CategoryModel.find().sort({ name: 1 }).lean(),
+    PartnerModel.aggregate<{ _id: string; count: number }>([
+      { $group: { _id: '$category', count: { $sum: 1 } } },
+    ]),
+  ]);
+
+  // Partners reference a category by its (unique) name.
+  const countByCategory = new Map(
+    partnerCounts.map(item => [item._id, item.count]),
+  );
+
+  return categories.map(category => ({
+    ...category,
+    partnerCount: countByCategory.get(category.name) ?? 0,
+  }));
 };
 
 const getSingleCategory = async (id: string) => {
