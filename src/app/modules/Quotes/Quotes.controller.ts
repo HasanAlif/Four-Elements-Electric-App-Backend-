@@ -23,6 +23,22 @@ const getAllMyQuotes = asyncHandler(async (req: Request, res: Response) => {
   });
 });
 
+const getMySingleQuoteActivityDetails = asyncHandler(
+  async (req: Request, res: Response) => {
+    const data = await QuotesService.getMySingleQuoteActivityDetails(
+      req.user._id.toString(),
+      req.params.id as string,
+    );
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      message: 'Quote activity details retrieved successfully!',
+      data,
+    });
+  },
+);
+
 export const QuotesController = {
   getAllMyQuotes,
+  getMySingleQuoteActivityDetails,
 };

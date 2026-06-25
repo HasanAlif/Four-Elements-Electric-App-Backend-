@@ -7,4 +7,8 @@ const router = Router();
 
 router.route('/').get(auth(ROLE.USER), QuotesController.getAllMyQuotes);
 
+router
+  .route('/:id')
+  .get(auth(ROLE.USER), QuotesController.getMySingleQuoteActivityDetails);
+
 export const QuotesRoutes = router;

@@ -9,6 +9,7 @@ import {
   TIMELINE_URGENCIES,
 } from '../../constants';
 import { qIdPlugin } from '../../lib/qId';
+import { statusTimelinePlugin } from '../../lib/statusTimeline';
 import {
   ILighting,
   LIGHTING_INSTALL_TYPES,
@@ -288,6 +289,7 @@ LightingSchema.index({ status: 1, createdAt: -1 });
 LightingSchema.index({ createdBy: 1, createdAt: -1 });
 
 LightingSchema.plugin(qIdPlugin);
+LightingSchema.plugin(statusTimelinePlugin);
 
 const LightingModel = model<ILighting>('Lighting', LightingSchema);
 

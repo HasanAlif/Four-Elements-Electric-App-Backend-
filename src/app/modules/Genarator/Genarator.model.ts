@@ -9,6 +9,7 @@ import {
   TIMELINE_URGENCIES,
 } from '../../constants';
 import { qIdPlugin } from '../../lib/qId';
+import { statusTimelinePlugin } from '../../lib/statusTimeline';
 import { IGenarator } from './Genarator.interface';
 
 const GenaratorSchema = new Schema<IGenarator>(
@@ -215,6 +216,7 @@ GenaratorSchema.index({ status: 1, createdAt: -1 });
 GenaratorSchema.index({ createdBy: 1, createdAt: -1 });
 
 GenaratorSchema.plugin(qIdPlugin);
+GenaratorSchema.plugin(statusTimelinePlugin);
 
 const GenaratorModel = model<IGenarator>('Genarator', GenaratorSchema);
 

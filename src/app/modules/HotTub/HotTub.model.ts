@@ -8,6 +8,7 @@ import {
   TIMELINE_URGENCIES,
 } from '../../constants';
 import { qIdPlugin } from '../../lib/qId';
+import { statusTimelinePlugin } from '../../lib/statusTimeline';
 import {
   HOT_TUB_AMPERAGES,
   HOT_TUB_LOCATIONS,
@@ -208,6 +209,7 @@ hotTubSchema.index({ status: 1, createdAt: -1 });
 hotTubSchema.index({ createdBy: 1, createdAt: -1 });
 
 hotTubSchema.plugin(qIdPlugin);
+hotTubSchema.plugin(statusTimelinePlugin);
 
 const HotTubModel = model<IHotTub>('HotTub', hotTubSchema);
 

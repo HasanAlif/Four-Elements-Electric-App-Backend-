@@ -8,6 +8,7 @@ import {
   TIMELINE_URGENCIES,
 } from '../../constants';
 import { qIdPlugin } from '../../lib/qId';
+import { statusTimelinePlugin } from '../../lib/statusTimeline';
 import { IEVChargerInstallation } from './EVChargerInstallation.interface';
 // import {
 //   EV_CHARGER_CONNECTION_TYPES,
@@ -216,6 +217,7 @@ evChargerInstallationSchema.index({ status: 1, createdAt: -1 });
 evChargerInstallationSchema.index({ createdBy: 1, createdAt: -1 });
 
 evChargerInstallationSchema.plugin(qIdPlugin);
+evChargerInstallationSchema.plugin(statusTimelinePlugin);
 
 const EVChargerInstallationModel = model<IEVChargerInstallation>(
   'EVChargerInstallation',

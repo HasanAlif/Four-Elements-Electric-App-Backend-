@@ -9,6 +9,7 @@ import {
   TIMELINE_URGENCIES,
 } from '../../constants';
 import { qIdPlugin } from '../../lib/qId';
+import { statusTimelinePlugin } from '../../lib/statusTimeline';
 import { IStarlink } from './Starlink.interface';
 
 const StarlinkSchema = new Schema<IStarlink>(
@@ -195,6 +196,7 @@ StarlinkSchema.index({ status: 1, createdAt: -1 });
 StarlinkSchema.index({ createdBy: 1, createdAt: -1 });
 
 StarlinkSchema.plugin(qIdPlugin);
+StarlinkSchema.plugin(statusTimelinePlugin);
 
 const StarlinkModel = model<IStarlink>('Starlink', StarlinkSchema);
 

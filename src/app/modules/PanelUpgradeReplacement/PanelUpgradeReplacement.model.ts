@@ -15,6 +15,7 @@ import {
   TIMELINE_URGENCIES,
 } from '../../constants';
 import { qIdPlugin } from '../../lib/qId';
+import { statusTimelinePlugin } from '../../lib/statusTimeline';
 
 const panelUpgradeReplacementSchema = new Schema<IPanelUpgradeReplacement>(
   {
@@ -194,6 +195,7 @@ panelUpgradeReplacementSchema.index({ status: 1, createdAt: -1 });
 panelUpgradeReplacementSchema.index({ createdBy: 1, createdAt: -1 });
 
 panelUpgradeReplacementSchema.plugin(qIdPlugin);
+panelUpgradeReplacementSchema.plugin(statusTimelinePlugin);
 
 const PanelUpgradeReplacementModel = model<IPanelUpgradeReplacement>(
   'PanelUpgradeReplacement',

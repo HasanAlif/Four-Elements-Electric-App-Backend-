@@ -9,6 +9,7 @@ import {
   TIMELINE_URGENCIES,
 } from '../../constants';
 import { qIdPlugin } from '../../lib/qId';
+import { statusTimelinePlugin } from '../../lib/statusTimeline';
 import { IOutlets, OUTLET_INSTALL_TYPES } from './Outlets.interface';
 
 const OutletsSchema = new Schema<IOutlets>(
@@ -201,6 +202,7 @@ OutletsSchema.index({ status: 1, createdAt: -1 });
 OutletsSchema.index({ createdBy: 1, createdAt: -1 });
 
 OutletsSchema.plugin(qIdPlugin);
+OutletsSchema.plugin(statusTimelinePlugin);
 
 const OutletsModel = model<IOutlets>('Outlets', OutletsSchema);
 

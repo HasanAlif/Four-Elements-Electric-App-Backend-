@@ -9,6 +9,7 @@ import {
   TIMELINE_URGENCIES,
 } from '../../constants';
 import { qIdPlugin } from '../../lib/qId';
+import { statusTimelinePlugin } from '../../lib/statusTimeline';
 import { ISwitches, SWITCH_INSTALL_TYPES } from './Switches.interface';
 
 const SwitchesSchema = new Schema<ISwitches>(
@@ -182,6 +183,7 @@ SwitchesSchema.index({ status: 1, createdAt: -1 });
 SwitchesSchema.index({ createdBy: 1, createdAt: -1 });
 
 SwitchesSchema.plugin(qIdPlugin);
+SwitchesSchema.plugin(statusTimelinePlugin);
 
 const SwitchesModel = model<ISwitches>('Switches', SwitchesSchema);
 

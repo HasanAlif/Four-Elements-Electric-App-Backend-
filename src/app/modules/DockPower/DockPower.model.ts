@@ -8,6 +8,7 @@ import {
   TIMELINE_URGENCIES,
 } from '../../constants';
 import { qIdPlugin } from '../../lib/qId';
+import { statusTimelinePlugin } from '../../lib/statusTimeline';
 import {
   DOCK_POWER_CIRCUIT_AMP_RATINGS,
   DOCK_POWER_CIRCUIT_COUNTS,
@@ -255,6 +256,7 @@ dockPowerSchema.index({ status: 1, createdAt: -1 });
 dockPowerSchema.index({ createdBy: 1, createdAt: -1 });
 
 dockPowerSchema.plugin(qIdPlugin);
+dockPowerSchema.plugin(statusTimelinePlugin);
 
 const DockPowerModel = model<IDockPower>('DockPower', dockPowerSchema);
 

@@ -9,6 +9,7 @@ import {
   TIMELINE_URGENCIES,
 } from '../../constants';
 import { qIdPlugin } from '../../lib/qId';
+import { statusTimelinePlugin } from '../../lib/statusTimeline';
 import { IDedicatedCircuit } from './DedicatedCircuit.interface';
 
 const DedicatedCircuitSchema = new Schema<IDedicatedCircuit>(
@@ -205,6 +206,7 @@ DedicatedCircuitSchema.index({ status: 1, createdAt: -1 });
 DedicatedCircuitSchema.index({ createdBy: 1, createdAt: -1 });
 
 DedicatedCircuitSchema.plugin(qIdPlugin);
+DedicatedCircuitSchema.plugin(statusTimelinePlugin);
 
 const DedicatedCircuitModel = model<IDedicatedCircuit>(
   'DedicatedCircuit',
