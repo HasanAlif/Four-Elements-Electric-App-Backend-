@@ -7,7 +7,11 @@ import PartnerModel from './Partner.model';
 import FAQModel from '../FAQ/FAQ.model';
 import User from '../User/user.model';
 import { IUser } from '../User/user.interface';
-import { createAccessToken, createRefreshToken } from '../../lib';
+import {
+  createAccessToken,
+  createRefreshToken,
+  sendImageToCloudinary,
+} from '../../lib';
 import { defaultUserImage, ROLE, AUTH_PROVIDER } from '../User/user.constant';
 
 type QuoteRow = {
@@ -633,17 +637,26 @@ const getAdminProfile = async (userData: IUser) => {
   };
 };
 
-const createAdminUserBySuperAdmin = async (payload: {
-  firstName: string;
-  lastName: string;
-  phone: string;
-  email: string;
-  password: string;
-  image?: string;
-}) => {
+const createAdminUserBySuperAdmin = async (
+  payload: {
+    firstName: string;
+    lastName: string;
+    phone: string;
+    email: string;
+    password: string;
+  },
+  imageFile?: Express.Multer.File,
+) => {
   const exists = await User.findOne({ email: payload.email });
   if (exists) {
     throw new AppError(httpStatus.CONFLICT, 'Email already exists!');
+  }
+
+  // Upload the (optional) profile image; fall back to the default avatar.
+  let image = defaultUserImage;
+  if (imageFile) {
+    const { secure_url } = await sendImageToCloudinary(imageFile);
+    image = secure_url;
   }
 
   const user = await User.create({
@@ -653,7 +666,7 @@ const createAdminUserBySuperAdmin = async (payload: {
     phone: payload.phone,
     email: payload.email,
     password: payload.password, // pre('save') hook hashes it
-    image: payload.image || defaultUserImage,
+    image,
     role: ROLE.ADMIN,
     authProvider: AUTH_PROVIDER.EMAIL,
     isVerifiedByOTP: true,

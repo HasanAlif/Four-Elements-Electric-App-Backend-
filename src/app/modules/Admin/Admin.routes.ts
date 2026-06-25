@@ -1,8 +1,13 @@
 import { Router } from 'express';
-import { auth, validateRequest } from '../../middlewares';
+import {
+  auth,
+  validateRequest,
+  validateRequestFromFormData,
+} from '../../middlewares';
 import { ROLE } from '../User/user.constant';
 import { AdminController } from './Admin.controller';
 import { AdminValidation } from './Admin.validation';
+import { multerUpload } from '../../lib';
 
 const router = Router();
 
@@ -106,7 +111,8 @@ router
   .route('/create-admin')
   .post(
     auth(ROLE.SUPER_ADMIN),
-    validateRequest(AdminValidation.createAdminUserSchema),
+    multerUpload.single('image'),
+    validateRequestFromFormData(AdminValidation.createAdminUserSchema),
     AdminController.createAdminUserBySuperAdmin,
   );
 

@@ -130,7 +130,6 @@ export const AdminValidation = {
         .string({ error: 'Password is required!' })
         .min(8, { message: 'Password must be at least 8 characters long!' })
         .max(20, { message: 'Password cannot exceed 20 characters!' }),
-      image: z.string().trim().optional(),
     }),
   }),
 };

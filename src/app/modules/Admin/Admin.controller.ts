@@ -206,7 +206,10 @@ const getAdminProfile = asyncHandler(async (req: Request, res: Response) => {
 
 const createAdminUserBySuperAdmin = asyncHandler(
   async (req: Request, res: Response) => {
-    const data = await AdminService.createAdminUserBySuperAdmin(req.body);
+    const data = await AdminService.createAdminUserBySuperAdmin(
+      req.body,
+      req.file,
+    );
 
     sendResponse(res, {
       statusCode: httpStatus.CREATED,
