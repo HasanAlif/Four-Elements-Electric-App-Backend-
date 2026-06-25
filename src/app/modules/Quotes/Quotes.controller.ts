@@ -100,6 +100,7 @@ const togglePartnerFavorite = asyncHandler(
     const data = await QuotesService.togglePartnerFavorite(
       req.user._id.toString(),
       req.params.partnerId as string,
+      asString(req.query.isFavourite),
     );
 
     sendResponse(res, {

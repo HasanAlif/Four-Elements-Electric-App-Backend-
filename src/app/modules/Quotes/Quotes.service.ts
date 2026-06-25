@@ -444,33 +444,49 @@ const getAllPartnerDetailsInSingleCategory = async (categoryId: string) => {
   return partners.map(formatPartnerDetails);
 };
 
-// Toggle: one click saves the partner, clicking again removes it.
-const togglePartnerFavorite = async (userId: string, partnerId: string) => {
+// Set the favorite state explicitly from isFavourite: true saves, false removes
+// (idempotent — the client controls the desired state).
+const togglePartnerFavorite = async (
+  userId: string,
+  partnerId: string,
+  rawIsFavourite?: string,
+) => {
   if (!isValidObjectId(partnerId)) {
     throw new AppError(httpStatus.NOT_FOUND, 'Partner not found!');
   }
 
-  const existing = await FavoriteModel.findOne({
-    user: userId,
-    partner: partnerId,
-  });
+  const normalized = (rawIsFavourite ?? '').trim().toLowerCase();
+  if (normalized !== 'true' && normalized !== 'false') {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "isFavourite must be 'true' or 'false'!",
+    );
+  }
+  const isFavourite = normalized === 'true';
 
-  if (existing) {
-    await existing.deleteOne();
-    return { favorited: false, partnerId };
+  if (isFavourite) {
+    // Only an existing, active partner can be saved.
+    const partner = await PartnerModel.findOne({
+      _id: partnerId,
+      isActive: true,
+    }).lean();
+    if (!partner) {
+      throw new AppError(httpStatus.NOT_FOUND, 'Partner not found!');
+    }
+
+    const existing = await FavoriteModel.findOne({
+      user: userId,
+      partner: partnerId,
+    });
+    if (!existing) {
+      await FavoriteModel.create({ user: userId, partner: partnerId });
+    }
+    return { favorited: true, partnerId };
   }
 
-  // Only an existing, active partner can be saved.
-  const partner = await PartnerModel.findOne({
-    _id: partnerId,
-    isActive: true,
-  }).lean();
-  if (!partner) {
-    throw new AppError(httpStatus.NOT_FOUND, 'Partner not found!');
-  }
-
-  await FavoriteModel.create({ user: userId, partner: partnerId });
-  return { favorited: true, partnerId };
+  // Remove (no partner check, so a now-inactive partner can still be unsaved).
+  await FavoriteModel.deleteOne({ user: userId, partner: partnerId });
+  return { favorited: false, partnerId };
 };
 
 const getAllMyFavoritePartners = async (userId: string) => {
