@@ -1,7 +1,7 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
 export enum ContentType {
-  PRIVACY_POLICY = 'privacy-policy',
+  ABOUT_US = 'about-us',
   TERMS_AND_CONDITIONS = 'terms-and-conditions',
 }
 

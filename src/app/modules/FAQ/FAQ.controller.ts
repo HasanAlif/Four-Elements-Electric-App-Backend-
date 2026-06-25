@@ -56,7 +56,7 @@ const deleteFAQ = asyncHandler(async (req: Request, res: Response) => {
 
 const getContentTypeName = (type: string): string => {
   const typeNames: Record<string, string> = {
-    [ContentType.PRIVACY_POLICY]: 'Privacy Policy',
+    [ContentType.ABOUT_US]: 'About Us',
     [ContentType.TERMS_AND_CONDITIONS]: 'Terms and Conditions',
   };
   return typeNames[type] || type;

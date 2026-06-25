@@ -51,7 +51,7 @@ const deleteFAQ = async (id: string) => {
 
 const getContentTypeName = (type: ContentType): string => {
   const typeNames: Record<ContentType, string> = {
-    [ContentType.PRIVACY_POLICY]: 'Privacy Policy',
+    [ContentType.ABOUT_US]: 'About Us',
     [ContentType.TERMS_AND_CONDITIONS]: 'Terms and Conditions',
   };
   return typeNames[type] || type;

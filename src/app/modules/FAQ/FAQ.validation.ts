@@ -33,7 +33,7 @@ export const FAQValidation = {
     }),
     params: z.object({
       type: z.enum(
-        [ContentType.PRIVACY_POLICY, ContentType.TERMS_AND_CONDITIONS],
+        [ContentType.ABOUT_US, ContentType.TERMS_AND_CONDITIONS],
         { error: 'Invalid content type!' },
       ),
     }),
