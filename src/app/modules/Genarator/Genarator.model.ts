@@ -9,6 +9,7 @@ import {
   TIMELINE_URGENCIES,
 } from '../../constants';
 import { qIdPlugin } from '../../lib/qId';
+import { quoteSubmitNotificationPlugin } from '../Notification/Notification.plugin';
 import { statusTimelinePlugin } from '../../lib/statusTimeline';
 import { IGenarator } from './Genarator.interface';
 
@@ -215,6 +216,7 @@ GenaratorSchema.index({ createdBy: 1, status: 1 });
 GenaratorSchema.index({ status: 1, createdAt: -1 });
 GenaratorSchema.index({ createdBy: 1, createdAt: -1 });
 
+GenaratorSchema.plugin(quoteSubmitNotificationPlugin);
 GenaratorSchema.plugin(qIdPlugin);
 GenaratorSchema.plugin(statusTimelinePlugin);
 

@@ -9,6 +9,7 @@ import {
   TIMELINE_URGENCIES,
 } from '../../constants';
 import { qIdPlugin } from '../../lib/qId';
+import { quoteSubmitNotificationPlugin } from '../Notification/Notification.plugin';
 import { statusTimelinePlugin } from '../../lib/statusTimeline';
 import {
   EXHAUST_FAN_INSTALL_TYPES,
@@ -242,6 +243,7 @@ ExhaustFansSchema.index({ createdBy: 1, status: 1 });
 ExhaustFansSchema.index({ status: 1, createdAt: -1 });
 ExhaustFansSchema.index({ createdBy: 1, createdAt: -1 });
 
+ExhaustFansSchema.plugin(quoteSubmitNotificationPlugin);
 ExhaustFansSchema.plugin(qIdPlugin);
 ExhaustFansSchema.plugin(statusTimelinePlugin);
 

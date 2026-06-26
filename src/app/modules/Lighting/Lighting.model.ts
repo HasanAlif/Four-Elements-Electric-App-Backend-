@@ -9,6 +9,7 @@ import {
   TIMELINE_URGENCIES,
 } from '../../constants';
 import { qIdPlugin } from '../../lib/qId';
+import { quoteSubmitNotificationPlugin } from '../Notification/Notification.plugin';
 import { statusTimelinePlugin } from '../../lib/statusTimeline';
 import {
   ILighting,
@@ -288,6 +289,7 @@ LightingSchema.index({ createdBy: 1, status: 1 });
 LightingSchema.index({ status: 1, createdAt: -1 });
 LightingSchema.index({ createdBy: 1, createdAt: -1 });
 
+LightingSchema.plugin(quoteSubmitNotificationPlugin);
 LightingSchema.plugin(qIdPlugin);
 LightingSchema.plugin(statusTimelinePlugin);
 

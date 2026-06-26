@@ -9,6 +9,7 @@ import {
   TIMELINE_URGENCIES,
 } from '../../constants';
 import { qIdPlugin } from '../../lib/qId';
+import { quoteSubmitNotificationPlugin } from '../Notification/Notification.plugin';
 import { statusTimelinePlugin } from '../../lib/statusTimeline';
 import { IOutlets, OUTLET_INSTALL_TYPES } from './Outlets.interface';
 
@@ -201,6 +202,7 @@ OutletsSchema.index({ createdBy: 1, status: 1 });
 OutletsSchema.index({ status: 1, createdAt: -1 });
 OutletsSchema.index({ createdBy: 1, createdAt: -1 });
 
+OutletsSchema.plugin(quoteSubmitNotificationPlugin);
 OutletsSchema.plugin(qIdPlugin);
 OutletsSchema.plugin(statusTimelinePlugin);
 

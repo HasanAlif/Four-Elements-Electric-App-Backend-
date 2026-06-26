@@ -1,7 +1,9 @@
 import httpStatus from 'http-status';
+import { Types } from 'mongoose';
 import { Service_STATUSES } from '../../constants';
 import { AppError } from '../../utils';
 import { serviceModels } from '../serviceModels';
+import { NotificationService } from '../Notification/Notification.service';
 import CategoryModel from './Category.model';
 import PartnerModel from './Partner.model';
 import FAQModel from '../FAQ/FAQ.model';
@@ -251,6 +253,19 @@ const updateQuoteStatus = async (
     );
   }
 
+  // Locate the owning collection + current state first, so we can notify the owner
+  // only when the status actually changes (and know the deep-link model name).
+  const currentMatches = await Promise.all(
+    serviceModels.map(async model => ({
+      model,
+      doc: await model
+        .findOne({ _id: quoteId, status: { $ne: Service_STATUSES.DRAFT } })
+        .select('status createdBy')
+        .lean(),
+    })),
+  );
+  const currentMatch = currentMatches.find(entry => entry.doc);
+
   // ObjectIds are globally unique, so at most one collection holds this quote.
   // Drafts are never exposed/edited through the admin surface.
   const results = await Promise.all(
@@ -269,6 +284,25 @@ const updateQuoteStatus = async (
 
   if (!updated) {
     throw new AppError(httpStatus.NOT_FOUND, 'Quote not found!');
+  }
+
+  // Notify the quote OWNER on a real status change (not the admin, not no-ops).
+  // Awaited but fully isolated inside NotificationService — never throws, so a
+  // notification/push failure can't fail this admin update.
+  const previousStatus = currentMatch?.doc?.status as string | undefined;
+  if (
+    currentMatch &&
+    payload.status !== undefined &&
+    payload.status !== previousStatus
+  ) {
+    await NotificationService.notifyStatusChanged({
+      recipientId: currentMatch.doc?.createdBy as Types.ObjectId,
+      serviceModel: currentMatch.model.modelName,
+      serviceId: updated._id as Types.ObjectId,
+      qId: updated.qId,
+      serviceType: updated.serviceType,
+      status: updated.status as string,
+    });
   }
 
   return updated;

@@ -9,6 +9,7 @@ import {
   TIMELINE_URGENCIES,
 } from '../../constants';
 import { qIdPlugin } from '../../lib/qId';
+import { quoteSubmitNotificationPlugin } from '../Notification/Notification.plugin';
 import { statusTimelinePlugin } from '../../lib/statusTimeline';
 import {
   CEILING_FAN_INSTALL_TYPES,
@@ -213,6 +214,7 @@ CellingFansSchema.index({ createdBy: 1, status: 1 });
 CellingFansSchema.index({ status: 1, createdAt: -1 });
 CellingFansSchema.index({ createdBy: 1, createdAt: -1 });
 
+CellingFansSchema.plugin(quoteSubmitNotificationPlugin);
 CellingFansSchema.plugin(qIdPlugin);
 CellingFansSchema.plugin(statusTimelinePlugin);
 

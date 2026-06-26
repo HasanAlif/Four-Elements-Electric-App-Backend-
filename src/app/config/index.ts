@@ -51,6 +51,13 @@ export default {
     password: process.env.PASSWORD_FOR_NODEMAILER,
   },
 
+  firebase: {
+    project_id: process.env.FIREBASE_PROJECT_ID,
+    client_email: process.env.FIREBASE_CLIENT_EMAIL,
+    // arrives with literal "\n" sequences from .env; normalized at init time
+    private_key: process.env.FIREBASE_PRIVATE_KEY,
+  },
+
   superAdmin: {
     name: process.env.SUPER_ADMIN_NAME,
     // address: process.env.SUPER_ADMIN_ADDRESS,

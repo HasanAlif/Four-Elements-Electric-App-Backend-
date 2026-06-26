@@ -9,6 +9,7 @@ import {
   TIMELINE_URGENCIES,
 } from '../../constants';
 import { qIdPlugin } from '../../lib/qId';
+import { quoteSubmitNotificationPlugin } from '../Notification/Notification.plugin';
 import { statusTimelinePlugin } from '../../lib/statusTimeline';
 import { IHomeSurgeProtection } from './HomeSurgeProtection.interface';
 
@@ -169,6 +170,7 @@ HomeSurgeProtectionSchema.index({ createdBy: 1, status: 1 });
 HomeSurgeProtectionSchema.index({ status: 1, createdAt: -1 });
 HomeSurgeProtectionSchema.index({ createdBy: 1, createdAt: -1 });
 
+HomeSurgeProtectionSchema.plugin(quoteSubmitNotificationPlugin);
 HomeSurgeProtectionSchema.plugin(qIdPlugin);
 HomeSurgeProtectionSchema.plugin(statusTimelinePlugin);
 

@@ -6,6 +6,7 @@ import config from './app/config';
 import seedSuperAdmin from './app/seed';
 import colors from 'colors';
 import { createServer } from 'http';
+import { initFirebase } from './app/lib';
 import 'dotenv/config';
 
 // import { initSocket } from './app/socket';
@@ -42,6 +43,14 @@ async function main() {
     await connectToDatabase();
     // Seed function
     await seedSuperAdmin();
+
+    // Initialize Firebase Admin (FCM). Non-fatal: logs a warning and no-ops pushes
+    // if creds are missing, so the API still boots without Firebase configured.
+    try {
+      initFirebase();
+    } catch (err) {
+      console.error(colors.red('Failed to initialize Firebase (FCM):'), err);
+    }
 
     const httpServer = createServer(app);
     // initSocket(httpServer);

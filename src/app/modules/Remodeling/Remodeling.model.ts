@@ -8,6 +8,7 @@ import {
   TIMELINE_URGENCIES,
 } from '../../constants';
 import { qIdPlugin } from '../../lib/qId';
+import { quoteSubmitNotificationPlugin } from '../Notification/Notification.plugin';
 import { statusTimelinePlugin } from '../../lib/statusTimeline';
 import {
   IRemodeling,
@@ -196,6 +197,7 @@ remodelingSchema.index({ createdBy: 1, status: 1 });
 remodelingSchema.index({ status: 1, createdAt: -1 });
 remodelingSchema.index({ createdBy: 1, createdAt: -1 });
 
+remodelingSchema.plugin(quoteSubmitNotificationPlugin);
 remodelingSchema.plugin(qIdPlugin);
 remodelingSchema.plugin(statusTimelinePlugin);
 

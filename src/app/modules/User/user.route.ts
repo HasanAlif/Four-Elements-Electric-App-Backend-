@@ -174,4 +174,18 @@ router
     UserController.deleteImage,
   );
 
+// 21. register / remove an FCM device token (any logged-in role)
+router
+  .route('/fcm-token')
+  .post(
+    auth(ROLE.USER, ROLE.ADMIN, ROLE.SUPER_ADMIN),
+    validateRequest(UserValidation.fcmTokenSchema),
+    UserController.addFcmToken,
+  )
+  .delete(
+    auth(ROLE.USER, ROLE.ADMIN, ROLE.SUPER_ADMIN),
+    validateRequest(UserValidation.fcmTokenSchema),
+    UserController.removeFcmToken,
+  );
+
 export const UserRoutes = router;

@@ -117,6 +117,12 @@ const userSchema = new Schema<IUser, IUserModel>(
     deactivationReason: {
       type: String,
     },
+
+    // Registered device tokens for FCM push (a user may have several devices).
+    fcmTokens: {
+      type: [String],
+      default: [],
+    },
   },
   { timestamps: true, versionKey: false },
 );

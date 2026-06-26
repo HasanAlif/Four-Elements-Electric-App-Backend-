@@ -9,6 +9,7 @@ import {
   TIMELINE_URGENCIES,
 } from '../../constants';
 import { qIdPlugin } from '../../lib/qId';
+import { quoteSubmitNotificationPlugin } from '../Notification/Notification.plugin';
 import { statusTimelinePlugin } from '../../lib/statusTimeline';
 import { IElectric } from './Electric.interface';
 import { string } from 'zod';
@@ -183,6 +184,7 @@ electricSchema.index({ createdBy: 1, status: 1 });
 electricSchema.index({ status: 1, createdAt: -1 });
 electricSchema.index({ createdBy: 1, createdAt: -1 });
 
+electricSchema.plugin(quoteSubmitNotificationPlugin);
 electricSchema.plugin(qIdPlugin);
 electricSchema.plugin(statusTimelinePlugin);
 

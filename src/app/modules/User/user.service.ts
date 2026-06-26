@@ -366,7 +366,11 @@ const verifySignupOtpIntoDB = async (userEmail: string, otp: string) => {
 };
 
 // 4. signinIntoDB
-const signinIntoDB = async (payload: { email: string; password: string }) => {
+const signinIntoDB = async (payload: {
+  email: string;
+  password: string;
+  fcmToken?: string;
+}) => {
   // const user = await UserModel.findOne({ email: payload.email }).select('+password');
   const user = await UserModel.isUserExistsByEmailWithPassword(payload.email);
 
@@ -415,6 +419,14 @@ const signinIntoDB = async (payload: { email: string; password: string }) => {
 
   if (!isPasswordCorrect) {
     throw new AppError(httpStatus.BAD_REQUEST, 'Password not matched!');
+  }
+
+  // Register the device token sent at login (idempotent; response shape unchanged).
+  if (payload.fcmToken) {
+    await UserModel.updateOne(
+      { _id: user._id },
+      { $addToSet: { fcmTokens: payload.fcmToken } },
+    );
   }
 
   // Prepare user data for token generation
@@ -1554,6 +1566,24 @@ const deleteImageFromDB = async (imageUrl: string) => {
   }
 };
 
+// 21. addFcmTokenIntoDB — register a device token (idempotent via $addToSet).
+const addFcmTokenIntoDB = async (userId: string, fcmToken: string) => {
+  await UserModel.updateOne(
+    { _id: userId },
+    { $addToSet: { fcmTokens: fcmToken } },
+  );
+  return { fcmToken };
+};
+
+// 22. removeFcmTokenFromDB — unregister a device token (called on logout).
+const removeFcmTokenFromDB = async (userId: string, fcmToken: string) => {
+  await UserModel.updateOne(
+    { _id: userId },
+    { $pull: { fcmTokens: fcmToken } },
+  );
+  return { fcmToken };
+};
+
 export const UserService = {
   createUserIntoDB,
   sendSignupOtpAgainIntoDB,
@@ -1576,4 +1606,6 @@ export const UserService = {
   // getAllUserFromDB,
   uploadImagesIntoDB,
   deleteImageFromDB,
+  addFcmTokenIntoDB,
+  removeFcmTokenFromDB,
 };

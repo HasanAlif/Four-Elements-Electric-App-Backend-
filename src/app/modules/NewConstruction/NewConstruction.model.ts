@@ -9,6 +9,7 @@ import {
   TIMELINE_URGENCIES,
 } from '../../constants';
 import { qIdPlugin } from '../../lib/qId';
+import { quoteSubmitNotificationPlugin } from '../Notification/Notification.plugin';
 import { statusTimelinePlugin } from '../../lib/statusTimeline';
 import { INewConstruction } from './NewConstruction.interface';
 
@@ -175,6 +176,7 @@ NewConstructionSchema.index({ createdBy: 1, status: 1 });
 NewConstructionSchema.index({ status: 1, createdAt: -1 });
 NewConstructionSchema.index({ createdBy: 1, createdAt: -1 });
 
+NewConstructionSchema.plugin(quoteSubmitNotificationPlugin);
 NewConstructionSchema.plugin(qIdPlugin);
 NewConstructionSchema.plugin(statusTimelinePlugin);
 

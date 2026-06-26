@@ -8,6 +8,7 @@ import {
   TIMELINE_URGENCIES,
 } from '../../constants';
 import { qIdPlugin } from '../../lib/qId';
+import { quoteSubmitNotificationPlugin } from '../Notification/Notification.plugin';
 import { statusTimelinePlugin } from '../../lib/statusTimeline';
 import {
   HOT_TUB_AMPERAGES,
@@ -208,6 +209,7 @@ hotTubSchema.index({ createdBy: 1, status: 1 });
 hotTubSchema.index({ status: 1, createdAt: -1 });
 hotTubSchema.index({ createdBy: 1, createdAt: -1 });
 
+hotTubSchema.plugin(quoteSubmitNotificationPlugin);
 hotTubSchema.plugin(qIdPlugin);
 hotTubSchema.plugin(statusTimelinePlugin);
 

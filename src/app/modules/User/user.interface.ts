@@ -41,6 +41,8 @@ export interface IUser extends Document {
   isDeleted: boolean;
   deactivationReason?: string;
 
+  fcmTokens?: string[]; // registered device tokens for push notifications
+
   createdAt: Date;
   updatedAt: Date;
 

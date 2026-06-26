@@ -101,6 +101,9 @@ const signinSchema = z.object({
       })
       .min(8, { message: 'Password must be at least 8 characters long!' })
       .max(20, { message: 'Password cannot exceed 20 characters!' }),
+
+    // Optional device token to register on this device at login.
+    fcmToken: z.string().min(1).optional(),
   }),
 });
 
@@ -277,6 +280,15 @@ const deleteImageSchema = z.object({
   }),
 });
 
+// 17. fcmTokenSchema (register / remove a device token)
+const fcmTokenSchema = z.object({
+  body: z.object({
+    fcmToken: z
+      .string({ error: 'FCM token is required!' })
+      .min(1, { message: 'FCM token is required!' }),
+  }),
+});
+
 export const UserValidation = {
   createUserSchema,
   sendSignupOtpAgainSchema,
@@ -292,4 +304,5 @@ export const UserValidation = {
   getNewAccessTokenSchema,
   deactivateUserAccountSchema,
   deleteImageSchema,
+  fcmTokenSchema,
 };

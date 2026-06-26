@@ -9,6 +9,7 @@ import {
   TIMELINE_URGENCIES,
 } from '../../constants';
 import { qIdPlugin } from '../../lib/qId';
+import { quoteSubmitNotificationPlugin } from '../Notification/Notification.plugin';
 import { statusTimelinePlugin } from '../../lib/statusTimeline';
 import { IStarlink } from './Starlink.interface';
 
@@ -195,6 +196,7 @@ StarlinkSchema.index({ createdBy: 1, status: 1 });
 StarlinkSchema.index({ status: 1, createdAt: -1 });
 StarlinkSchema.index({ createdBy: 1, createdAt: -1 });
 
+StarlinkSchema.plugin(quoteSubmitNotificationPlugin);
 StarlinkSchema.plugin(qIdPlugin);
 StarlinkSchema.plugin(statusTimelinePlugin);
 

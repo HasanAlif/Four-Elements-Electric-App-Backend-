@@ -8,6 +8,7 @@ import {
   TIMELINE_URGENCIES,
 } from '../../constants';
 import { qIdPlugin } from '../../lib/qId';
+import { quoteSubmitNotificationPlugin } from '../Notification/Notification.plugin';
 import { statusTimelinePlugin } from '../../lib/statusTimeline';
 import { IEVChargerInstallation } from './EVChargerInstallation.interface';
 // import {
@@ -216,6 +217,7 @@ evChargerInstallationSchema.index({ createdBy: 1, status: 1 });
 evChargerInstallationSchema.index({ status: 1, createdAt: -1 });
 evChargerInstallationSchema.index({ createdBy: 1, createdAt: -1 });
 
+evChargerInstallationSchema.plugin(quoteSubmitNotificationPlugin);
 evChargerInstallationSchema.plugin(qIdPlugin);
 evChargerInstallationSchema.plugin(statusTimelinePlugin);
 

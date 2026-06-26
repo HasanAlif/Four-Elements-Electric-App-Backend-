@@ -255,6 +255,34 @@ const deleteImage = asyncHandler(async (req, res) => {
   });
 });
 
+// 21. addFcmToken
+const addFcmToken = asyncHandler(async (req, res) => {
+  const result = await UserService.addFcmTokenIntoDB(
+    req.user._id.toString(),
+    req.body.fcmToken as string,
+  );
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    message: 'Device registered for notifications!',
+    data: result,
+  });
+});
+
+// 22. removeFcmToken
+const removeFcmToken = asyncHandler(async (req, res) => {
+  const result = await UserService.removeFcmTokenFromDB(
+    req.user._id.toString(),
+    req.body.fcmToken as string,
+  );
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    message: 'Device unregistered from notifications!',
+    data: result,
+  });
+});
+
 export const UserController = {
   createUser,
   sendSignupOtpAgain,
@@ -277,4 +305,6 @@ export const UserController = {
   // getAllUser,
   uploadImages,
   deleteImage,
+  addFcmToken,
+  removeFcmToken,
 };

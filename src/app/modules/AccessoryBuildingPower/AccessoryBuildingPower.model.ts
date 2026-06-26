@@ -8,6 +8,7 @@ import {
   TIMELINE_URGENCIES,
 } from '../../constants';
 import { qIdPlugin } from '../../lib/qId';
+import { quoteSubmitNotificationPlugin } from '../Notification/Notification.plugin';
 import { statusTimelinePlugin } from '../../lib/statusTimeline';
 import {
   // ACCESSORY_BUILDING_CIRCUIT_AMP_RATINGS,
@@ -246,6 +247,7 @@ accessoryBuildingPowerSchema.index({ createdBy: 1, status: 1 });
 accessoryBuildingPowerSchema.index({ status: 1, createdAt: -1 });
 accessoryBuildingPowerSchema.index({ createdBy: 1, createdAt: -1 });
 
+accessoryBuildingPowerSchema.plugin(quoteSubmitNotificationPlugin);
 accessoryBuildingPowerSchema.plugin(qIdPlugin);
 accessoryBuildingPowerSchema.plugin(statusTimelinePlugin);
 
