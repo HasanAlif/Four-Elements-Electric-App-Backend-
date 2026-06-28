@@ -42,6 +42,7 @@ const getUserRecntActivity = asyncHandler(
   async (req: Request, res: Response) => {
     const data = await QuotesService.getUserRecntActivity(
       req.user._id.toString(),
+      asString(req.query.type),
     );
 
     sendResponse(res, {

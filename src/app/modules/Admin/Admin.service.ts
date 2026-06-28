@@ -4,6 +4,7 @@ import { Service_STATUSES } from '../../constants';
 import { AppError } from '../../utils';
 import { serviceModels } from '../serviceModels';
 import { NotificationService } from '../Notification/Notification.service';
+import { RecentActivityService } from '../RecentActivity/RecentActivity.service';
 import CategoryModel from './Category.model';
 import PartnerModel from './Partner.model';
 import FAQModel from '../FAQ/FAQ.model';
@@ -302,6 +303,17 @@ const updateQuoteStatus = async (
       qId: updated.qId,
       serviceType: updated.serviceType,
       status: updated.status as string,
+    });
+
+    // Refresh this quote's Recent Activity row (resurfaces for send/closed). Isolated.
+    await RecentActivityService.recordQuoteActivity({
+      user: currentMatch.doc?.createdBy as Types.ObjectId,
+      refId: updated._id as Types.ObjectId,
+      refModel: currentMatch.model.modelName,
+      title: updated.serviceType,
+      status: updated.status as string,
+      createdAt: updated.createdAt,
+      statusChangedAt: new Date(),
     });
   }
 

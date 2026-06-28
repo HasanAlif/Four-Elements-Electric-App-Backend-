@@ -6,6 +6,13 @@ import { serviceModels } from '../serviceModels';
 import PartnerModel from '../Admin/Partner.model';
 import CategoryModel from '../Admin/Category.model';
 import FavoriteModel from './Favorite.model';
+import UserModel from '../User/user.model';
+import RecentActivityModel from '../RecentActivity/RecentActivity.model';
+import { getQuoteActivityVerb } from '../RecentActivity/RecentActivity.constant';
+import {
+  MAINTENANCE_ALERTS,
+  MAINTENANCE_FIELD_KEYS,
+} from '../MaintenanceAlerts/maintenanceAlerts.constant';
 
 type QuoteRow = {
   _id: unknown;
@@ -273,35 +280,116 @@ const getMySingleQuoteActivityDetails = async (
   };
 };
 
-const getUserRecntActivity = async (userId: string) => {
-  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+// --- Recent-activity feed ---
 
-  // The only user action is submitting a quote, so recent activity = this user's
-  // non-draft quotes created within the last 7 days, newest first.
-  const rowsPerModel = await Promise.all(
-    quoteModels.map(model =>
-      model
-        .find({
-          createdBy: userId,
-          status: { $ne: Service_STATUSES.DRAFT },
-          createdAt: { $gte: sevenDaysAgo },
+const DAY_MS = 24 * 60 * 60 * 1000;
+const RECENT_PAST_DAYS = 30;
+const RECENT_UPCOMING_DAYS = 30;
+
+const formatUpcoming = (date: Date) => {
+  const days = Math.ceil((new Date(date).getTime() - Date.now()) / DAY_MS);
+  if (days <= 0) return 'Due today';
+  if (days === 1) return 'Due in 1 day';
+  return `Due in ${days} days`;
+};
+
+type TActivityFeedItem = {
+  id?: string;
+  type: 'quote' | 'guide' | 'reminder';
+  title: string;
+  status: string | null;
+  serviceModel?: string;
+  timestamp: string;
+};
+
+// Optional `type` filter: 'all' (default) or a single feed item type.
+const RECENT_ACTIVITY_FILTERS = ['all', 'quote', 'guide', 'reminder'] as const;
+type TRecentActivityFilter = (typeof RECENT_ACTIVITY_FILTERS)[number];
+
+const getUserRecntActivity = async (userId: string, rawType?: string) => {
+  const type = (rawType ?? 'all').trim().toLowerCase();
+  if (!RECENT_ACTIVITY_FILTERS.includes(type as TRecentActivityFilter)) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      `type must be one of: ${RECENT_ACTIVITY_FILTERS.join(', ')}!`,
+    );
+  }
+
+  const now = Date.now();
+  const pastCutoff = new Date(now - RECENT_PAST_DAYS * DAY_MS);
+  const upcomingCutoff = new Date(now + RECENT_UPCOMING_DAYS * DAY_MS);
+
+  const wantStored = type === 'all' || type === 'quote' || type === 'guide';
+  const wantReminders = type === 'all' || type === 'reminder';
+
+  const pastPromise: Promise<TActivityFeedItem[]> = wantStored
+    ? RecentActivityModel.find({
+        user: userId,
+        activityAt: { $gte: pastCutoff },
+        ...(type === 'all' ? {} : { type }),
+      })
+        .sort({ activityAt: -1 })
+        .lean()
+        .then(rows =>
+          rows.map(
+            (row): TActivityFeedItem =>
+              row.type === 'quote'
+                ? {
+                    id: String(row.refId),
+                    type: 'quote',
+                    title: row.title,
+                    status: row.status ?? null,
+                    serviceModel: row.refModel,
+                    timestamp: `${getQuoteActivityVerb(row.status)} ${formatRelative(row.activityAt)}`,
+                  }
+                : {
+                    id: String(row.refId),
+                    type: 'guide',
+                    title: row.title,
+                    status: null,
+                    timestamp: `Saved ${formatRelative(row.activityAt)}`,
+                  },
+          ),
+        )
+    : Promise.resolve([]);
+
+  // Live reminders: enabled maintenance tasks due within the upcoming window, soonest first.
+  const remindersPromise: Promise<TActivityFeedItem[]> = wantReminders
+    ? UserModel.findById(userId)
+        .select('+maintenanceAlerts')
+        .lean()
+        .then(user => {
+          const alerts = user?.maintenanceAlerts;
+          if (!alerts) return [];
+
+          const reminders: (TActivityFeedItem & { _due: number })[] = [];
+          for (const key of MAINTENANCE_FIELD_KEYS) {
+            const alert = alerts[key];
+            if (!alert?.enabled || !alert.nextDueAt) continue;
+
+            const due = new Date(alert.nextDueAt);
+            if (due.getTime() < now || due > upcomingCutoff) continue;
+
+            reminders.push({
+              type: 'reminder',
+              title: MAINTENANCE_ALERTS[key].title,
+              status: 'upcoming',
+              timestamp: formatUpcoming(due),
+              _due: due.getTime(),
+            });
+          }
+          reminders.sort((a, b) => a._due - b._due);
+          return reminders.map(({ _due, ...item }) => item);
         })
-        .select('serviceType status createdAt')
-        .lean(),
-    ),
-  );
+    : Promise.resolve([]);
 
-  return rowsPerModel
-    .flat()
-    .sort(
-      (a, b) =>
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-    )
-    .map(row => ({
-      serviceType: row.serviceType,
-      status: row.status,
-      Submitted: formatRelative(row.createdAt),
-    }));
+  const [past, reminderItems] = await Promise.all([
+    pastPromise,
+    remindersPromise,
+  ]);
+
+  // Reminders first (soonest due), then stored past events (already newest-first).
+  return [...reminderItems, ...past];
 };
 
 // Relevance of one field against the (lowercased) query: exact > starts-with >

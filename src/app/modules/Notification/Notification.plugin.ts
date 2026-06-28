@@ -2,6 +2,7 @@
 import { Schema } from 'mongoose';
 import { Service_STATUSES } from '../../constants';
 import { NotificationService } from './Notification.service';
+import { RecentActivityService } from '../RecentActivity/RecentActivity.service';
 
 // Emits a QUOTE_SUBMITTED notification the first time a service request becomes a
 // real (non-draft) quote — i.e. the exact moment qIdPlugin mints its qId. Defined
@@ -31,6 +32,16 @@ export const quoteSubmitNotificationPlugin = (schema: Schema) => {
       qId: this.qId,
       serviceType: this.serviceType,
       status: this.status,
+    });
+
+    // Record the submission in the Recent Activity feed (also isolated — never throws).
+    await RecentActivityService.recordQuoteActivity({
+      user: this.createdBy,
+      refId: this._id,
+      refModel: this.constructor.modelName,
+      title: this.serviceType,
+      status: this.status,
+      createdAt: this.createdAt,
     });
   });
 };

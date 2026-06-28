@@ -5,6 +5,7 @@ import QueryBuilder from '../../builder/QueryBuilder';
 import GuideModel, { IGuide } from './Guide.model';
 import SavedGuideModel, { ISavedGuide } from './savedGuide.model';
 import { TCreateGuidePayload, TGuideQuery } from './Guide.interface';
+import { RecentActivityService } from '../RecentActivity/RecentActivity.service';
 
 // Shape of a SavedGuide row once `.populate('guide').lean()` has run (guide may be null
 // if the referenced guide was removed).
@@ -81,7 +82,7 @@ const getSingleGuideFromDB = async (userId: string, id: string) => {
 const saveGuideIntoDB = async (userId: string, guideId: string) => {
   assertObjectId(guideId);
 
-  const guide = await GuideModel.findById(guideId).select('_id');
+  const guide = await GuideModel.findById(guideId).select('_id name');
   if (!guide) {
     throw new AppError(httpStatus.NOT_FOUND, 'Guide not found!');
   }
@@ -94,6 +95,14 @@ const saveGuideIntoDB = async (userId: string, guideId: string) => {
     { upsert: true },
   );
 
+  // Surface the save in the Recent Activity feed (isolated — never throws).
+  await RecentActivityService.recordGuideActivity({
+    user: userId,
+    refId: guideId,
+    title: guide.name,
+    activityAt: new Date(),
+  });
+
   return { guideId, isSaved: true };
 };
 
@@ -102,6 +111,12 @@ const unsaveGuideFromDB = async (userId: string, guideId: string) => {
 
   // Idempotent: removing a guide that isn't saved simply deletes nothing.
   await SavedGuideModel.deleteOne({ user: userId, guide: guideId });
+
+  // Drop its Recent Activity row so it leaves the feed (isolated — never throws).
+  await RecentActivityService.removeGuideActivity({
+    user: userId,
+    refId: guideId,
+  });
 
   return { guideId, isSaved: false };
 };
