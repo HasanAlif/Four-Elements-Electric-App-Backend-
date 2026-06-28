@@ -7,6 +7,7 @@ import seedSuperAdmin from './app/seed';
 import colors from 'colors';
 import { createServer } from 'http';
 import { initFirebase } from './app/lib';
+import { startMaintenanceReminderCron } from './app/modules/MaintenanceAlerts/maintenanceAlerts.cron';
 import 'dotenv/config';
 
 let server: Server | null = null;
@@ -48,6 +49,18 @@ async function main() {
       initFirebase();
     } catch (err) {
       console.error(colors.red('Failed to initialize Firebase (FCM):'), err);
+    }
+
+    // Schedule the daily maintenance reminder cron. No-op on serverless (Vercel) unless
+    // ENABLE_MAINTENANCE_CRON=true — there the protected HTTP endpoint + Vercel Cron is
+    // used instead.
+    try {
+      startMaintenanceReminderCron();
+    } catch (err) {
+      console.error(
+        colors.red('Failed to start maintenance reminder cron:'),
+        err,
+      );
     }
 
     const httpServer = createServer(app);

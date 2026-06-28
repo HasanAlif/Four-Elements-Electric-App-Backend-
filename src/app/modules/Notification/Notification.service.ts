@@ -36,6 +36,7 @@ const dispatchPush = async (notification: INotification): Promise<void> => {
     serviceId: notification.serviceId ? String(notification.serviceId) : '',
     qId: notification.qId ?? '',
     status: notification.status ?? '',
+    fieldKey: notification.fieldKey ?? '',
   };
 
   const result = await sendPushToTokens(
@@ -56,36 +57,53 @@ const dispatchPush = async (notification: INotification): Promise<void> => {
   );
 };
 
-// Persist FIRST, then dispatch the push. The whole thing is isolated so a
-// notification/FCM failure can never break the quote write that triggered it.
-const createAndDispatch = async (
+// The shared persist→dispatch choke point. Persist FIRST, then push. Fully isolated —
+// never throws — so a notification/FCM failure can never break the action that
+// triggered it (a quote write, an admin update, or a maintenance scan).
+type TPersistInput = {
+  user: Types.ObjectId | string;
+  type: TNotificationType;
+  title: string;
+  message: string;
+  serviceModel?: string;
+  serviceId?: Types.ObjectId | string;
+  qId?: string;
+  serviceType?: string;
+  status?: string;
+  fieldKey?: string;
+};
+
+const persistAndDispatch = async (doc: TPersistInput): Promise<void> => {
+  try {
+    const notification = await NotificationModel.create(doc);
+    await dispatchPush(notification);
+  } catch (err) {
+    console.error(`[notification] ${doc.type} dispatch failed:`, err);
+  }
+};
+
+// Quote notifications: copy is derived from the centralized catalog.
+const createAndDispatch = (
   type: TNotificationType,
   event: string,
   input: TNotifyInput,
 ): Promise<void> => {
-  try {
-    const { title, message } = buildNotificationContent(event, {
-      serviceType: input.serviceType,
-      qId: input.qId,
-    });
+  const { title, message } = buildNotificationContent(event, {
+    serviceType: input.serviceType,
+    qId: input.qId,
+  });
 
-    const notification = await NotificationModel.create({
-      user: input.recipientId,
-      type,
-      title,
-      message,
-      serviceModel: input.serviceModel,
-      serviceId: input.serviceId,
-      qId: input.qId,
-      serviceType: input.serviceType,
-      status: input.status,
-    });
-
-    await dispatchPush(notification);
-  } catch (err) {
-    // Swallow: the triggering quote write must still succeed.
-    console.error(`[notification] ${type} dispatch failed:`, err);
-  }
+  return persistAndDispatch({
+    user: input.recipientId,
+    type,
+    title,
+    message,
+    serviceModel: input.serviceModel,
+    serviceId: input.serviceId,
+    qId: input.qId,
+    serviceType: input.serviceType,
+    status: input.status,
+  });
 };
 
 // Fired when a quote is first submitted (qId minted). Idempotent at the trigger.
@@ -96,6 +114,22 @@ const notifyQuoteSubmitted = (input: TNotifyInput): Promise<void> =>
 const notifyStatusChanged = (
   input: TNotifyInput & { status: string },
 ): Promise<void> => createAndDispatch('STATUS_CHANGED', input.status, input);
+
+// Fired by the daily maintenance cron when a tracked task is due. Title/message come
+// from the maintenance config map (passed in), keeping this module decoupled from it.
+const notifyMaintenanceReminder = (input: {
+  recipientId: Types.ObjectId | string;
+  fieldKey: string;
+  title: string;
+  message: string;
+}): Promise<void> =>
+  persistAndDispatch({
+    user: input.recipientId,
+    type: 'MAINTENANCE_REMINDER',
+    title: input.title,
+    message: input.message,
+    fieldKey: input.fieldKey,
+  });
 
 // ----- Owner-scoped read / state -----
 
@@ -162,6 +196,7 @@ const markAllAsReadIntoDB = async (userId: string) => {
 export const NotificationService = {
   notifyQuoteSubmitted,
   notifyStatusChanged,
+  notifyMaintenanceReminder,
   getMyNotificationsFromDB,
   markOneAsReadIntoDB,
   markAllAsReadIntoDB,

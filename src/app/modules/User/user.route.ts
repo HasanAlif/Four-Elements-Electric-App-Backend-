@@ -2,6 +2,8 @@ import { Router } from 'express';
 import { auth, validateRequest, authLimiter } from '../../middlewares';
 import { UserValidation } from './user.validation';
 import { UserController } from './user.controller';
+import { MaintenanceAlertsController } from '../MaintenanceAlerts/maintenanceAlerts.controller';
+import { MaintenanceAlertsValidation } from '../MaintenanceAlerts/maintenanceAlerts.validation';
 import { multerUpload } from '../../lib';
 import { ROLE } from './user.constant';
 
@@ -186,6 +188,16 @@ router
     auth(ROLE.USER, ROLE.ADMIN, ROLE.SUPER_ADMIN),
     validateRequest(UserValidation.fcmTokenSchema),
     UserController.removeFcmToken,
+  );
+
+// 22. maintenance alerts — read current states + toggle a subset (owner-scoped)
+router
+  .route('/maintenance-alerts')
+  .get(auth(ROLE.USER), MaintenanceAlertsController.getMyMaintenanceAlerts)
+  .patch(
+    auth(ROLE.USER),
+    validateRequest(MaintenanceAlertsValidation.toggleMaintenanceAlertsSchema),
+    MaintenanceAlertsController.toggleMaintenanceAlerts,
   );
 
 export const UserRoutes = router;

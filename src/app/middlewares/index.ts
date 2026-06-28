@@ -5,6 +5,7 @@ import {
 } from './validateRequest';
 import { globalLimiter, authLimiter } from './rateLimiter';
 import { sanitizeMongo } from './sanitizeMongo';
+import cronAuth from './cronAuth';
 
 export {
   auth,
@@ -13,4 +14,5 @@ export {
   globalLimiter,
   authLimiter,
   sanitizeMongo,
+  cronAuth,
 };

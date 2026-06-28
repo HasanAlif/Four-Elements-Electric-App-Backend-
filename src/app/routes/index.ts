@@ -24,6 +24,7 @@ import { FAQRoutes } from '../modules/FAQ/FAQ.routes';
 import { appContentRoutes } from '../modules/FAQ/appContent.route';
 import { QuotesRoutes } from '../modules/Quotes/Quotes.routes';
 import { NotificationRoutes } from '../modules/Notification/Notification.routes';
+import { MaintenanceCronRoutes } from '../modules/MaintenanceAlerts/maintenanceAlerts.routes';
 
 const router = Router();
 
@@ -127,6 +128,10 @@ const moduleRoutes = [
   {
     path: '/notifications',
     route: NotificationRoutes,
+  },
+  {
+    path: '/internal/cron',
+    route: MaintenanceCronRoutes,
   },
 ];
 

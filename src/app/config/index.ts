@@ -58,6 +58,15 @@ export default {
     private_key: process.env.FIREBASE_PRIVATE_KEY,
   },
 
+  maintenance: {
+    // shared secret for the protected cron endpoint (x-cron-secret or Bearer token)
+    cron_secret: process.env.MAINTENANCE_CRON_SECRET,
+    // UTC hour (0-23) the daily reminder scan runs; defaults to 14 if unset/invalid
+    cron_hour: process.env.MAINTENANCE_CRON_HOUR,
+    // 'true' enables the in-process node-cron (PM2/VM); off by default on serverless
+    enable_in_process_cron: process.env.ENABLE_MAINTENANCE_CRON,
+  },
+
   superAdmin: {
     name: process.env.SUPER_ADMIN_NAME,
     // address: process.env.SUPER_ADMIN_ADDRESS,

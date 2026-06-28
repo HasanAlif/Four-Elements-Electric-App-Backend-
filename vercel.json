@@ -11,5 +11,11 @@
       "src": "/(.*)",
       "dest": "dist/server.js"
     }
+  ],
+  "crons": [
+    {
+      "path": "/api/v1/internal/cron/maintenance-reminders",
+      "schedule": "0 14 * * *"
+    }
   ]
 }

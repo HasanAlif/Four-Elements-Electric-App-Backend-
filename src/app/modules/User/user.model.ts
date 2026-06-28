@@ -5,6 +5,7 @@ import { AUTH_PROVIDER, defaultUserImage, ROLE } from './user.constant';
 import { IUser, IUserModel, TUserAddress } from './user.interface';
 import { AppError } from '../../utils';
 import httpStatus from 'http-status';
+import { MAINTENANCE_FIELD_KEYS } from '../MaintenanceAlerts/maintenanceAlerts.constant';
 
 const userAddressSchema = new Schema<TUserAddress>(
   {
@@ -18,6 +19,34 @@ const userAddressSchema = new Schema<TUserAddress>(
   },
   { _id: true },
 );
+
+// One maintenance task's reminder state. Dedicated per-field dates because the
+// document-level updatedAt changes on every save and can't track per-task cadence.
+const maintenanceAlertSchema = new Schema(
+  {
+    enabled: { type: Boolean, default: false },
+    enabledAt: { type: Date, default: null },
+    nextDueAt: { type: Date, default: null },
+    lastSentAt: { type: Date, default: null },
+  },
+  { _id: false },
+);
+
+// Keyed by the 7 fieldKeys from the maintenance config map (map-driven — adding a task
+// in maintenanceAlerts.constant.ts automatically extends this sub-document).
+const maintenanceAlertsDefinition: Record<
+  string,
+  { type: typeof maintenanceAlertSchema; default: () => object }
+> = {};
+for (const key of MAINTENANCE_FIELD_KEYS) {
+  maintenanceAlertsDefinition[key] = {
+    type: maintenanceAlertSchema,
+    default: () => ({}),
+  };
+}
+const maintenanceAlertsSchema = new Schema(maintenanceAlertsDefinition, {
+  _id: false,
+});
 
 const userSchema = new Schema<IUser, IUserModel>(
   {
@@ -123,6 +152,14 @@ const userSchema = new Schema<IUser, IUserModel>(
       type: [String],
       default: [],
     },
+
+    // Per-task home-maintenance reminder state. select:false keeps it out of every
+    // normal user response (profile/find); the cron reads it via an explicit select.
+    maintenanceAlerts: {
+      type: maintenanceAlertsSchema,
+      select: false,
+      default: () => ({}),
+    },
   },
   { timestamps: true, versionKey: false },
 );
@@ -208,6 +245,7 @@ userSchema.pre('aggregate', function (this: Aggregate<IUser>) {
     // passwordChangedAt: 0,
     otp: 0,
     otpExpiry: 0,
+    maintenanceAlerts: 0,
     // isVerifiedByOTP: 0,
     // isActive: 0,
     // isDeleted: 0,
@@ -245,6 +283,15 @@ userSchema.methods.isJWTIssuedBeforePasswordChanged = function (
 
   return passwordChangedTime > jwtIssuedTimestamp;
 };
+
+// Indexes for the daily maintenance cron's eligibility query (enabled + due) — one
+// compound index per task key, matching the $or-over-keys query in the scan.
+MAINTENANCE_FIELD_KEYS.forEach(key => {
+  userSchema.index({
+    [`maintenanceAlerts.${key}.enabled`]: 1,
+    [`maintenanceAlerts.${key}.nextDueAt`]: 1,
+  });
+});
 
 const UserModel = model<IUser, IUserModel>('User', userSchema);
 

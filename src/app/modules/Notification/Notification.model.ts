@@ -49,6 +49,11 @@ const notificationSchema = new Schema<INotification>(
       type: String,
       trim: true,
     },
+    // Maintenance task key for MAINTENANCE_REMINDER notifications.
+    fieldKey: {
+      type: String,
+      trim: true,
+    },
   },
   {
     timestamps: true, // createdAt is needed for the UI "2h ago" labels
