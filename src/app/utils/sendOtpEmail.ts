@@ -50,7 +50,7 @@ const sendOtpEmail = async ({
           filename: 'logo.png',
           path:
             config.NODE_ENV === 'production'
-              ? 'https://res.cloudinary.com/dweesppci/image/upload/v1780984105/1780984105497-KHALED-SIDDIQUE.png' // ✅ works on Vercel
+              ? 'https://res.cloudinary.com/dweesppci/image/upload/v1780984105/1780984105497-KHALED-SIDDIQUE.png' // ✅ remote URL in production (no bundled assets)
               : path.join(__dirname, 'assets', 'logo.png'), // ✅ works locally
           cid: logoCid, // Embed logo with CID
         },

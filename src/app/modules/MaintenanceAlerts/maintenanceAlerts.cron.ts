@@ -3,14 +3,12 @@ import cron from 'node-cron';
 import config from '../../config';
 import { MaintenanceAlertsService } from './maintenanceAlerts.service';
 
-// Long-lived (PM2/VM) trigger. Disabled by default — only runs when
-// ENABLE_MAINTENANCE_CRON=true. On serverless (Vercel) the protected HTTP endpoint
-// driven by Vercel Cron is used instead, so this stays off there.
+// In-process daily trigger for the long-lived Node server. Scheduled unconditionally
+// at boot; the protected HTTP endpoint (maintenanceAlerts.routes.ts) remains available
+// as a manual "run scan now" trigger for an external scheduler or admin.
 export const startMaintenanceReminderCron = (): void => {
-  if (config.maintenance.enable_in_process_cron !== 'true') return;
-
   // PM2 cluster guard: run on exactly one instance to avoid duplicate sends.
-  const instance = process.env.NODE_APP_INSTANCE;
+  const instance = config.maintenance.node_app_instance;
   if (instance && instance !== '0') return;
 
   const hour = Number(config.maintenance.cron_hour);
@@ -25,5 +23,7 @@ export const startMaintenanceReminderCron = (): void => {
     { timezone: 'UTC', noOverlap: true },
   );
 
-  console.log(`Maintenance reminder cron scheduled daily at ${safeHour}:00 UTC.`);
+  console.log(
+    `Maintenance reminder cron scheduled daily at ${safeHour}:00 UTC.`,
+  );
 };

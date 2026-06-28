@@ -51,9 +51,9 @@ async function main() {
       console.error(colors.red('Failed to initialize Firebase (FCM):'), err);
     }
 
-    // Schedule the daily maintenance reminder cron. No-op on serverless (Vercel) unless
-    // ENABLE_MAINTENANCE_CRON=true — there the protected HTTP endpoint + Vercel Cron is
-    // used instead.
+    // Schedule the daily maintenance reminder cron (in-process node-cron). Runs on a
+    // single instance under PM2; the protected HTTP endpoint stays available as a
+    // manual/external trigger.
     try {
       startMaintenanceReminderCron();
     } catch (err) {

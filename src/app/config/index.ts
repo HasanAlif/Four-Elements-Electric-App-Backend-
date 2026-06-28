@@ -59,12 +59,13 @@ export default {
   },
 
   maintenance: {
-    // shared secret for the protected cron endpoint (x-cron-secret or Bearer token)
+    // shared secret for the protected cron endpoint (x-cron-secret or Bearer token);
+    // intentionally has NO default — a missing secret makes the endpoint fail closed
     cron_secret: process.env.MAINTENANCE_CRON_SECRET,
-    // UTC hour (0-23) the daily reminder scan runs; defaults to 14 if unset/invalid
-    cron_hour: process.env.MAINTENANCE_CRON_HOUR,
-    // 'true' enables the in-process node-cron (PM2/VM); off by default on serverless
-    enable_in_process_cron: process.env.ENABLE_MAINTENANCE_CRON,
+    // UTC hour (0-23) the daily reminder scan runs; default 14 (≈ US morning)
+    cron_hour: process.env.MAINTENANCE_CRON_HOUR || '14',
+    // PM2 cluster instance id (PM2 sets NODE_APP_INSTANCE); cron runs on instance 0 only
+    node_app_instance: process.env.NODE_APP_INSTANCE,
   },
 
   superAdmin: {

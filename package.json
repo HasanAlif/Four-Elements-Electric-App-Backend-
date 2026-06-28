@@ -1,9 +1,9 @@
 {
   "name": "ashley_apis",
   "author": {
-    "name": "Khaled Siddique",
-    "email": "khaledssbd@gmail.com",
-    "url": "https://khaled-siddique.vercel.app"
+    "name": "Mehedi Hasan Alif",
+    "email": "alifalmehedihasan@gmail.com",
+    "url": "https://mehedi-hasan-alif.vercel.app"
   },
   "description": "ashley_apis is a set of RESTful APIs for managing electrical appliances.",
   "keywords": [
@@ -39,7 +39,6 @@
     "format": "prettier --write \"src/**/*.ts\"",
     "format:all": "prettier --write .",
     "create-module": "ts-node src/scripts/createModule.ts",
-    "deploy": "pnpm build && vercel && vercel --prod",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
   },

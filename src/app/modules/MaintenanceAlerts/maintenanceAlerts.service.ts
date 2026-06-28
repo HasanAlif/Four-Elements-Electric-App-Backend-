@@ -104,18 +104,19 @@ const runMaintenanceReminderScan = async (): Promise<{
   let failures = 0;
 
   try {
-    // Indexed eligibility query — only users with >=1 enabled & due task. We never load
-    // every user and filter in memory.
-    const users = await UserModel.find({
+    // Indexed eligibility query — only users with >=1 enabled & due task. Streamed via a
+    // cursor so a large user base is never buffered into memory.
+    const cursor = UserModel.find({
       $or: MAINTENANCE_FIELD_KEYS.map(key => ({
         [`maintenanceAlerts.${key}.enabled`]: true,
         [`maintenanceAlerts.${key}.nextDueAt`]: { $lte: now },
       })),
-    }).select('maintenanceAlerts');
+    })
+      .select('maintenanceAlerts')
+      .cursor();
 
-    scanned = users.length;
-
-    for (const user of users) {
+    for await (const user of cursor) {
+      scanned++;
       // Isolate each user — one user's failure must not abort the whole scan.
       try {
         for (const key of MAINTENANCE_FIELD_KEYS) {
@@ -126,22 +127,17 @@ const runMaintenanceReminderScan = async (): Promise<{
 
           const { title, message, intervalMonths } = MAINTENANCE_ALERTS[key];
 
-          // Reuse the existing pipeline (persist -> FCM -> prune dead -> isolated).
-          await NotificationService.notifyMaintenanceReminder({
-            recipientId: user._id,
-            fieldKey: key,
-            title,
-            message,
-          });
-
-          // ADVANCE on send — anchored to `now`, NOT the old due date, so an overdue
-          // task fires ONCE then moves forward (no catch-up flood). This advancement is
-          // what stops daily re-spam: the task isn't due again until its next cadence.
-          // (Multi-instance hardening: make this a claim-first atomic findOneAndUpdate
-          // guarded on the due condition; the recommended single daily Vercel-Cron call
-          // already guarantees a single invocation.)
-          await UserModel.updateOne(
-            { _id: user._id },
+          // CLAIM-FIRST (atomic): advance this field ONLY if it is still enabled & due.
+          // findOneAndUpdate is atomic, so a concurrent/overlapping scan can't also claim
+          // it — the scan is idempotent under concurrent runs (no double-send), and this
+          // advancement is what stops daily re-spam. Anchored to `now` (not the old due
+          // date) so an overdue task fires ONCE and moves forward — no catch-up flood.
+          const claimed = await UserModel.findOneAndUpdate(
+            {
+              _id: user._id,
+              [`maintenanceAlerts.${key}.enabled`]: true,
+              [`maintenanceAlerts.${key}.nextDueAt`]: { $lte: now },
+            },
             {
               $set: {
                 [`maintenanceAlerts.${key}.lastSentAt`]: now,
@@ -152,6 +148,19 @@ const runMaintenanceReminderScan = async (): Promise<{
               },
             },
           );
+
+          // Lost the race (another run already advanced it) — skip without sending.
+          if (!claimed) continue;
+
+          // We own this cycle: send via the EXISTING pipeline (persist -> FCM -> prune
+          // dead -> failure-isolated). Persist happens before the push, so even an FCM
+          // send failure still leaves the reminder persisted.
+          await NotificationService.notifyMaintenanceReminder({
+            recipientId: user._id,
+            fieldKey: key,
+            title,
+            message,
+          });
           sent++;
         }
       } catch (err) {

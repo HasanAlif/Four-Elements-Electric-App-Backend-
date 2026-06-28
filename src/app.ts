@@ -11,7 +11,8 @@ import config from './app/config';
 
 const app: Application = express();
 
-// behind a single proxy (Vercel) — needed for correct client IP in rate limiting
+// behind a single reverse proxy (nginx / load balancer) — needed for correct client IP
+// in rate limiting
 app.set('trust proxy', 1);
 
 // app.disable('etag');
