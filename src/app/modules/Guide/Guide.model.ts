@@ -3,7 +3,7 @@ import { Schema, model, Document } from 'mongoose';
 export interface IGuide extends Document {
   name: string;
   safetyWarnings: string;
-  steps: string[];
+  steps: { subtitle: string; description: string }[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -21,7 +21,12 @@ const GuideSchema = new Schema<IGuide>(
       required: [true, 'Safety warnings are required!'],
     },
     steps: {
-      type: [String],
+      type: [
+        {
+          subtitle: { type: String, trim: true },
+          description: { type: String, trim: true },
+        },
+      ],
       required: [true, 'Steps are required!'],
     },
   },

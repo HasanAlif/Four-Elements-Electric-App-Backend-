@@ -2,7 +2,7 @@
 export type TCreateGuidePayload = {
   name: string;
   safetyWarnings: string;
-  steps: string[];
+  steps: { subtitle: string; description: string }[];
 };
 
 // Common list/pagination query passed through to QueryBuilder.

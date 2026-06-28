@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
-// Admin create: all three fields required; steps is a non-empty array of non-empty strings.
+// Admin create: all three fields required; steps is a non-empty array of objects,
+// each with a non-empty subtitle and description.
 const createGuideSchema = z.object({
   body: z.object({
     name: z.string({ error: 'Name is required!' }).trim().min(1),
@@ -9,9 +10,19 @@ const createGuideSchema = z.object({
       .trim()
       .min(1),
     steps: z
-      .array(z.string().trim().min(1, 'A step cannot be empty!'), {
-        error: 'Steps are required!',
-      })
+      .array(
+        z.object({
+          subtitle: z
+            .string({ error: 'Subtitle is required!' })
+            .trim()
+            .min(1, 'Subtitle cannot be empty!'),
+          description: z
+            .string({ error: 'Description is required!' })
+            .trim()
+            .min(1, 'Description cannot be empty!'),
+        }),
+        { error: 'Steps are required!' },
+      )
       .min(1, 'Provide at least one step!'),
   }),
 });
