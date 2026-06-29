@@ -11,10 +11,8 @@ import {
   ACCESSORY_BUILDING_CIRCUIT_COUNTS,
   ACCESSORY_BUILDING_CONSTRUCTION_TYPES,
   ACCESSORY_BUILDING_FLOOR_TYPES,
-  ACCESSORY_BUILDING_PANEL_LOCATIONS,
   ACCESSORY_BUILDING_SERVICE_SIZES,
   ACCESSORY_BUILDING_SERVICE_TYPES,
-  ACCESSORY_BUILDING_STATUSES,
 } from './AccessoryBuildingPower.interface';
 
 const accessoryBuildingPowerBodySchema = z.object({
@@ -39,7 +37,7 @@ const accessoryBuildingPowerBodySchema = z.object({
     .optional(),
   intendedUse: z.string().optional(),
 
-  buildingStatus: z.enum(ACCESSORY_BUILDING_STATUSES).optional(),
+  buildingStatus: z.string().optional(),
   constructionType: z.enum(ACCESSORY_BUILDING_CONSTRUCTION_TYPES).optional(),
   hasHeatingOrCooling: z.boolean().optional(),
   floorType: z.enum(ACCESSORY_BUILDING_FLOOR_TYPES).optional(),
@@ -52,7 +50,7 @@ const accessoryBuildingPowerBodySchema = z.object({
     .enum(ACCESSORY_BUILDING_CIRCUIT_AMP_RATINGS)
     .optional(),
 
-  panelLocation: z.enum(ACCESSORY_BUILDING_PANEL_LOCATIONS).optional(),
+  panelLocation: z.string().optional(),
   panelLocationOther: z.string().optional(),
 
   panelPhotos: z.array(z.string()).optional(),

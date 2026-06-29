@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import httpStatus from 'http-status';
 import UserModel from '../User/user.model';
 import { AppError } from '../../utils';
@@ -14,8 +13,6 @@ import {
 } from './maintenanceAlerts.interface';
 import { TMaintenanceAlerts } from '../User/user.interface';
 
-// Serialize the user's current per-task state for all 7 keys. Robust to users created
-// before a key existed (missing -> disabled/null).
 const serializeStates = (
   alerts?: Partial<TMaintenanceAlerts>,
 ): TMaintenanceAlertStates =>
@@ -28,7 +25,6 @@ const serializeStates = (
     return acc;
   }, {} as TMaintenanceAlertStates);
 
-// GET — current toggle states for the owner (renders the settings screen).
 const getMyMaintenanceAlertsFromDB = async (
   userId: string,
 ): Promise<TMaintenanceAlertStates> => {
@@ -39,7 +35,6 @@ const getMyMaintenanceAlertsFromDB = async (
   return serializeStates(user.maintenanceAlerts);
 };
 
-// PATCH — toggle any subset of tasks. Strictly owner-scoped.
 const toggleMaintenanceAlertsIntoDB = async (
   userId: string,
   payload: TToggleMaintenanceAlertsPayload,
@@ -54,13 +49,11 @@ const toggleMaintenanceAlertsIntoDB = async (
 
   for (const key of MAINTENANCE_FIELD_KEYS) {
     const desired = payload[key];
-    if (desired === undefined) continue; // key not in body — leave untouched
+    if (desired === undefined) continue;
 
     const current = user.maintenanceAlerts?.[key];
 
     if (desired === true) {
-      // false->true (enabling): start the cycle. true->true is a NO-OP, so re-sending
-      // `true` never resets or delays the already-running reminder timer.
       if (!current?.enabled) {
         update[`maintenanceAlerts.${key}.enabled`] = true;
         update[`maintenanceAlerts.${key}.enabledAt`] = now;
@@ -71,14 +64,13 @@ const toggleMaintenanceAlertsIntoDB = async (
         update[`maintenanceAlerts.${key}.lastSentAt`] = null;
       }
     } else {
-      // ->false (disabling): stop tracking and clear nextDueAt so the cron skips it.
       update[`maintenanceAlerts.${key}.enabled`] = false;
       update[`maintenanceAlerts.${key}.nextDueAt`] = null;
     }
   }
 
   if (Object.keys(update).length === 0) {
-    return serializeStates(user.maintenanceAlerts); // nothing changed (all no-ops)
+    return serializeStates(user.maintenanceAlerts);
   }
 
   await UserModel.updateOne({ _id: userId }, { $set: update });
@@ -87,12 +79,6 @@ const toggleMaintenanceAlertsIntoDB = async (
   return serializeStates(fresh?.maintenanceAlerts);
 };
 
-// --- Daily reminder scan ---
-
-// Pure, directly callable (testable without a scheduler). Finds users with at least
-// one enabled+due task, sends each due reminder through the EXISTING NotificationService
-// pipeline, then advances that task to its next cadence so it recurs without spamming.
-// Never throws — safe to wire to any trigger (HTTP cron endpoint or node-cron).
 const runMaintenanceReminderScan = async (): Promise<{
   scanned: number;
   sent: number;
@@ -104,8 +90,6 @@ const runMaintenanceReminderScan = async (): Promise<{
   let failures = 0;
 
   try {
-    // Indexed eligibility query — only users with >=1 enabled & due task. Streamed via a
-    // cursor so a large user base is never buffered into memory.
     const cursor = UserModel.find({
       $or: MAINTENANCE_FIELD_KEYS.map(key => ({
         [`maintenanceAlerts.${key}.enabled`]: true,
@@ -117,7 +101,6 @@ const runMaintenanceReminderScan = async (): Promise<{
 
     for await (const user of cursor) {
       scanned++;
-      // Isolate each user — one user's failure must not abort the whole scan.
       try {
         for (const key of MAINTENANCE_FIELD_KEYS) {
           const alert = user.maintenanceAlerts?.[key];
@@ -127,11 +110,6 @@ const runMaintenanceReminderScan = async (): Promise<{
 
           const { title, message, intervalMonths } = MAINTENANCE_ALERTS[key];
 
-          // CLAIM-FIRST (atomic): advance this field ONLY if it is still enabled & due.
-          // findOneAndUpdate is atomic, so a concurrent/overlapping scan can't also claim
-          // it — the scan is idempotent under concurrent runs (no double-send), and this
-          // advancement is what stops daily re-spam. Anchored to `now` (not the old due
-          // date) so an overdue task fires ONCE and moves forward — no catch-up flood.
           const claimed = await UserModel.findOneAndUpdate(
             {
               _id: user._id,
@@ -149,12 +127,8 @@ const runMaintenanceReminderScan = async (): Promise<{
             },
           );
 
-          // Lost the race (another run already advanced it) — skip without sending.
           if (!claimed) continue;
 
-          // We own this cycle: send via the EXISTING pipeline (persist -> FCM -> prune
-          // dead -> failure-isolated). Persist happens before the push, so even an FCM
-          // send failure still leaves the reminder persisted.
           await NotificationService.notifyMaintenanceReminder({
             recipientId: user._id,
             fieldKey: key,
@@ -169,7 +143,6 @@ const runMaintenanceReminderScan = async (): Promise<{
       }
     }
   } catch (err) {
-    // Top-level guard: the job must never crash the process.
     console.error('[maintenance] scan failed:', err);
   }
 

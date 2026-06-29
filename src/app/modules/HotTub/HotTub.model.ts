@@ -14,7 +14,6 @@ import {
   HOT_TUB_AMPERAGES,
   HOT_TUB_LOCATIONS,
   HOT_TUB_PANEL_DISTANCE,
-  HOT_TUB_PANEL_LOCATIONS,
   IHotTub,
 } from './HotTub.interface';
 
@@ -160,7 +159,7 @@ const hotTubSchema = new Schema<IHotTub>(
     },
     panelLocation: {
       type: String,
-      enum: HOT_TUB_PANEL_LOCATIONS,
+      trim: true,
     },
     panelDistance: {
       type: String,
@@ -205,7 +204,6 @@ const hotTubSchema = new Schema<IHotTub>(
 );
 
 hotTubSchema.index({ createdBy: 1, status: 1 });
-// admin/quotes fan-out (status != draft) + trend, and per-user lists — both sorted by createdAt
 hotTubSchema.index({ status: 1, createdAt: -1 });
 hotTubSchema.index({ createdBy: 1, createdAt: -1 });
 

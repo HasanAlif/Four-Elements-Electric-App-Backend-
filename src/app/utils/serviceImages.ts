@@ -1,13 +1,8 @@
-/* eslint-disable no-console */
 import {
   sendImageToCloudinary,
   deleteImageFromCloudinary,
 } from '../lib/upload';
 
-// Image field config for a service module.
-// name == form-data field name == model field name.
-// multiple: true  => stored as string[]
-// multiple: false => stored as a single string (first uploaded file)
 export type TImageFieldConfig = {
   name: string;
   multiple: boolean;
@@ -18,7 +13,6 @@ type TMulterFiles =
   | Express.Multer.File[]
   | undefined;
 
-// Normalize req.files (multer .fields() => object, .any() => array) into a map.
 const asFileMap = (
   files: TMulterFiles,
 ): Record<string, Express.Multer.File[]> => {
@@ -32,8 +26,6 @@ const asFileMap = (
   return files;
 };
 
-// Upload every provided image field to Cloudinary.
-// Returns { field: string[] | string } only for fields that actually had files.
 export const uploadServiceImages = async (
   files: TMulterFiles,
   fields: TImageFieldConfig[],
@@ -56,10 +48,7 @@ export const uploadServiceImages = async (
   return result;
 };
 
-// Flatten existing image URLs from a document for the given field names.
-// Handles both single-string and string[] fields.
 export const collectImageUrls = (
-  // accepts plain objects and Mongoose lean docs (no index signature required)
   doc: object,
   fieldNames: string[],
 ): string[] => {
@@ -80,7 +69,6 @@ export const collectImageUrls = (
   return urls;
 };
 
-// Best-effort permanent delete from Cloudinary (never throws — logs failures).
 export const deleteServiceImages = async (urls: string[]): Promise<void> => {
   await Promise.all(
     urls.map(async url => {

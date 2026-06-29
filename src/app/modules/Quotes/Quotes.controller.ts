@@ -3,8 +3,6 @@ import { Request, Response } from 'express';
 import { asyncHandler, sendResponse } from '../../utils';
 import { QuotesService } from './Quotes.service';
 
-// Accept a query-string filter only if it is actually a string (drops objects/arrays
-// like ?status[$ne]=x so they can never reach a Mongo filter or crash string ops).
 const asString = (value: unknown): string | undefined =>
   typeof value === 'string' ? value : undefined;
 

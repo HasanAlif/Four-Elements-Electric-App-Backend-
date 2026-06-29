@@ -208,30 +208,7 @@ const adminGetAllUsers = asyncHandler(async (req, res) => {
   });
 });
 
-// 17. adminGetAllMetaData
-// const adminGetAllMetaData = asyncHandler(async (req, res) => {
-//   const result = await UserService.adminGetAllMetaDataFromDB();
-
-//   sendResponse(res, {
-//     statusCode: httpStatus.OK,
-//     message: 'Dashboard data retrieved successfully!',
-//     data: result,
-//   });
-// });
-
-// 18. getAllUser
-// const getAllUser = asyncHandler(async (req, res) => {
-//   const result = await UserService.getAllUserFromDB(req.query);
-
-//   sendResponse(res, {
-//     statusCode: httpStatus.OK,
-//     message: 'Users retrieved successfully!',
-//     data: result.data,
-//     meta: result.meta,
-//   });
-// });
-
-// 19. uploadImages
+// 17. uploadImages
 const uploadImages = asyncHandler(async (req, res) => {
   const files = Array.isArray(req.files)
     ? req.files
@@ -246,7 +223,7 @@ const uploadImages = asyncHandler(async (req, res) => {
   });
 });
 
-// 20. deleteImage
+// 18. deleteImage
 const deleteImage = asyncHandler(async (req, res) => {
   const result = await UserService.deleteImageFromDB(
     req.body.imageUrl as string,
@@ -259,7 +236,7 @@ const deleteImage = asyncHandler(async (req, res) => {
   });
 });
 
-// 21. addFcmToken
+// 19. addFcmToken
 const addFcmToken = asyncHandler(async (req, res) => {
   const result = await UserService.addFcmTokenIntoDB(
     req.user._id.toString(),
@@ -273,7 +250,7 @@ const addFcmToken = asyncHandler(async (req, res) => {
   });
 });
 
-// 22. removeFcmToken
+// 20. removeFcmToken
 const removeFcmToken = asyncHandler(async (req, res) => {
   const result = await UserService.removeFcmTokenFromDB(
     req.user._id.toString(),
@@ -305,8 +282,6 @@ export const UserController = {
   deactivateUserAccount,
   deleteSpecificUserAccount,
   adminGetAllUsers,
-  // adminGetAllMetaData,
-  // getAllUser,
   uploadImages,
   deleteImage,
   addFcmToken,

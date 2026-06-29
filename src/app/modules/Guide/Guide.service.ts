@@ -7,31 +7,22 @@ import SavedGuideModel, { ISavedGuide } from './savedGuide.model';
 import { TCreateGuidePayload, TGuideQuery } from './Guide.interface';
 import { RecentActivityService } from '../RecentActivity/RecentActivity.service';
 
-// Shape of a SavedGuide row once `.populate('guide').lean()` has run (guide may be null
-// if the referenced guide was removed).
 type TSavedGuideLean = {
   _id: Types.ObjectId;
   guide: IGuide | null;
   createdAt: Date;
 };
 
-// Reject a malformed id early with a clean 404 instead of a Mongoose CastError.
 const assertObjectId = (id: string) => {
   if (!isValidObjectId(id)) {
     throw new AppError(httpStatus.NOT_FOUND, 'Guide not found!');
   }
 };
 
-// --- Admin ---
-
 const createGuideIntoDB = async (payload: TCreateGuidePayload) => {
   return GuideModel.create(payload);
 };
 
-// --- User: browse ---
-
-// Paginated guide list. Each guide carries an `isSaved` flag for the current user so the
-// frontend can render the bookmark state without a second round-trip.
 const getAllGuidesFromDB = async (userId: string, query: TGuideQuery = {}) => {
   const guideQuery = new QueryBuilder<IGuide>(
     GuideModel.find(),
@@ -77,8 +68,6 @@ const getSingleGuideFromDB = async (userId: string, id: string) => {
   return { ...guide, isSaved };
 };
 
-// --- User: save / unsave ---
-
 const saveGuideIntoDB = async (userId: string, guideId: string) => {
   assertObjectId(guideId);
 
@@ -87,15 +76,12 @@ const saveGuideIntoDB = async (userId: string, guideId: string) => {
     throw new AppError(httpStatus.NOT_FOUND, 'Guide not found!');
   }
 
-  // Idempotent: upsert means saving an already-saved guide is a no-op (the unique
-  // {user,guide} index also guards against duplicates).
   await SavedGuideModel.updateOne(
     { user: userId, guide: guideId },
     { $setOnInsert: { user: userId, guide: guideId } },
     { upsert: true },
   );
 
-  // Surface the save in the Recent Activity feed (isolated — never throws).
   await RecentActivityService.recordGuideActivity({
     user: userId,
     refId: guideId,
@@ -109,10 +95,8 @@ const saveGuideIntoDB = async (userId: string, guideId: string) => {
 const unsaveGuideFromDB = async (userId: string, guideId: string) => {
   assertObjectId(guideId);
 
-  // Idempotent: removing a guide that isn't saved simply deletes nothing.
   await SavedGuideModel.deleteOne({ user: userId, guide: guideId });
 
-  // Drop its Recent Activity row so it leaves the feed (isolated — never throws).
   await RecentActivityService.removeGuideActivity({
     user: userId,
     refId: guideId,
@@ -121,8 +105,6 @@ const unsaveGuideFromDB = async (userId: string, guideId: string) => {
   return { guideId, isSaved: false };
 };
 
-// Paginated list of the user's saved guides (most recently saved first). Each item is
-// the populated guide plus the `savedAt` timestamp.
 const getMySavedGuidesFromDB = async (
   userId: string,
   query: TGuideQuery = {},
@@ -139,7 +121,6 @@ const getMySavedGuidesFromDB = async (
     savedQuery.countTotal(),
   ]);
 
-  // Drop any entries whose guide no longer exists, and flatten to guide + savedAt.
   const data = saved
     .filter((s): s is TSavedGuideLean & { guide: IGuide } => s.guide !== null)
     .map(s => ({

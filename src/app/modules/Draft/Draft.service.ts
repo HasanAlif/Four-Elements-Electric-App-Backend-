@@ -19,7 +19,6 @@ const getAllMyDraftsFromDB = async (userId: string) => {
 
   const results = await Promise.all(draftPromises);
 
-  // Filter out services with no drafts
   const filteredResults = results.filter(result => result.count > 0);
 
   return filteredResults;

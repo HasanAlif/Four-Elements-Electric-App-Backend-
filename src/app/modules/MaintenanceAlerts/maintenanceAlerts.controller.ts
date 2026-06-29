@@ -32,8 +32,6 @@ const toggleMaintenanceAlerts = asyncHandler(
   },
 );
 
-// Internal cron trigger (protected by cronAuth). Runs the scan and returns the summary.
-// Same fn the in-process node-cron path invokes directly.
 const runMaintenanceReminderScan = asyncHandler(
   async (_req: Request, res: Response) => {
     const data = await MaintenanceAlertsService.runMaintenanceReminderScan();

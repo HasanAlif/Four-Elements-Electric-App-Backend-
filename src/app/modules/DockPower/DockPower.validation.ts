@@ -10,7 +10,6 @@ import {
   DOCK_POWER_CIRCUIT_AMP_RATINGS,
   DOCK_POWER_CIRCUIT_COUNTS,
   DOCK_POWER_NEW_SERVICE_SIZES,
-  DOCK_POWER_PANEL_LOCATIONS,
   DOCK_POWER_SERVICE_TYPES,
   DOCK_POWER_SUB_PANEL_SIZES,
 } from './DockPower.interface';
@@ -45,7 +44,7 @@ const dockPowerBodySchema = z.object({
   dedicatedCircuitsCount: z.enum(DOCK_POWER_CIRCUIT_COUNTS).optional(),
   dedicatedCircuitAmpRating: z.enum(DOCK_POWER_CIRCUIT_AMP_RATINGS).optional(),
 
-  panelLocation: z.enum(DOCK_POWER_PANEL_LOCATIONS).optional(),
+  panelLocation: z.string().optional(),
   panelLocationOther: z.string().optional(),
 
   panelPhotos: z.array(z.string()).optional(),

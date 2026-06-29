@@ -11,13 +11,6 @@ import { qIdPlugin } from '../../lib/qId';
 import { quoteSubmitNotificationPlugin } from '../Notification/Notification.plugin';
 import { statusTimelinePlugin } from '../../lib/statusTimeline';
 import { IEVChargerInstallation } from './EVChargerInstallation.interface';
-// import {
-//   EV_CHARGER_CONNECTION_TYPES,
-//   EV_CHARGER_DISTANCES,
-//   EV_CHARGER_INSTALLATION_LOCATIONS,
-//   EV_CHARGER_PANEL_LOCATIONS,
-//   EV_CHARGER_STATUSES,
-// } from './EVChargerInstallation.interface';
 
 const evChargerInstallationSchema = new Schema<IEVChargerInstallation>(
   {
@@ -213,7 +206,6 @@ const evChargerInstallationSchema = new Schema<IEVChargerInstallation>(
 );
 
 evChargerInstallationSchema.index({ createdBy: 1, status: 1 });
-// admin/quotes fan-out (status != draft) + trend, and per-user lists — both sorted by createdAt
 evChargerInstallationSchema.index({ status: 1, createdAt: -1 });
 evChargerInstallationSchema.index({ createdBy: 1, createdAt: -1 });
 

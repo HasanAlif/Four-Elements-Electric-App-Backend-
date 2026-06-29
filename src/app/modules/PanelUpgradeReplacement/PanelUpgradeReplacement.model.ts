@@ -2,7 +2,6 @@ import { model, Schema } from 'mongoose';
 import {
   IPanelUpgradeReplacement,
   PANEL_AMPERAGES,
-  PANEL_LOCATIONS,
   PANEL_POWER_FEEDS,
   PANEL_SERVICE_TYPES,
 } from './PanelUpgradeReplacement.interface';
@@ -149,7 +148,7 @@ const panelUpgradeReplacementSchema = new Schema<IPanelUpgradeReplacement>(
     },
     panelLocation: {
       type: String,
-      enum: PANEL_LOCATIONS,
+      trim: true,
     },
     powerFeedType: {
       type: String,

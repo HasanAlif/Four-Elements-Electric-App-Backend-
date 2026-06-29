@@ -41,14 +41,6 @@ export interface IServiceCall extends Document {
   preferredTime?: TServiceCallPreferredTime;
   schedulingPreference?: string[];
 
-  // installationLocation?: string;
-  // chargerOwnership?: string;
-  // chargerLevel?: string;
-  // panelLocation?: string;
-  // distance?: string;
-  // environment?: string;
-  // accessibility?: string;
-
   panelPhotos?: string[];
   workAreaPhotos?: string[];
   extraReferencePhotos?: string[];

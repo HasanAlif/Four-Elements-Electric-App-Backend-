@@ -12,7 +12,6 @@ import { quoteSubmitNotificationPlugin } from '../Notification/Notification.plug
 import { statusTimelinePlugin } from '../../lib/statusTimeline';
 import {
   IRemodeling,
-  REMODELING_PANEL_LOCATIONS,
 } from './Remodeling.interface';
 
 const remodelingSchema = new Schema<IRemodeling>(
@@ -134,7 +133,7 @@ const remodelingSchema = new Schema<IRemodeling>(
     },
     panelLocation: {
       type: String,
-      enum: REMODELING_PANEL_LOCATIONS,
+      trim: true,
     },
     remodelingAreas: {
       type: String,

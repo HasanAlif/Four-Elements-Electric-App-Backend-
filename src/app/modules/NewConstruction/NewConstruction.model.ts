@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { model, Schema } from 'mongoose';
 import {
   CONTACT_METHODS,
@@ -172,7 +171,6 @@ const NewConstructionSchema = new Schema<INewConstruction>(
 );
 
 NewConstructionSchema.index({ createdBy: 1, status: 1 });
-// admin/quotes fan-out (status != draft) + trend, and per-user lists — both sorted by createdAt
 NewConstructionSchema.index({ status: 1, createdAt: -1 });
 NewConstructionSchema.index({ createdBy: 1, createdAt: -1 });
 

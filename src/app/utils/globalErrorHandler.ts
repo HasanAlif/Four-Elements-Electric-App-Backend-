@@ -27,13 +27,11 @@ const globalErrorHandler: ErrorRequestHandler = (err, req, res, _next) => {
   if (err instanceof ZodError) {
     const simplifiedError = handleZodError(err);
     statusCode = simplifiedError?.statusCode;
-    // message = simplifiedError?.message;
     message = simplifiedError?.errorSources[0].message;
     errorSources = simplifiedError?.errorSources;
   } else if (err?.name === 'ValidationError') {
     const simplifiedError = handleValidationError(err);
     statusCode = simplifiedError?.statusCode;
-    // message = simplifiedError?.message;
     message = simplifiedError?.errorSources[0].message;
     errorSources = simplifiedError?.errorSources;
   } else if (err?.name === 'CastError') {
@@ -57,7 +55,6 @@ const globalErrorHandler: ErrorRequestHandler = (err, req, res, _next) => {
       },
     ];
   } else if (err instanceof Error) {
-    // Don't leak internal/driver messages in production for unhandled errors.
     const safeMessage =
       config.NODE_ENV === 'production' ? 'Something went wrong!' : err.message;
     message = safeMessage;
@@ -69,18 +66,11 @@ const globalErrorHandler: ErrorRequestHandler = (err, req, res, _next) => {
     ];
   }
 
-  // (2)
-  // log error to Error.log logger
-  // errorLogger(err, req, statusCode);
-
-  // ultimate return
   res.status(statusCode).json({
     success: false,
     message,
     ...meta,
     errorSources,
-    // err,
-    // stack: config.NODE_ENV === 'development' ? err?.stack : null,
   });
 };
 

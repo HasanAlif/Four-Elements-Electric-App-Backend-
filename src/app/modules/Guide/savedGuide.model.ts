@@ -1,8 +1,4 @@
 import { Schema, model, Document, Types } from 'mongoose';
-
-// Join collection between a user and a guide they've saved/bookmarked. Kept separate
-// from the User document so the list scales, carries a `savedAt` (createdAt), and can be
-// paginated. The unique compound index makes "save" idempotent at the DB level.
 export interface ISavedGuide extends Document {
   user: Types.ObjectId;
   guide: Types.ObjectId;
@@ -26,7 +22,6 @@ const SavedGuideSchema = new Schema<ISavedGuide>(
   { timestamps: true, versionKey: false },
 );
 
-// One save per (user, guide) — also serves the "my saved guides" lookup by user.
 SavedGuideSchema.index({ user: 1, guide: 1 }, { unique: true });
 
 const SavedGuideModel = model<ISavedGuide>('SavedGuide', SavedGuideSchema);

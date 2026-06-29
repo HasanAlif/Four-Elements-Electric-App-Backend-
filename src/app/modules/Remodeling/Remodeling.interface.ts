@@ -7,16 +7,6 @@ import {
   TTimelineUrgency,
 } from '../../constants';
 
-export const REMODELING_PANEL_LOCATIONS = [
-  'Basement (Finished)',
-  'Basement (Unfinished)',
-  'Garage (Finished)',
-  'Garage (Unfinished)',
-  'Other (please specify)',
-] as const;
-export type TRemodelingPanelLocation =
-  (typeof REMODELING_PANEL_LOCATIONS)[number];
-
 export interface IRemodeling extends Document {
   _id: Types.ObjectId;
   qId?: string;
@@ -39,7 +29,7 @@ export interface IRemodeling extends Document {
   ownershipStatus: TOwnershipStatus;
   timelineUrgency: TTimelineUrgency;
 
-  panelLocation: TRemodelingPanelLocation;
+  panelLocation: string;
   remodelingAreas: string;
 
   hasPlansDrawings: boolean;

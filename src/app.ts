@@ -11,13 +11,8 @@ import config from './app/config';
 
 const app: Application = express();
 
-// behind a single reverse proxy (nginx / load balancer) — needed for correct client IP
-// in rate limiting
 app.set('trust proxy', 1);
 
-// app.disable('etag');
-
-// security headers (set early, before routes)
 app.use(helmet());
 
 // CORS configuration
@@ -47,22 +42,11 @@ app.use(morgan('dev'));
 app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 
-// strip MongoDB operator/dotted keys from body/params/query (NoSQL-injection guard)
 app.use(sanitizeMongo);
 
-// for static files
-// app.use('/public', express.static('public'));
-
-// broad rate limit for the whole API (auth/OTP routes add a stricter limiter)
 app.use(globalLimiter);
 
-// All main routes
 app.use('/api/v1', routes);
-
-// Testing
-// app.get('/', (req: Request, res: Response) => {
-//   res.send({ message: 'Server is running like a Rabit!' });
-// });
 
 app.get('/', (req: Request, res: Response) => {
   const currentDateTime = new Date().toISOString();
@@ -88,10 +72,8 @@ app.get('/', (req: Request, res: Response) => {
   });
 });
 
-// global error handler
 app.use(globalErrorHandler);
 
-// all not found handler
 app.use(notFoundHandler);
 
 export default app;

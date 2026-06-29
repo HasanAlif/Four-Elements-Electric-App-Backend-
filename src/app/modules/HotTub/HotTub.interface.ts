@@ -25,14 +25,6 @@ export const HOT_TUB_LOCATIONS = [
 ] as const;
 export type THotTubLocation = (typeof HOT_TUB_LOCATIONS)[number];
 
-export const HOT_TUB_PANEL_LOCATIONS = [
-  'Basement (Finished)',
-  'Basement (Unfinished)',
-  'Garage (Finished)',
-  'Garage (Unfinished)',
-] as const;
-export type THotTubPanelLocation = (typeof HOT_TUB_PANEL_LOCATIONS)[number];
-
 export const HOT_TUB_PANEL_DISTANCE = [
   'Less than 25 ft',
   '25 - 50 ft',
@@ -71,7 +63,7 @@ export interface IHotTub extends Document {
 
   amperageNeeded?: THotTubAmperage;
   location: THotTubLocation;
-  panelLocation?: THotTubPanelLocation;
+  panelLocation?: string;
   panelDistance?: THotTubPanelDistance;
 
   panelPhotos: string[];

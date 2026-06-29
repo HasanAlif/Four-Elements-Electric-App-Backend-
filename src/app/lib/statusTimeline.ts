@@ -1,14 +1,5 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Schema } from 'mongoose';
 
-// Records every status transition a quote goes through, so the user-facing
-// activity view can show a real sequence (pending -> in_review -> send ...).
-// Applied to all service-request models alongside qIdPlugin.
-//
-// - pre('save')  covers creation (Model.create) and user updates incl. the
-//   in-place draft -> submit flip (existing.save()).
-// - pre('findOneAndUpdate') covers admin status changes (Admin.updateQuoteStatus
-//   uses findOneAndUpdate), so the admin service needs no change.
 export const statusTimelinePlugin = (schema: Schema) => {
   schema.add({
     statusTimeline: {

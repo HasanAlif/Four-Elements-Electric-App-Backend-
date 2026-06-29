@@ -56,12 +56,11 @@ const notificationSchema = new Schema<INotification>(
     },
   },
   {
-    timestamps: true, // createdAt is needed for the UI "2h ago" labels
+    timestamps: true,
     versionKey: false,
   },
 );
 
-// Serves the owner list (newest first) and the unread badge in one index.
 notificationSchema.index({ user: 1, isRead: 1, createdAt: -1 });
 
 const NotificationModel = model<INotification>(

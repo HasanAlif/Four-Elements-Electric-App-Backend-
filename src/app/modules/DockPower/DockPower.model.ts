@@ -14,7 +14,6 @@ import {
   DOCK_POWER_CIRCUIT_AMP_RATINGS,
   DOCK_POWER_CIRCUIT_COUNTS,
   DOCK_POWER_NEW_SERVICE_SIZES,
-  DOCK_POWER_PANEL_LOCATIONS,
   DOCK_POWER_SERVICE_TYPES,
   DOCK_POWER_SUB_PANEL_SIZES,
   IDockPower,
@@ -182,7 +181,7 @@ const dockPowerSchema = new Schema<IDockPower>(
 
     panelLocation: {
       type: String,
-      enum: DOCK_POWER_PANEL_LOCATIONS,
+      trim: true,
     },
     panelLocationOther: {
       type: String,
@@ -252,7 +251,6 @@ const dockPowerSchema = new Schema<IDockPower>(
 );
 
 dockPowerSchema.index({ createdBy: 1, status: 1 });
-// admin/quotes fan-out (status != draft) + trend, and per-user lists — both sorted by createdAt
 dockPowerSchema.index({ status: 1, createdAt: -1 });
 dockPowerSchema.index({ createdBy: 1, createdAt: -1 });
 

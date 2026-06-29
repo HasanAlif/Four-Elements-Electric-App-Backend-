@@ -48,15 +48,7 @@ export const DOCK_POWER_CIRCUIT_AMP_RATINGS = ['15', '20'] as const;
 export type TDockPowerCircuitAmpRating =
   (typeof DOCK_POWER_CIRCUIT_AMP_RATINGS)[number];
 
-export const DOCK_POWER_PANEL_LOCATIONS = [
-  'Basement (Finished)',
-  'Basement (Unfinished)',
-  'Garage (Finished)',
-  'Garage (Unfinished)',
-  'Other (please specify)',
-] as const;
-export type TDockPowerPanelLocation =
-  (typeof DOCK_POWER_PANEL_LOCATIONS)[number];
+
 
 export interface IDockPower extends Document {
   _id: Types.ObjectId;
@@ -94,7 +86,7 @@ export interface IDockPower extends Document {
   dedicatedCircuitsCount?: TDockPowerCircuitCount;
   dedicatedCircuitAmpRating?: TDockPowerCircuitAmpRating;
 
-  panelLocation: TDockPowerPanelLocation;
+  panelLocation: string;
   panelLocationOther?: string;
   panelPhotos: string[];
 

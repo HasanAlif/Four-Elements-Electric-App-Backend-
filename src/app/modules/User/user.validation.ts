@@ -14,9 +14,6 @@ const createUserSchema = z.object({
       })
       .min(3, { message: 'Name must be at least 3 characters long' })
       .max(20, { message: 'Name cannot exceed 20 characters' }),
-    // address: z.string({
-    //   error: 'Address is required',
-    // }),
     phone: z.string({
       error: 'Phone is required',
     }),
@@ -24,11 +21,11 @@ const createUserSchema = z.object({
       .string({
         error: 'Email is required!',
       })
-      .email({ message: 'Invalid email format!' }) // Ensure it's a valid email
-      .transform(email => email.toLowerCase()) // Convert email to lowercase
-      .refine(email => email !== '', { message: 'Email is required!' }) // Check that email is not empty
+      .email({ message: 'Invalid email format!' })
+      .transform(email => email.toLowerCase())
+      .refine(email => email !== '', { message: 'Email is required!' })
       .refine(value => typeof value === 'string', {
-        message: 'Email must be string!', // Check that email is string
+        message: 'Email must be string!',
       }),
 
     password: z

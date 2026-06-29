@@ -55,22 +55,11 @@ const sendOtpEmail = async ({
           cid: logoCid, // Embed logo with CID
         },
       ],
-
-      // attachments: [
-      //   ...attachments, // Attach any custom attachments
-      //   {
-      //     filename: 'logo.png',
-      //     path: path.join(__dirname, 'assets', 'logo.png'),
-      //     cid: logoCid, // Embed logo with CID
-      //   },
-      // ],
     };
 
     // Send the email using Nodemailer
     await transporter.sendMail(mailOptions);
   } catch (error) {
-    // Log the error and throw a custom error with a message
-    // eslint-disable-next-line no-console
     console.log(error);
     throw new AppError(
       httpStatus.INTERNAL_SERVER_ERROR,

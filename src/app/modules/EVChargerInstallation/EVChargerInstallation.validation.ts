@@ -1,10 +1,4 @@
 import { z } from 'zod';
-// import {
-//   EV_CHARGER_DISTANCES,
-//   EV_CHARGER_INSTALLATION_LOCATIONS,
-//   EV_CHARGER_PANEL_LOCATIONS,
-//   EV_CHARGER_STATUSES,
-// } from './EVChargerInstallation.interface';
 import {
   CONTACT_METHODS,
   OWNERSHIP_STATUSES,

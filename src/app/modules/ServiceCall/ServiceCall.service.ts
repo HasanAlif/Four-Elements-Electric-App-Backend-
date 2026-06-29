@@ -13,7 +13,6 @@ import ServiceCallModel from './ServiceCall.model';
 import { DEFAULT_REQUEST_STATUS } from '../../constants';
 import { IUser } from '../User/user.interface';
 
-// Image fields uploaded as files (form-data) and stored as Cloudinary URLs
 const IMAGE_FIELDS: TImageFieldConfig[] = [
   { name: 'panelPhotos', multiple: true },
   { name: 'workAreaPhotos', multiple: true },

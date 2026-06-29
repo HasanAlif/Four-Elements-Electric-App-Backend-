@@ -7,13 +7,13 @@ import {
   TTimelineUrgency,
 } from '../../constants';
 
-export const ACCESSORY_BUILDING_STATUSES = [
-  'Already built or delivered on site',
-  'Will be delivered / built soon',
-  'Not built yet',
-] as const;
-export type TAccessoryBuildingStatus =
-  (typeof ACCESSORY_BUILDING_STATUSES)[number];
+// export const ACCESSORY_BUILDING_STATUSES = [
+//   'Already built or delivered on site',
+//   'Will be delivered / built soon',
+//   'Not built yet',
+// ] as const;
+// export type TAccessoryBuildingStatus =
+//   (typeof ACCESSORY_BUILDING_STATUSES)[number];
 
 export const ACCESSORY_BUILDING_CONSTRUCTION_TYPES = [
   'Metal / Steel Frame',
@@ -66,15 +66,7 @@ export const ACCESSORY_BUILDING_CIRCUIT_AMP_RATINGS = ['15', '20'] as const;
 export type TAccessoryBuildingCircuitAmpRating =
   (typeof ACCESSORY_BUILDING_CIRCUIT_AMP_RATINGS)[number];
 
-export const ACCESSORY_BUILDING_PANEL_LOCATIONS = [
-  'Basement (Finished)',
-  'Basement (Unfinished)',
-  'Garage (Finished)',
-  'Garage (Unfinished)',
-  'Other (please specify)',
-] as const;
-export type TAccessoryBuildingPanelLocation =
-  (typeof ACCESSORY_BUILDING_PANEL_LOCATIONS)[number];
+
 
 export interface IAccessoryBuildingPower extends Document {
   _id: Types.ObjectId;

@@ -1,7 +1,6 @@
 import { z } from 'zod';
 import {
   PANEL_AMPERAGES,
-  PANEL_LOCATIONS,
   PANEL_POWER_FEEDS,
   PANEL_SERVICE_TYPES,
 } from './PanelUpgradeReplacement.interface';
@@ -32,7 +31,7 @@ const panelBodySchema = z.object({
   panelServiceType: z.enum(PANEL_SERVICE_TYPES).optional(),
   currentPanelAmperage: z.enum(PANEL_AMPERAGES).optional(),
   desiredPanelAmperage: z.enum(PANEL_AMPERAGES).optional(),
-  panelLocation: z.enum(PANEL_LOCATIONS).optional(),
+  panelLocation: z.string().optional(),
   powerFeedType: z.enum(PANEL_POWER_FEEDS).optional(),
 
   meterPhotos: z.array(z.string()).optional(),

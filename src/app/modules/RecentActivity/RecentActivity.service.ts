@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { Types } from 'mongoose';
 import RecentActivityModel from './RecentActivity.model';
 import { resolveQuoteActivityAt } from './RecentActivity.constant';
@@ -44,7 +43,7 @@ type TRecordGuideInput = {
   user: TId;
   refId: TId;
   title?: string;
-  activityAt: Date; // save time (SavedGuide.createdAt)
+  activityAt: Date;
 };
 
 const recordGuideActivity = async (input: TRecordGuideInput): Promise<void> => {
@@ -66,7 +65,6 @@ const recordGuideActivity = async (input: TRecordGuideInput): Promise<void> => {
   }
 };
 
-// Drop a guide's activity row when it is unsaved (Decision B).
 const removeGuideActivity = async (input: {
   user: TId;
   refId: TId;

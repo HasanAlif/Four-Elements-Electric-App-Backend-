@@ -6,7 +6,6 @@ import {
   TIMELINE_URGENCIES,
   Service_STATUSES,
 } from '../../constants';
-import { REMODELING_PANEL_LOCATIONS } from './Remodeling.interface';
 
 const remodelingBodySchema = z.object({
   fullName: z.string({ error: 'Full name is required!' }).min(1),
@@ -24,7 +23,7 @@ const remodelingBodySchema = z.object({
   ownershipStatus: z.enum(OWNERSHIP_STATUSES),
   timelineUrgency: z.enum(TIMELINE_URGENCIES),
 
-  panelLocation: z.enum(REMODELING_PANEL_LOCATIONS).optional(),
+  panelLocation: z.string().optional(),
   remodelingAreas: z.string().optional(),
 
   hasPlansDrawings: z.boolean().optional(),

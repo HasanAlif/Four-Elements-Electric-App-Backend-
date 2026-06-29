@@ -148,36 +148,6 @@ const serviceCallSchema = new Schema<IServiceCall>(
       type: [String],
       default: [],
     },
-
-    // installationLocation: {
-    //   type: String,
-    //   trim: true,
-    // },
-    // chargerOwnership: {
-    //   type: String,
-    //   trim: true,
-    // },
-    // chargerLevel: {
-    //   type: String,
-    //   trim: true,
-    // },
-    // panelLocation: {
-    //   type: String,
-    //   trim: true,
-    // },
-    // distance: {
-    //   type: String,
-    //   trim: true,
-    // },
-    // environment: {
-    //   type: String,
-    //   trim: true,
-    // },
-    // accessibility: {
-    //   type: String,
-    //   trim: true,
-    // },
-
     panelPhotos: {
       type: [String],
       default: [],
@@ -222,7 +192,6 @@ const serviceCallSchema = new Schema<IServiceCall>(
 );
 
 serviceCallSchema.index({ createdBy: 1, status: 1 });
-// admin/quotes fan-out (status != draft) + trend, and per-user lists — both sorted by createdAt
 serviceCallSchema.index({ status: 1, createdAt: -1 });
 serviceCallSchema.index({ createdBy: 1, createdAt: -1 });
 

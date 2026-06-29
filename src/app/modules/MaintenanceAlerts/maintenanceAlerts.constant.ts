@@ -1,8 +1,3 @@
-// Single source of truth for the home-maintenance reminder system. The User model
-// fields, the toggle validation, the toggle API, and the daily cron scan ALL derive
-// from this map — adding or changing a tracked task is a ONE-LINE edit here, never a
-// change spread across files.
-
 export const MAINTENANCE_CADENCES = {
   YEARLY: 'yearly',
   MONTHLY: 'monthly',
@@ -14,14 +9,11 @@ export type TMaintenanceCadence =
 
 type TMaintenanceAlertConfig = {
   cadence: TMaintenanceCadence;
-  // How far ahead nextDueAt is set each cycle (12 yearly / 1 monthly / 3 seasonal).
   intervalMonths: number;
-  // User-facing push/notification copy (warm, plain language).
   title: string;
   message: string;
 };
 
-// fieldKey names are an API contract the frontend sends — keep these spellings stable.
 export const MAINTENANCE_ALERTS = {
   smokeDetectorBatteries: {
     cadence: MAINTENANCE_CADENCES.YEARLY,
@@ -80,18 +72,13 @@ export const MAINTENANCE_FIELD_KEYS = Object.keys(
   MAINTENANCE_ALERTS,
 ) as MaintenanceFieldKey[];
 
-// Calendar-aware month add in UTC, month-end safe: Jan 31 + 1mo -> Feb 28/29 (not
-// Mar 3), preserving time-of-day. Used for both enabling and post-send advancement so
-// cadences never drift onto fixed 30-day counts.
 export const addMonthsUTC = (from: Date, months: number): Date => {
   const result = new Date(from.getTime());
   const day = result.getUTCDate();
 
-  // Move to the 1st first so the month change can never overflow into the next month.
   result.setUTCDate(1);
   result.setUTCMonth(result.getUTCMonth() + months);
 
-  // Clamp the original day to the last valid day of the target month.
   const lastDayOfTargetMonth = new Date(
     Date.UTC(result.getUTCFullYear(), result.getUTCMonth() + 1, 0),
   ).getUTCDate();

@@ -27,7 +27,6 @@ const FavoriteSchema = new Schema<IFavorite>(
   },
 );
 
-// A user can favorite a given partner only once.
 FavoriteSchema.index({ user: 1, partner: 1 }, { unique: true });
 
 export const FavoriteModel = model<IFavorite>('Favorite', FavoriteSchema);

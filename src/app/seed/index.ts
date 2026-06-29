@@ -7,7 +7,6 @@ import colors from 'colors';
 const superAdminData = {
   role: ROLE.SUPER_ADMIN,
   name: config.superAdmin.name,
-  // address: config.superAdmin.address,
   phone: config.superAdmin.phone,
   email: config.superAdmin.email,
   password: config.superAdmin.password,

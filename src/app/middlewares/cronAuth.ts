@@ -3,10 +3,6 @@ import httpStatus from 'http-status';
 import { AppError, asyncHandler } from '../utils';
 import config from '../config';
 
-// Guards the internal cron endpoint: the caller (any external scheduler / admin) must
-// present the shared secret via the `x-cron-secret` header OR `Authorization: Bearer
-// <secret>`. Never runs unprotected — a server with no configured secret rejects with
-// 500 rather than allowing the scan.
 const cronAuth = asyncHandler(async (req, res, next) => {
   const secret = config.maintenance.cron_secret;
 
@@ -22,7 +18,6 @@ const cronAuth = asyncHandler(async (req, res, next) => {
     req.headers.authorization?.replace('Bearer ', '') ||
     '';
 
-  // Constant-time comparison so the response timing can't leak the secret.
   const providedBuf = Buffer.from(provided);
   const secretBuf = Buffer.from(secret);
   if (

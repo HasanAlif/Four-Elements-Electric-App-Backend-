@@ -1,7 +1,5 @@
 import { z } from 'zod';
 
-// Notifications are created internally only — these schemas cover the read/state
-// endpoints (list + mark-one-read). mark-all-read needs no validation.
 const idParamsSchema = z.object({
   params: z.object({
     id: z.string({ error: 'Notification ID is required!' }).min(1),

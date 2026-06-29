@@ -20,14 +20,6 @@ import ServiceCallModel from './ServiceCall/ServiceCall.model';
 import StarlinkModel from './Starlink/Starlink.model';
 import SwitchesModel from './Switches/Switches.model';
 
-// Single source of truth for the 18 service-request collections. The Quotes,
-// Draft, and Admin services all fan out over these — add a new service module's
-// model here ONCE (instead of in three places) so it can never silently go
-// missing from quotes/drafts/admin views.
-//
-// `name` is the display label used by the Draft list response; it is preserved
-// exactly as the Draft service previously emitted it (note 'Generator' for the
-// legacy-spelled Genarator model).
 export type TServiceModelEntry = { name: string; model: Model<any> };
 
 export const serviceModelEntries: TServiceModelEntry[] = [

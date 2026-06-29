@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import z from 'zod';
 import httpStatus from 'http-status';
 import config from '../../config';
@@ -195,13 +194,6 @@ const buildAuthResponse = (user: IUser) => {
 
 // 1. createUserIntoDB
 const createUserIntoDB = async (payload: IUser & { fcmToken?: string }) => {
-  // if (payload.role === ROLE.ADMIN || payload.role === ROLE.SUPER_ADMIN) {
-  //   throw new AppError(
-  //     httpStatus.BAD_REQUEST,
-  //     "You can't create a admin, super_apmin account here!",
-  //   );
-  // }
-
   const existingUser = await UserModel.isUserExistsByEmailWithPassword(
     payload.email,
   );
@@ -293,13 +285,6 @@ const sendSignupOtpAgainIntoDB = async (userEmail: string) => {
       userEmail: user.email,
     };
   } else {
-    // if OTP is still valid
-    // await sendOtpEmail({
-    //   email: user?.email,
-    //   otp: user?.otp,
-    //   name: user?.name,
-    //   customMessage: 'Verify quickly using this OTP!',
-    // });
     throw new AppError(
       httpStatus.BAD_REQUEST,
       'An OTP was already sent. Please wait until it expires before requesting a new one.',
@@ -393,11 +378,6 @@ const signinIntoDB = async (payload: {
   if (!user.isActive) {
     throw new AppError(httpStatus.BAD_REQUEST, 'User is not active!');
   }
-
-  // no need this part as isDeleted is functioned to hide the soft deleted user
-  // if (user.isDeleted) {
-  //   throw new AppError(httpStatus.BAD_REQUEST, 'You are not authorized!');
-  // }
 
   if (!user.isVerifiedByOTP) {
     const now = new Date();
@@ -1026,100 +1006,6 @@ const deleteSpecificUserAccountIntoDB = async (userData: IUser) => {
 };
 
 // 16. adminGetAllUsersFromDB (using MongoDB aggregation)
-// const adminGetAllUsersFromDB = async (query: Record<string, unknown>) => {
-//   const {
-//     searchTerm,
-//     sort: sortQuery,
-//     page: pageQuery,
-//     limit: limitQuery,
-//     fields: fieldsQuery,
-//     ...rawFilters
-//   } = query as Record<string, any>;
-
-//   const page = Number(pageQuery) || 1;
-//   const limit = Number(limitQuery) || 10;
-//   const skip = (page - 1) * limit;
-
-//   // Base match: exclude admins
-//   const matchStage: Record<string, unknown> = {
-//     role: { $ne: ROLE.ADMIN },
-//     ...rawFilters,
-//   };
-
-//   const pipeline: any[] = [{ $match: matchStage }];
-
-//   // Search by name, email, phone, address
-//   if (searchTerm) {
-//     pipeline.push({
-//       $match: {
-//         $or: [
-//           { name: { $regex: searchTerm, $options: 'i' } },
-//           { email: { $regex: searchTerm, $options: 'i' } },
-//           { phone: { $regex: searchTerm, $options: 'i' } },
-//           { address: { $regex: searchTerm, $options: 'i' } },
-//         ],
-//       },
-//     });
-//   }
-
-//   // Sort
-//   const sortStage: Record<string, 1 | -1> = {};
-//   const sortString = (sortQuery as string) || '-createdAt';
-//   sortString
-//     .split(',')
-//     .filter(Boolean)
-//     .forEach((field: string) => {
-//       if (field.startsWith('-')) {
-//         sortStage[field.substring(1)] = -1;
-//       } else {
-//         sortStage[field] = 1;
-//       }
-//     });
-
-//   if (Object.keys(sortStage).length) {
-//     pipeline.push({ $sort: sortStage });
-//   }
-
-//   // Fields selection
-//   let projectStage: Record<string, 0 | 1> | null = null;
-//   if (fieldsQuery) {
-//     const fields = (fieldsQuery as string).split(',').filter(Boolean);
-//     if (fields.length) {
-//       projectStage = fields.reduce<Record<string, 0 | 1>>((acc, field) => {
-//         acc[field] = 1;
-//         return acc;
-//       }, {});
-//     }
-//   }
-
-//   const facetPipeline: any = {
-//     data: [{ $skip: skip }, { $limit: limit }],
-//     meta: [{ $count: 'total' }],
-//   };
-
-//   if (projectStage) {
-//     facetPipeline.data.unshift({ $project: projectStage });
-//   }
-
-//   pipeline.push({ $facet: facetPipeline });
-
-//   const result = await UserModel.aggregate(pipeline);
-//   const facetResult = result[0] || { data: [], meta: [] };
-
-//   const total = facetResult.meta[0]?.total || 0;
-//   const totalPage = Math.ceil(total / limit) || 1;
-
-//   const meta = {
-//     page,
-//     limit,
-//     total,
-//     totalPage,
-//   };
-
-//   return { data: facetResult.data, meta };
-// };
-
-// 17. adminGetAllUsersFromDB (using MongoDB aggregation)
 const adminGetAllUsersFromDB = async (query: Record<string, unknown>) => {
   const {
     searchTerm,
@@ -1174,41 +1060,10 @@ const adminGetAllUsersFromDB = async (query: Record<string, unknown>) => {
     pipeline.push({ $sort: sortStage });
   }
 
-  // Fields selection
-  // let projectStage: Record<string, 0 | 1> | null = null;
-  // if (fieldsQuery) {
-  //   const fields = (fieldsQuery as string).split(',').filter(Boolean);
-  //   if (fields.length) {
-  //     projectStage = fields.reduce<Record<string, 0 | 1>>((acc, field) => {
-  //       acc[field] = 1;
-  //       return acc;
-  //     }, {});
-  //   }
-  // } else {
-  // By default, exclude password from results
-  // projectStage = {
-  //   password: 0,
-  //   otp: 0,
-  //   otpExpiry: 0,
-  //   // isVerifiedByOTP: 0,
-  //   // isActive: 0,
-  //   // isDeleted: 0,
-  //   // deactivationReason: 0,
-  //   // passwordChangedAt: 0,
-  //   // role: 0,
-  //   // createdAt: 0,
-  //   // updatedAt: 0,
-  // };
-  // }
-
   const facetPipeline: Record<string, PipelineStage.FacetPipelineStage[]> = {
     data: [{ $skip: skip }, { $limit: limit }],
     meta: [{ $count: 'total' }],
   };
-
-  // if (projectStage) {
-  //   facetPipeline.data.unshift({ $project: projectStage });
-  // }
 
   pipeline.push({ $facet: facetPipeline });
 
@@ -1228,349 +1083,7 @@ const adminGetAllUsersFromDB = async (query: Record<string, unknown>) => {
   return { data: facetResult.data, meta };
 };
 
-// 18. adminGetAllMetaDataFromDB (dashboard meta aggregation)
-// const adminGetAllMetaDataFromDB = async () => {
-//   const [
-//     totalBooks,
-//     totalOrders,
-//     orderStats,
-//     userGrowthRaw,
-//     revenueSeriesRaw,
-//     pendingOrders,
-//   ] = await Promise.all([
-//     BookModel.countDocuments({}),
-//     OrderModel.countDocuments({}),
-//     OrderModel.aggregate([
-//       {
-//         $match: {
-//           paymentStatus: 'Paid',
-//         },
-//       },
-//       {
-//         $group: {
-//           _id: null,
-//           totalRevenue: { $sum: '$finalAmount' },
-//           totalPaidOrders: { $sum: 1 },
-//           customers: { $addToSet: '$user' },
-//         },
-//       },
-//       {
-//         $project: {
-//           _id: 0,
-//           totalRevenue: 1,
-//           totalPaidOrders: 1,
-//           activeCustomers: { $size: '$customers' },
-//         },
-//       },
-//     ]),
-//     UserModel.aggregate([
-//       {
-//         $group: {
-//           _id: {
-//             year: { $year: '$createdAt' },
-//             month: { $month: '$createdAt' },
-//           },
-//           users: { $sum: 1 },
-//         },
-//       },
-//       {
-//         $sort: { '_id.year': 1, '_id.month': 1 },
-//       },
-//     ]),
-//     OrderModel.aggregate([
-//       {
-//         $match: {
-//           paymentStatus: 'Paid',
-//         },
-//       },
-//       {
-//         $group: {
-//           _id: {
-//             year: { $year: '$createdAt' },
-//             month: { $month: '$createdAt' },
-//           },
-//           income: { $sum: '$finalAmount' },
-//         },
-//       },
-//       {
-//         $sort: { '_id.year': 1, '_id.month': 1 },
-//       },
-//     ]),
-//     OrderModel.aggregate([
-//       {
-//         $match: {
-//           deliveryStatus: { $ne: 'Delivered' },
-//           isDeleted: { $ne: true },
-//         },
-//       },
-//       {
-//         $sort: { createdAt: -1 },
-//       },
-//       // {
-//       //   $limit: 4,
-//       // },
-//       {
-//         $lookup: {
-//           from: 'users',
-//           localField: 'user',
-//           foreignField: '_id',
-//           as: 'user',
-//         },
-//       },
-//       {
-//         $unwind: '$user',
-//       },
-//       {
-//         $lookup: {
-//           from: 'books',
-//           localField: 'books.book',
-//           foreignField: '_id',
-//           as: 'bookDetails',
-//         },
-//       },
-//       {
-//         $addFields: {
-//           books: {
-//             $map: {
-//               input: '$books',
-//               as: 'orderBook',
-//               in: {
-//                 quantity: '$$orderBook.quantity',
-//                 unitPrice: '$$orderBook.unitPrice',
-//                 book: {
-//                   $arrayElemAt: [
-//                     {
-//                       $filter: {
-//                         input: '$bookDetails',
-//                         as: 'b',
-//                         cond: { $eq: ['$$b._id', '$$orderBook.book'] },
-//                       },
-//                     },
-//                     0,
-//                   ],
-//                 },
-//               },
-//             },
-//           },
-//         },
-//       },
-//       {
-//         $project: {
-//           bookDetails: 0,
-
-//           // user sanitization
-//           'user.password': 0,
-//           'user.otp': 0,
-//           'user.otpExpiry': 0,
-//           'user.passwordChangedAt': 0,
-//           'user.isDeleted': 0,
-//           'user.deactivationReason': 0,
-//           // 'user.isActive': 0,
-//           // 'user.isVerifiedByOTP': 0,
-//           'user.role': 0,
-//           'user.createdAt': 0,
-//           'user.updatedAt': 0,
-
-//           // order-level meta in pendingOrders
-//           isDeleted: 0,
-//           createdAt: 0,
-//           updatedAt: 0,
-
-//           // book-level meta inside each order
-//           'books.book.isActive': 0,
-//           'books.book.createdAt': 0,
-//           'books.book.updatedAt': 0,
-//         },
-//       },
-//     ]),
-//   ]);
-
-//   const statsSummary = {
-//     totalBooks,
-//     totalOrders,
-//     totalRevenue: orderStats[0]?.totalRevenue || 0,
-//     activeCustomers: orderStats[0]?.activeCustomers || 0,
-//   };
-
-//   const MONTH_LABELS = [
-//     'Jan',
-//     'Feb',
-//     'Mar',
-//     'Apr',
-//     'May',
-//     'Jun',
-//     'Jul',
-//     'Aug',
-//     'Sep',
-//     'Oct',
-//     'Nov',
-//     'Dec',
-//   ];
-
-//   const userGrowthSeries = userGrowthRaw.reduce(
-//     (
-//       acc: { year: number; data: { month: string; users: number }[] }[],
-//       item: any,
-//     ) => {
-//       const year = item._id.year as number;
-//       const monthIndex = (item._id.month as number) - 1;
-//       const monthLabel = MONTH_LABELS[monthIndex] || `${item._id.month}`;
-//       const existingYear = acc.find((y) => y.year === year);
-
-//       if (existingYear) {
-//         existingYear.data.push({ month: monthLabel, users: item.users });
-//       } else {
-//         acc.push({ year, data: [{ month: monthLabel, users: item.users }] });
-//       }
-
-//       return acc;
-//     },
-//     [],
-//   );
-
-//   const revenueSeriesMap = revenueSeriesRaw.reduce(
-//     (acc: Record<number, { month: string; income: number }[]>, item: any) => {
-//       const year = item._id.year as number;
-//       const monthIndex = (item._id.month as number) - 1;
-//       const monthLabel = MONTH_LABELS[monthIndex] || `${item._id.month}`;
-
-//       if (!acc[year]) {
-//         acc[year] = [];
-//       }
-
-//       acc[year].push({ month: monthLabel, income: item.income });
-//       return acc;
-//     },
-//     {},
-//   );
-
-//   const revenueSeries = Object.entries(revenueSeriesMap).map(
-//     ([yearStr, data]) => {
-//       const year = Number(yearStr);
-//       const yearlyTotal = (data as any).reduce(
-//         (sum: any, entry: any) => sum + entry.income,
-//         0,
-//       );
-//       return {
-//         year,
-//         data,
-//         yearlyTotal,
-//       };
-//     },
-//   );
-
-//   return {
-//     stats: statsSummary,
-//     userGrowthSeries,
-//     revenueSeries,
-//     pendingOrders,
-//   };
-// };
-
-// 20. getAllUserFromDB
-// const getAllUserFromDB = async (query: Record<string, unknown>) => {
-//   const {
-//     searchTerm,
-//     sort: sortQuery,
-//     page: pageQuery,
-//     limit: limitQuery,
-//     // fields: fieldsQuery,
-//     ...rawFilters
-//   } = query as Record<string, any>;
-
-//   const page = Number(pageQuery) || 1;
-//   const limit = Number(limitQuery) || 10;
-//   const skip = (page - 1) * limit;
-
-//   const pipeline: any[] = [{ $match: rawFilters }];
-
-//   // Search by name, email, phone
-//   if (searchTerm) {
-//     pipeline.push({
-//       $match: {
-//         $or: [
-//           { name: { $regex: searchTerm, $options: 'i' } },
-//           { email: { $regex: searchTerm, $options: 'i' } },
-//           { phone: { $regex: searchTerm, $options: 'i' } },
-//           // { address: { $regex: searchTerm, $options: 'i' } },
-//         ],
-//       },
-//     });
-//   }
-
-//   // Sort
-//   const sortStage: Record<string, 1 | -1> = {};
-//   const sortString = (sortQuery as string) || '-createdAt';
-//   sortString
-//     .split(',')
-//     .filter(Boolean)
-//     .forEach((field: string) => {
-//       if (field.startsWith('-')) {
-//         sortStage[field.substring(1)] = -1;
-//       } else {
-//         sortStage[field] = 1;
-//       }
-//     });
-
-//   if (Object.keys(sortStage).length) {
-//     pipeline.push({ $sort: sortStage });
-//   }
-
-//   // Fields selection
-//   // let projectStage: Record<string, 0 | 1> | null = null;
-//   // if (fieldsQuery) {
-//   //   const fields = (fieldsQuery as string).split(',').filter(Boolean);
-//   //   if (fields.length) {
-//   //     projectStage = fields.reduce<Record<string, 0 | 1>>((acc, field) => {
-//   //       acc[field] = 1;
-//   //       return acc;
-//   //     }, {});
-//   //   }
-//   // } else {
-//   // By default, exclude password from results
-//   // projectStage = {
-//   //   password: 0,
-//   //   otp: 0,
-//   //   otpExpiry: 0,
-//   //   // isVerifiedByOTP: 0,
-//   //   // isActive: 0,
-//   //   // isDeleted: 0,
-//   //   // deactivationReason: 0,
-//   //   // passwordChangedAt: 0,
-//   //   // role: 0,
-//   //   // createdAt: 0,
-//   //   // updatedAt: 0,
-//   // };
-//   // }
-
-//   const facetPipeline: any = {
-//     data: [{ $skip: skip }, { $limit: limit }],
-//     meta: [{ $count: 'total' }],
-//   };
-
-//   // if (projectStage) {
-//   //   facetPipeline.data.unshift({ $project: projectStage });
-//   // }
-
-//   pipeline.push({ $facet: facetPipeline });
-
-//   const result = await UserModel.aggregate(pipeline);
-//   const facetResult = result[0] || { data: [], meta: [] };
-
-//   const total = facetResult.meta[0]?.total || 0;
-//   const totalPage = Math.ceil(total / limit) || 1;
-
-//   const meta = {
-//     page,
-//     limit,
-//     total,
-//     totalPage,
-//   };
-
-//   return { data: facetResult.data, meta };
-// };
-
-// 19. uploadImagesIntoDB
+// 17. uploadImagesIntoDB
 const uploadImagesIntoDB = async (
   imageFiles: Express.Multer.File[] | undefined,
 ): Promise<string[]> => {
@@ -1602,7 +1115,7 @@ const uploadImagesIntoDB = async (
   return imageUrls;
 };
 
-// 20. deleteImageFromDB
+// 18. deleteImageFromDB
 const deleteImageFromDB = async (imageUrl: string) => {
   try {
     await deleteImageFromCloudinary(imageUrl);
@@ -1612,7 +1125,7 @@ const deleteImageFromDB = async (imageUrl: string) => {
   }
 };
 
-// 21. addFcmTokenIntoDB — set the user's single active device token (replaces any previous).
+// 19. addFcmTokenIntoDB — set the user's single active device token (replaces any previous).
 const addFcmTokenIntoDB = async (userId: string, fcmToken: string) => {
   await UserModel.updateOne(
     { _id: userId },
@@ -1621,7 +1134,7 @@ const addFcmTokenIntoDB = async (userId: string, fcmToken: string) => {
   return { fcmToken };
 };
 
-// 22. removeFcmTokenFromDB — unregister a device token (called on logout).
+// 20. removeFcmTokenFromDB — unregister a device token (called on logout).
 const removeFcmTokenFromDB = async (userId: string, fcmToken: string) => {
   await UserModel.updateOne(
     { _id: userId },
@@ -1648,8 +1161,6 @@ export const UserService = {
   deactivateAccountIntoDB,
   deleteSpecificUserAccountIntoDB,
   adminGetAllUsersFromDB,
-  // adminGetAllMetaDataFromDB,
-  // getAllUserFromDB,
   uploadImagesIntoDB,
   deleteImageFromDB,
   addFcmTokenIntoDB,

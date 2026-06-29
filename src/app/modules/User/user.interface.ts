@@ -12,7 +12,6 @@ export type TUserAddress = {
   isDefault: boolean;
 };
 
-// Per-task home-maintenance reminder state.
 export type TMaintenanceAlert = {
   enabled: boolean;
   enabledAt: Date | null;
@@ -22,7 +21,6 @@ export type TMaintenanceAlert = {
 
 export type TMaintenanceAlerts = Record<MaintenanceFieldKey, TMaintenanceAlert>;
 
-// Instance methods
 export interface IUser extends Document {
   _id: Types.ObjectId;
 
@@ -52,23 +50,19 @@ export interface IUser extends Document {
   isDeleted: boolean;
   deactivationReason?: string;
 
-  fcmTokens?: string[]; // the user's single active FCM token (latest only; replaced on each login/registration)
+  fcmTokens?: string[];
 
-  // Per-task home-maintenance reminder state (keyed by the 7 fieldKeys). Hidden from
-  // normal user responses via select:false on the schema path.
   maintenanceAlerts?: TMaintenanceAlerts;
 
   createdAt: Date;
   updatedAt: Date;
 
-  // Instance methods
   isPasswordMatched(plainTextPassword: string): Promise<boolean>;
   isJWTIssuedBeforePasswordChanged(
     jwtIssuedTimestamp: number | undefined,
   ): boolean;
 }
 
-// Static methods
 export interface IUserModel extends Model<IUser> {
   isUserExistsByEmailWithPassword(email: string): Promise<IUser | null>;
 }

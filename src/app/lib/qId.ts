@@ -32,10 +32,6 @@ export const getNextQId = async (): Promise<string> => {
 export const qIdPlugin = (schema: Schema) => {
   schema.add({ qId: { type: String } });
 
-  // Unique only among docs that actually have a qId (drafts never get one, so a
-  // partial index avoids null-collisions). Blocks duplicate/forged quote ids.
-  // NOTE: applying to an existing collection builds the index — ensure there are
-  // no pre-existing duplicate qId values before deploying.
   schema.index(
     { qId: 1 },
     { unique: true, partialFilterExpression: { qId: { $type: 'string' } } },

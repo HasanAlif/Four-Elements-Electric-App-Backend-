@@ -2,7 +2,6 @@ import { rateLimit } from 'express-rate-limit';
 import httpStatus from 'http-status';
 import { AppError } from '../utils';
 
-// Broad abuse protection for the whole API.
 export const globalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   limit: 300, // per IP per window

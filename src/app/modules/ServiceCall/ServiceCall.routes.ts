@@ -11,7 +11,6 @@ import { multerUpload } from '../../lib';
 
 const router = Router();
 
-// image files accepted on create/update (uploaded to Cloudinary in the service)
 const uploadServiceCallImages = multerUpload.fields([
   { name: 'panelPhotos', maxCount: 10 },
   { name: 'workAreaPhotos', maxCount: 10 },

@@ -10,17 +10,14 @@ const auth = (...requiredRoles: TRole[]) => {
   return asyncHandler(async (req, res, next) => {
     const token = req.headers.authorization?.replace('Bearer ', '') || '';
 
-    // checking if the token is missing
     if (!token) {
       throw new AppError(httpStatus.UNAUTHORIZED, 'You are not authorized!');
     }
 
-    // checking if the given token is valid
     const decoded = verifyToken(token, config.jwt.access_secret!) as JwtPayload;
 
     const { _id, iat } = decoded;
 
-    // checking if the user is exist
     const user = await UserModel.findById(_id);
 
     if (!user) {
@@ -39,7 +36,6 @@ const auth = (...requiredRoles: TRole[]) => {
       throw new AppError(httpStatus.UNAUTHORIZED, 'You are not authorized!');
     }
 
-    // checking if any hacker using a token even-after the user changed the password
     if (user.passwordChangedAt && user.isJWTIssuedBeforePasswordChanged(iat)) {
       throw new AppError(httpStatus.UNAUTHORIZED, 'You are not authorized!');
     }

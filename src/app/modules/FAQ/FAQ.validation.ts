@@ -32,10 +32,9 @@ export const FAQValidation = {
         .min(1, 'Content cannot be empty!'),
     }),
     params: z.object({
-      type: z.enum(
-        [ContentType.ABOUT_US, ContentType.TERMS_AND_CONDITIONS],
-        { error: 'Invalid content type!' },
-      ),
+      type: z.enum([ContentType.ABOUT_US, ContentType.TERMS_AND_CONDITIONS], {
+        error: 'Invalid content type!',
+      }),
     }),
   }),
 

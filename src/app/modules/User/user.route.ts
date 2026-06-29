@@ -150,15 +150,7 @@ router
   .route('/admin-get-all')
   .get(auth(ROLE.ADMIN, ROLE.SUPER_ADMIN), UserController.adminGetAllUsers);
 
-// 17. adminGetAllMetaData
-// router
-//   .route('/meta-data')
-//   .get(auth(ROLE.ADMIN, ROLE.SUPER_ADMIN), UserController.adminGetAllMetaData);
-
-// 18. getAllUser
-// router.route('/users').get(UserController.getAllUser);
-
-// 19. uploadImages
+// 17. uploadImages
 router
   .route('/upload-images')
   .post(
@@ -167,7 +159,7 @@ router
     UserController.uploadImages,
   );
 
-// 20. deleteImage
+// 18. deleteImage
 router
   .route('/delete-image')
   .delete(
@@ -176,7 +168,7 @@ router
     UserController.deleteImage,
   );
 
-// 21. register / remove an FCM device token (any logged-in role)
+// 19. register / remove an FCM device token (any logged-in role)
 router
   .route('/fcm-token')
   .post(
@@ -190,7 +182,7 @@ router
     UserController.removeFcmToken,
   );
 
-// 22. maintenance alerts — read current states + toggle a subset (owner-scoped)
+// 20. maintenance alerts — read current states + toggle a subset (owner-scoped)
 router
   .route('/maintenance-alerts')
   .get(auth(ROLE.USER), MaintenanceAlertsController.getMyMaintenanceAlerts)

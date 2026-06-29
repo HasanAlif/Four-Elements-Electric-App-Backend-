@@ -14,7 +14,6 @@ router
     NotificationController.getMyNotifications,
   );
 
-// Literal path must precede '/:id/read' so it isn't captured as an id.
 router
   .route('/mark-all-read')
   .patch(auth(ROLE.USER), NotificationController.markAllAsRead);

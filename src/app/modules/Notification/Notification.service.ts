@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import httpStatus from 'http-status';
 import { isValidObjectId, Types } from 'mongoose';
 import { AppError } from '../../utils';
@@ -9,8 +8,6 @@ import NotificationModel from './Notification.model';
 import { INotification, TNotificationType } from './Notification.interface';
 import { buildNotificationContent } from './Notification.constant';
 
-// ----- Internal creation/dispatch choke point -----
-
 type TNotifyInput = {
   recipientId: Types.ObjectId | string;
   serviceModel: string;
@@ -20,8 +17,6 @@ type TNotifyInput = {
   status?: string;
 };
 
-// Load the recipient's device tokens and deliver the push. Prunes dead tokens.
-// Never throws here — callers wrap, but keep this resilient regardless.
 const dispatchPush = async (notification: INotification): Promise<void> => {
   const recipient = await UserModel.findById(notification.user).select(
     'fcmTokens',
@@ -29,7 +24,6 @@ const dispatchPush = async (notification: INotification): Promise<void> => {
   const tokens = recipient?.fcmTokens ?? [];
   if (tokens.length === 0) return;
 
-  // FCM data values MUST all be strings (for deep-linking on the device).
   const data: Record<string, string> = {
     type: notification.type,
     serviceModel: notification.serviceModel ?? '',
@@ -57,9 +51,6 @@ const dispatchPush = async (notification: INotification): Promise<void> => {
   );
 };
 
-// The shared persist→dispatch choke point. Persist FIRST, then push. Fully isolated —
-// never throws — so a notification/FCM failure can never break the action that
-// triggered it (a quote write, an admin update, or a maintenance scan).
 type TPersistInput = {
   user: Types.ObjectId | string;
   type: TNotificationType;
@@ -82,7 +73,6 @@ const persistAndDispatch = async (doc: TPersistInput): Promise<void> => {
   }
 };
 
-// Quote notifications: copy is derived from the centralized catalog.
 const createAndDispatch = (
   type: TNotificationType,
   event: string,
@@ -106,17 +96,13 @@ const createAndDispatch = (
   });
 };
 
-// Fired when a quote is first submitted (qId minted). Idempotent at the trigger.
 const notifyQuoteSubmitted = (input: TNotifyInput): Promise<void> =>
   createAndDispatch('QUOTE_SUBMITTED', 'submitted', input);
 
-// Fired when an admin changes a quote's status (the new status drives the copy).
 const notifyStatusChanged = (
   input: TNotifyInput & { status: string },
 ): Promise<void> => createAndDispatch('STATUS_CHANGED', input.status, input);
 
-// Fired by the daily maintenance cron when a tracked task is due. Title/message come
-// from the maintenance config map (passed in), keeping this module decoupled from it.
 const notifyMaintenanceReminder = (input: {
   recipientId: Types.ObjectId | string;
   fieldKey: string;
@@ -130,8 +116,6 @@ const notifyMaintenanceReminder = (input: {
     message: input.message,
     fieldKey: input.fieldKey,
   });
-
-// ----- Owner-scoped read / state -----
 
 type TGetMyNotificationsQuery = {
   page?: string;

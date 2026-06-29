@@ -7,7 +7,6 @@ const router = Router();
 
 router.route('/').get(auth(ROLE.USER), QuotesController.getAllMyQuotes);
 
-// Literal paths must precede '/:id' so they aren't captured as an id.
 router
   .route('/recent-activity')
   .get(auth(ROLE.USER), QuotesController.getUserRecntActivity);

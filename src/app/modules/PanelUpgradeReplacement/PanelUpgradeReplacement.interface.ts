@@ -23,15 +23,6 @@ export const PANEL_AMPERAGES = [
 ] as const;
 export type TPanelAmperage = (typeof PANEL_AMPERAGES)[number];
 
-export const PANEL_LOCATIONS = [
-  'Basement (Finished)',
-  'Basement (Unfinished)',
-  'Garage (Finished)',
-  'Garage (Unfinished)',
-  'Other (please specify)',
-] as const;
-export type TPanelLocation = (typeof PANEL_LOCATIONS)[number];
-
 export const PANEL_POWER_FEEDS = ['Overhead', 'Underground', 'Unsure'] as const;
 export type TPowerFeedType = (typeof PANEL_POWER_FEEDS)[number];
 
@@ -63,7 +54,7 @@ export interface IPanelUpgradeReplacement extends Document {
   currentPanelAmperage: TPanelAmperage;
   powerFeedType: TPowerFeedType;
 
-  panelLocation: TPanelLocation;
+  panelLocation: string;
   additionalInformation?: string;
 
   meterPhotos?: string[];

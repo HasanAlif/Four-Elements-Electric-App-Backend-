@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { model, Schema } from 'mongoose';
 import {
   CONTACT_METHODS,
@@ -198,7 +197,6 @@ const OutletsSchema = new Schema<IOutlets>(
 );
 
 OutletsSchema.index({ createdBy: 1, status: 1 });
-// admin/quotes fan-out (status != draft) + trend, and per-user lists — both sorted by createdAt
 OutletsSchema.index({ status: 1, createdAt: -1 });
 OutletsSchema.index({ createdBy: 1, createdAt: -1 });
 

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { model, Schema } from 'mongoose';
 import {
   CONTACT_METHODS,
@@ -285,7 +284,6 @@ const LightingSchema = new Schema<ILighting>(
 );
 
 LightingSchema.index({ createdBy: 1, status: 1 });
-// admin/quotes fan-out (status != draft) + trend, and per-user lists — both sorted by createdAt
 LightingSchema.index({ status: 1, createdAt: -1 });
 LightingSchema.index({ createdBy: 1, createdAt: -1 });
 

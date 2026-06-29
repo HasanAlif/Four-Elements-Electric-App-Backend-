@@ -10,17 +10,7 @@ import {
 import { qIdPlugin } from '../../lib/qId';
 import { quoteSubmitNotificationPlugin } from '../Notification/Notification.plugin';
 import { statusTimelinePlugin } from '../../lib/statusTimeline';
-import {
-  // ACCESSORY_BUILDING_CIRCUIT_AMP_RATINGS,
-  // ACCESSORY_BUILDING_CIRCUIT_COUNTS,
-  // ACCESSORY_BUILDING_CONSTRUCTION_TYPES,
-  // ACCESSORY_BUILDING_FLOOR_TYPES,
-  // ACCESSORY_BUILDING_PANEL_LOCATIONS,
-  // ACCESSORY_BUILDING_SERVICE_SIZES,
-  // ACCESSORY_BUILDING_SERVICE_TYPES,
-  // ACCESSORY_BUILDING_STATUSES,
-  IAccessoryBuildingPower,
-} from './AccessoryBuildingPower.interface';
+import { IAccessoryBuildingPower } from './AccessoryBuildingPower.interface';
 
 const accessoryBuildingPowerSchema = new Schema<IAccessoryBuildingPower>(
   {
@@ -243,7 +233,6 @@ const accessoryBuildingPowerSchema = new Schema<IAccessoryBuildingPower>(
 );
 
 accessoryBuildingPowerSchema.index({ createdBy: 1, status: 1 });
-// admin/quotes fan-out (status != draft) + trend, and per-user lists — both sorted by createdAt
 accessoryBuildingPowerSchema.index({ status: 1, createdAt: -1 });
 accessoryBuildingPowerSchema.index({ createdBy: 1, createdAt: -1 });
 

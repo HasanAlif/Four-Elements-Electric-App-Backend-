@@ -19,7 +19,6 @@ router
     GuideController.getAllGuides,
   );
 
-// Literal path must precede '/:id' so 'saved' isn't captured as an id.
 router
   .route('/saved')
   .get(

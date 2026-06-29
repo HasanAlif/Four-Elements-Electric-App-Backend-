@@ -1,7 +1,5 @@
 import { z } from 'zod';
 
-// Admin create: all three fields required; steps is a non-empty array of objects,
-// each with a non-empty subtitle and description.
 const createGuideSchema = z.object({
   body: z.object({
     name: z.string({ error: 'Name is required!' }).trim().min(1),
@@ -27,14 +25,12 @@ const createGuideSchema = z.object({
   }),
 });
 
-// Shared `:id` param guard for single / save / unsave.
 const idParamsSchema = z.object({
   params: z.object({
     id: z.string({ error: 'Guide ID is required!' }).min(1),
   }),
 });
 
-// Optional list/pagination query (list + saved-list).
 const listQuerySchema = z.object({
   query: z
     .object({

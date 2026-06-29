@@ -1,10 +1,5 @@
 import { Service_STATUSES } from '../../constants';
 
-// Centralized, user-friendly notification copy. ONE place to edit wording.
-// Keyed by a logical event: the literal 'submitted', or any real service status
-// (pending / in_review / send / closed). `send` means the team has reached out
-// ("Contacted" in admin analytics).
-
 type TContentInput = {
   serviceType?: string;
   qId?: string;
@@ -12,8 +7,6 @@ type TContentInput = {
 
 type TContent = { title: string; message: string };
 
-// Build the human-readable label for a service/qId. Falls back gracefully when a
-// field is missing so the copy never shows "undefined".
 const label = (serviceType?: string) => serviceType?.trim() || 'service';
 const ref = (qId?: string) => (qId ? ` (#${qId})` : '');
 

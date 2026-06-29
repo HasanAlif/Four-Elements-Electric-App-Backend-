@@ -9,7 +9,6 @@ import {
   HOT_TUB_AMPERAGES,
   HOT_TUB_LOCATIONS,
   HOT_TUB_PANEL_DISTANCE,
-  HOT_TUB_PANEL_LOCATIONS,
 } from './HotTub.interface';
 
 const hotTubBodySchema = z.object({
@@ -35,7 +34,7 @@ const hotTubBodySchema = z.object({
 
   amperageNeeded: z.enum(HOT_TUB_AMPERAGES).optional(),
   location: z.enum(HOT_TUB_LOCATIONS).optional(),
-  panelLocation: z.enum(HOT_TUB_PANEL_LOCATIONS).optional(),
+  panelLocation: z.string().optional(),
   panelDistance: z.enum(HOT_TUB_PANEL_DISTANCE).optional(),
 
   panelPhotos: z.array(z.string()).optional(),
@@ -47,9 +46,6 @@ const hotTubBodySchema = z.object({
   completionPercentage: z.number().optional(),
 });
 
-// Photo presence (panelPhotos, hotTubPhotos) and manualDocument (when
-// hasDigitalManual) are enforced in the service because images now arrive as
-// form-data files, not in `data`.
 const hotTubCreateBodySchema = hotTubBodySchema;
 
 export const HotTubValidation = {

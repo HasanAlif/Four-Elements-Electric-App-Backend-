@@ -3,8 +3,6 @@ import { Request, Response } from 'express';
 import { asyncHandler, sendResponse } from '../../utils';
 import { AdminService } from './Admin.service';
 
-// Accept a query-string filter only if it is actually a string; an object/array
-// (e.g. ?serviceType[$ne]=x) is dropped so it can never reach a Mongo filter.
 const asString = (value: unknown): string | undefined =>
   typeof value === 'string' ? value : undefined;
 

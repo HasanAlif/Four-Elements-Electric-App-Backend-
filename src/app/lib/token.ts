@@ -22,24 +22,6 @@ export const createAccessToken = (payload: TTokenData): string => {
   return token;
 };
 
-// type TArtistTokenData = {
-//   id: string;
-//   name: string;
-//   phone: string;
-//   image: string;
-//   email: string;
-//   role: string;
-// };
-
-// export const createArtistAccessToken = (payload: TArtistTokenData): string => {
-//   const token = jwt.sign(payload, config.jwt.access_secret!, {
-//     algorithm: 'HS256',
-//     expiresIn: config.jwt.access_expires_in!,
-//   } as SignOptions);
-
-//   return token;
-// };
-
 export const createRefreshToken = (payload: { email: string }): string => {
   const token = jwt.sign(payload, config.jwt.refresh_secret!, {
     algorithm: 'HS256',
