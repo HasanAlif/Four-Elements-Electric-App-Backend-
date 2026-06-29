@@ -19,7 +19,7 @@ export const getNextQId = async (): Promise<string> => {
   const counter = await CounterModel.findByIdAndUpdate(
     QUOTE_COUNTER_ID,
     { $inc: { seq: 1 } },
-    { new: true, upsert: true },
+    { returnDocument: 'after', upsert: true },
   );
 
   if (!counter) {

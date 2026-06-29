@@ -275,7 +275,7 @@ const updateQuoteStatus = async (
         .findOneAndUpdate(
           { _id: quoteId, status: { $ne: Service_STATUSES.DRAFT } },
           update,
-          { new: true, runValidators: true },
+          { returnDocument: 'after', runValidators: true },
         )
         .lean(),
     ),
@@ -406,7 +406,7 @@ const updateCategory = async (
   }
 
   const category = await CategoryModel.findByIdAndUpdate(id, payload, {
-    new: true,
+    returnDocument: 'after',
     runValidators: true,
   });
 
@@ -593,7 +593,7 @@ const updatePartner = async (id: string, payload: Partial<TPartnerPayload>) => {
       ...payload,
       lastChange: { changeType: 'updated', fields: changedFields },
     },
-    { new: true, runValidators: true },
+    { returnDocument: 'after', runValidators: true },
   );
 
   if (!partner) {

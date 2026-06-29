@@ -28,7 +28,7 @@ const getSingleFAQ = async (id: string) => {
 
 const updateFAQ = async (id: string, payload: Partial<TFAQPayload>) => {
   const faq = await FAQModel.findByIdAndUpdate(id, payload, {
-    new: true,
+    returnDocument: 'after',
     runValidators: true,
   });
 
@@ -61,7 +61,7 @@ const createOrUpdateContent = async (type: ContentType, content: string) => {
   const result = await AppContent.findOneAndUpdate(
     { type },
     { content },
-    { new: true, upsert: true, runValidators: true },
+    { returnDocument: 'after', upsert: true, runValidators: true },
   );
   return result;
 };
