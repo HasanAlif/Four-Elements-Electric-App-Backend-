@@ -10,22 +10,6 @@ import {
 export const PANEL_SERVICE_TYPES = ['Replacement', 'Upgrade'] as const;
 export type TPanelServiceType = (typeof PANEL_SERVICE_TYPES)[number];
 
-export const PANEL_AMPERAGES = [
-  '50',
-  '60',
-  '100',
-  '150',
-  '200',
-  '300',
-  '350',
-  '400',
-  'Unsure',
-] as const;
-export type TPanelAmperage = (typeof PANEL_AMPERAGES)[number];
-
-export const PANEL_POWER_FEEDS = ['Overhead', 'Underground', 'Unsure'] as const;
-export type TPowerFeedType = (typeof PANEL_POWER_FEEDS)[number];
-
 export interface IPanelUpgradeReplacement extends Document {
   _id: Types.ObjectId;
   qId?: string;
@@ -49,10 +33,10 @@ export interface IPanelUpgradeReplacement extends Document {
   timelineUrgency: TTimelineUrgency;
 
   panelServiceType: TPanelServiceType;
-  desiredPanelAmperage?: TPanelAmperage;
+  desiredPanelAmperage?: string;
 
-  currentPanelAmperage: TPanelAmperage;
-  powerFeedType: TPowerFeedType;
+  currentPanelAmperage: string;
+  powerFeedType: string;
 
   panelLocation: string;
   additionalInformation?: string;

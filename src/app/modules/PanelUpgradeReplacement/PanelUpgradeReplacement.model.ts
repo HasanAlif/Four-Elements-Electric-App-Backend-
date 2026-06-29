@@ -1,8 +1,6 @@
 import { model, Schema } from 'mongoose';
 import {
   IPanelUpgradeReplacement,
-  PANEL_AMPERAGES,
-  PANEL_POWER_FEEDS,
   PANEL_SERVICE_TYPES,
 } from './PanelUpgradeReplacement.interface';
 import {
@@ -140,11 +138,11 @@ const panelUpgradeReplacementSchema = new Schema<IPanelUpgradeReplacement>(
     },
     desiredPanelAmperage: {
       type: String,
-      enum: PANEL_AMPERAGES,
+      trim: true,
     },
     currentPanelAmperage: {
       type: String,
-      enum: PANEL_AMPERAGES,
+      trim: true,
     },
     panelLocation: {
       type: String,
@@ -152,7 +150,7 @@ const panelUpgradeReplacementSchema = new Schema<IPanelUpgradeReplacement>(
     },
     powerFeedType: {
       type: String,
-      enum: PANEL_POWER_FEEDS,
+      trim: true,
     },
     meterPhotos: {
       type: [String],
