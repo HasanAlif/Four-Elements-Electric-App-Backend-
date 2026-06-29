@@ -6,8 +6,7 @@ import morgan from 'morgan';
 import routes from './app/routes';
 import { globalErrorHandler, notFoundHandler } from './app/utils';
 import { globalLimiter, sanitizeMongo } from './app/middlewares';
-import os from 'os';
-import config from './app/config';
+import { LANDING_PAGE_TEMPLATE } from './app/utils/Template';
 
 const app: Application = express();
 
@@ -49,27 +48,7 @@ app.use(globalLimiter);
 app.use('/api/v1', routes);
 
 app.get('/', (req: Request, res: Response) => {
-  const currentDateTime = new Date().toISOString();
-  const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-  const serverHostname = os.hostname();
-  const serverPlatform = os.platform();
-  const serverUptime = os.uptime();
-  res.send({
-    success: true,
-    message: `Welcome to ${config.preffered_website_name} Server`,
-    version: '1.0.0',
-    clientDetails: {
-      ipAddress: clientIp,
-      accessedAt: currentDateTime,
-    },
-    serverDetails: {
-      hostname: serverHostname,
-      platform: serverPlatform,
-      uptime: `${Math.floor(serverUptime / 60 / 60)} hours ${Math.floor(
-        (serverUptime / 60) % 60,
-      )} minutes`,
-    },
-  });
+  res.send(LANDING_PAGE_TEMPLATE);
 });
 
 app.use(globalErrorHandler);
