@@ -36,6 +36,7 @@ app.use(
       'http://10.10.20.30:3003',
       'http://10.10.20.30:5173',
       'http://10.10.20.30:5173',
+      'https://ashely-dashboard.vercel.app',
     ],
   }),
 );

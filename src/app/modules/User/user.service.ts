@@ -25,6 +25,10 @@ import jwt, { JwtPayload, SignOptions } from 'jsonwebtoken';
 import { deleteImageFromCloudinary, sendImageToCloudinary } from '../../lib';
 import { PipelineStage } from 'mongoose';
 import { createPublicKey } from 'crypto';
+import { Service_STATUSES } from '../../constants';
+import { serviceModels } from '../serviceModels';
+import FavoriteModel from '../Quotes/Favorite.model';
+import { MAINTENANCE_FIELD_KEYS } from '../MaintenanceAlerts/maintenanceAlerts.constant';
 
 type TSocialSigninPayload = {
   provider: Exclude<TAuthProvider, 'EMAIL'>;
@@ -873,11 +877,45 @@ const resetPasswordIntoDB = async (
 
 // 12. fetchProfileFromDB
 const fetchProfileFromDB = async (userData: IUser) => {
-  const user = await UserModel.findById(userData._id).select(
-    '-password -passwordChangedAt -otp -otpExpiry -isActive -isDeleted -deactivationReason -createdAt -updatedAt',
+  const userId = userData._id;
+
+  const [user, quotesCount, savedPartner, alertsHolder] = await Promise.all([
+    // Profile projection — same hidden fields as before.
+    UserModel.findById(userId)
+      .select(
+        '-password -passwordChangedAt -otp -otpExpiry -isActive -isDeleted -deactivationReason -createdAt -updatedAt',
+      )
+      .lean(),
+    // Submitted quotes (drafts excluded) across all service collections.
+    Promise.all(
+      serviceModels.map(serviceModel =>
+        serviceModel.countDocuments({
+          createdBy: userId,
+          status: { $ne: Service_STATUSES.DRAFT },
+        }),
+      ),
+    ).then(counts => counts.reduce((sum, count) => sum + count, 0)),
+    // Saved (favorited) partners.
+    FavoriteModel.countDocuments({ user: userId }),
+    // Reminder states only (select:false → explicit +); kept OUT of the response.
+    UserModel.findById(userId).select('+maintenanceAlerts').lean(),
+  ]);
+
+  if (!user) {
+    return null;
+  }
+
+  // Count the maintenance reminders the user has turned on.
+  const alerts = (alertsHolder?.maintenanceAlerts ?? {}) as unknown as Record<
+    string,
+    { enabled?: boolean }
+  >;
+  const Reminder = MAINTENANCE_FIELD_KEYS.reduce(
+    (count, key) => count + (alerts?.[key]?.enabled ? 1 : 0),
+    0,
   );
 
-  return user;
+  return { ...user, Quotes: quotesCount, Reminder, savedPartner };
 };
 
 // 13. getNewAccessTokenFromDB
