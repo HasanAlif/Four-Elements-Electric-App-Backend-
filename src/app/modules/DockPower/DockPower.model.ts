@@ -10,14 +10,7 @@ import {
 import { qIdPlugin } from '../../lib/qId';
 import { quoteSubmitNotificationPlugin } from '../Notification/Notification.plugin';
 import { statusTimelinePlugin } from '../../lib/statusTimeline';
-import {
-  DOCK_POWER_CIRCUIT_AMP_RATINGS,
-  DOCK_POWER_CIRCUIT_COUNTS,
-  DOCK_POWER_NEW_SERVICE_SIZES,
-  DOCK_POWER_SERVICE_TYPES,
-  DOCK_POWER_SUB_PANEL_SIZES,
-  IDockPower,
-} from './DockPower.interface';
+import { IDockPower } from './DockPower.interface';
 
 const dockPowerSchema = new Schema<IDockPower>(
   {
@@ -153,12 +146,12 @@ const dockPowerSchema = new Schema<IDockPower>(
 
     electricalServiceType: {
       type: String,
-      enum: DOCK_POWER_SERVICE_TYPES,
+      trim: true,
     },
 
     newServiceSize: {
       type: String,
-      enum: DOCK_POWER_NEW_SERVICE_SIZES,
+      trim: true,
     },
     serviceSizeOther: {
       type: String,
@@ -167,16 +160,16 @@ const dockPowerSchema = new Schema<IDockPower>(
 
     subPanelSize: {
       type: String,
-      enum: DOCK_POWER_SUB_PANEL_SIZES,
+      trim: true,
     },
 
     dedicatedCircuitsCount: {
       type: String,
-      enum: DOCK_POWER_CIRCUIT_COUNTS,
+      trim: true,
     },
     dedicatedCircuitAmpRating: {
       type: String,
-      enum: DOCK_POWER_CIRCUIT_AMP_RATINGS,
+      trim: true,
     },
 
     panelLocation: {

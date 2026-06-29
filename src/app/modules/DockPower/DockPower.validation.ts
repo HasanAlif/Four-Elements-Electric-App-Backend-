@@ -6,13 +6,6 @@ import {
   TIMELINE_URGENCIES,
   Service_STATUSES,
 } from '../../constants';
-import {
-  DOCK_POWER_CIRCUIT_AMP_RATINGS,
-  DOCK_POWER_CIRCUIT_COUNTS,
-  DOCK_POWER_NEW_SERVICE_SIZES,
-  DOCK_POWER_SERVICE_TYPES,
-  DOCK_POWER_SUB_PANEL_SIZES,
-} from './DockPower.interface';
 
 const dockPowerBodySchema = z.object({
   fullName: z.string({ error: 'Full name is required!' }).min(1),
@@ -37,12 +30,12 @@ const dockPowerBodySchema = z.object({
     .min(0, 'Receptacle count cannot be negative!')
     .optional(),
 
-  electricalServiceType: z.enum(DOCK_POWER_SERVICE_TYPES).optional(),
-  newServiceSize: z.enum(DOCK_POWER_NEW_SERVICE_SIZES).optional(),
-  subPanelSize: z.enum(DOCK_POWER_SUB_PANEL_SIZES).optional(),
+  electricalServiceType: z.string().optional(),
+  newServiceSize: z.string().optional(),
+  subPanelSize: z.string().optional(),
   serviceSizeOther: z.string().optional(),
-  dedicatedCircuitsCount: z.enum(DOCK_POWER_CIRCUIT_COUNTS).optional(),
-  dedicatedCircuitAmpRating: z.enum(DOCK_POWER_CIRCUIT_AMP_RATINGS).optional(),
+  dedicatedCircuitsCount: z.string().optional(),
+  dedicatedCircuitAmpRating: z.string().optional(),
 
   panelLocation: z.string().optional(),
   panelLocationOther: z.string().optional(),

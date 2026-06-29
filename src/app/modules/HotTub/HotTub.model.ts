@@ -10,12 +10,7 @@ import {
 import { qIdPlugin } from '../../lib/qId';
 import { quoteSubmitNotificationPlugin } from '../Notification/Notification.plugin';
 import { statusTimelinePlugin } from '../../lib/statusTimeline';
-import {
-  HOT_TUB_AMPERAGES,
-  HOT_TUB_LOCATIONS,
-  HOT_TUB_PANEL_DISTANCE,
-  IHotTub,
-} from './HotTub.interface';
+import { IHotTub } from './HotTub.interface';
 
 const hotTubSchema = new Schema<IHotTub>(
   {
@@ -151,11 +146,11 @@ const hotTubSchema = new Schema<IHotTub>(
     },
     amperageNeeded: {
       type: String,
-      enum: HOT_TUB_AMPERAGES,
+      trim: true,
     },
     location: {
       type: String,
-      enum: HOT_TUB_LOCATIONS,
+      trim: true,
     },
     panelLocation: {
       type: String,
@@ -163,7 +158,7 @@ const hotTubSchema = new Schema<IHotTub>(
     },
     panelDistance: {
       type: String,
-      enum: HOT_TUB_PANEL_DISTANCE,
+      trim: true,
     },
     panelPhotos: {
       type: [String],

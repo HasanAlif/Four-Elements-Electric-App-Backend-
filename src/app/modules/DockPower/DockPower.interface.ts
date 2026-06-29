@@ -7,48 +7,46 @@ import {
   TTimelineUrgency,
 } from '../../constants';
 
-export const DOCK_POWER_SERVICE_TYPES = [
-  'New service',
-  'Sub-panel',
-  '1-2 dedicated circuits',
-] as const;
-export type TDockPowerElectricalServiceType =
-  (typeof DOCK_POWER_SERVICE_TYPES)[number];
+// export const DOCK_POWER_SERVICE_TYPES = [
+//   'New service',
+//   'Sub-panel',
+//   '1-2 dedicated circuits',
+// ] as const;
+// export type TDockPowerElectricalServiceType =
+//   (typeof DOCK_POWER_SERVICE_TYPES)[number];
 
-export const DOCK_POWER_NEW_SERVICE_SIZES = [
-  '100 amp',
-  '125 amp',
-  '150 amp',
-  '200 amp',
-  '300 amp',
-  '350 amp',
-  '400 amp',
-  'Unsure',
-  'Other',
-] as const;
-export type TDockPowerNewServiceSize =
-  (typeof DOCK_POWER_NEW_SERVICE_SIZES)[number];
+// export const DOCK_POWER_NEW_SERVICE_SIZES = [
+//   '100 amp',
+//   '125 amp',
+//   '150 amp',
+//   '200 amp',
+//   '300 amp',
+//   '350 amp',
+//   '400 amp',
+//   'Unsure',
+//   'Other',
+// ] as const;
+// export type TDockPowerNewServiceSize =
+//   (typeof DOCK_POWER_NEW_SERVICE_SIZES)[number];
 
-export const DOCK_POWER_SUB_PANEL_SIZES = [
-  '30 amp',
-  '50 amp',
-  '60 amp',
-  '100 amp',
-  '125 amp',
-  'Unsure',
-  'Other',
-] as const;
-export type TDockPowerSubPanelSize =
-  (typeof DOCK_POWER_SUB_PANEL_SIZES)[number];
+// export const DOCK_POWER_SUB_PANEL_SIZES = [
+//   '30 amp',
+//   '50 amp',
+//   '60 amp',
+//   '100 amp',
+//   '125 amp',
+//   'Unsure',
+//   'Other',
+// ] as const;
+// export type TDockPowerSubPanelSize =
+//   (typeof DOCK_POWER_SUB_PANEL_SIZES)[number];
 
-export const DOCK_POWER_CIRCUIT_COUNTS = ['1', '2'] as const;
-export type TDockPowerCircuitCount = (typeof DOCK_POWER_CIRCUIT_COUNTS)[number];
+// export const DOCK_POWER_CIRCUIT_COUNTS = ['1', '2'] as const;
+// export type TDockPowerCircuitCount = (typeof DOCK_POWER_CIRCUIT_COUNTS)[number];
 
-export const DOCK_POWER_CIRCUIT_AMP_RATINGS = ['15', '20'] as const;
-export type TDockPowerCircuitAmpRating =
-  (typeof DOCK_POWER_CIRCUIT_AMP_RATINGS)[number];
-
-
+// export const DOCK_POWER_CIRCUIT_AMP_RATINGS = ['15', '20'] as const;
+// export type TDockPowerCircuitAmpRating =
+//   (typeof DOCK_POWER_CIRCUIT_AMP_RATINGS)[number];
 
 export interface IDockPower extends Document {
   _id: Types.ObjectId;
@@ -76,15 +74,15 @@ export interface IDockPower extends Document {
   electricalNeedsDetails: string;
   receptacleCount: number;
 
-  electricalServiceType: TDockPowerElectricalServiceType;
+  electricalServiceType: string;
 
-  newServiceSize?: TDockPowerNewServiceSize;
+  newServiceSize?: string;
   serviceSizeOther?: string;
 
-  subPanelSize?: TDockPowerSubPanelSize;
+  subPanelSize?: string;
 
-  dedicatedCircuitsCount?: TDockPowerCircuitCount;
-  dedicatedCircuitAmpRating?: TDockPowerCircuitAmpRating;
+  dedicatedCircuitsCount?: string;
+  dedicatedCircuitAmpRating?: string;
 
   panelLocation: string;
   panelLocationOther?: string;

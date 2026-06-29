@@ -5,11 +5,6 @@ import {
   TIMELINE_URGENCIES,
   Service_STATUSES,
 } from '../../constants';
-import {
-  HOT_TUB_AMPERAGES,
-  HOT_TUB_LOCATIONS,
-  HOT_TUB_PANEL_DISTANCE,
-} from './HotTub.interface';
 
 const hotTubBodySchema = z.object({
   fullName: z.string({ error: 'Full name is required!' }).min(1),
@@ -32,10 +27,10 @@ const hotTubBodySchema = z.object({
   hotTubManufacturer: z.string().optional(),
   hotTubModelNumber: z.string().optional(),
 
-  amperageNeeded: z.enum(HOT_TUB_AMPERAGES).optional(),
-  location: z.enum(HOT_TUB_LOCATIONS).optional(),
+  amperageNeeded: z.string().optional(),
+  location: z.string().optional(),
   panelLocation: z.string().optional(),
-  panelDistance: z.enum(HOT_TUB_PANEL_DISTANCE).optional(),
+  panelDistance: z.string().optional(),
 
   panelPhotos: z.array(z.string()).optional(),
   hotTubPhotos: z.array(z.string()).optional(),

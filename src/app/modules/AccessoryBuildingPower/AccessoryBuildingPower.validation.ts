@@ -6,14 +6,6 @@ import {
   TIMELINE_URGENCIES,
   Service_STATUSES,
 } from '../../constants';
-import {
-  ACCESSORY_BUILDING_CIRCUIT_AMP_RATINGS,
-  ACCESSORY_BUILDING_CIRCUIT_COUNTS,
-  ACCESSORY_BUILDING_CONSTRUCTION_TYPES,
-  ACCESSORY_BUILDING_FLOOR_TYPES,
-  ACCESSORY_BUILDING_SERVICE_SIZES,
-  ACCESSORY_BUILDING_SERVICE_TYPES,
-} from './AccessoryBuildingPower.interface';
 
 const accessoryBuildingPowerBodySchema = z.object({
   fullName: z.string({ error: 'Full name is required!' }).min(1),
@@ -38,17 +30,15 @@ const accessoryBuildingPowerBodySchema = z.object({
   intendedUse: z.string().optional(),
 
   buildingStatus: z.string().optional(),
-  constructionType: z.enum(ACCESSORY_BUILDING_CONSTRUCTION_TYPES).optional(),
+  constructionType: z.string().optional(),
   hasHeatingOrCooling: z.boolean().optional(),
-  floorType: z.enum(ACCESSORY_BUILDING_FLOOR_TYPES).optional(),
+  floorType: z.string().optional(),
 
-  electricalServiceType: z.enum(ACCESSORY_BUILDING_SERVICE_TYPES).optional(),
-  serviceSize: z.enum(ACCESSORY_BUILDING_SERVICE_SIZES).optional(),
+  electricalServiceType: z.string().optional(),
+  serviceSize: z.string().optional(),
   serviceSizeOther: z.string().optional(),
-  dedicatedCircuitsCount: z.enum(ACCESSORY_BUILDING_CIRCUIT_COUNTS).optional(),
-  dedicatedCircuitAmpRating: z
-    .enum(ACCESSORY_BUILDING_CIRCUIT_AMP_RATINGS)
-    .optional(),
+  dedicatedCircuitsCount: z.string().optional(),
+  dedicatedCircuitAmpRating: z.string().optional(),
 
   panelLocation: z.string().optional(),
   panelLocationOther: z.string().optional(),
