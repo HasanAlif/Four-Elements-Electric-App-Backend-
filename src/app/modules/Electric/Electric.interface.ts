@@ -31,7 +31,7 @@ export interface IElectric extends Document {
 
   inspectionType: string;
   squareFootage: string;
-  panelNeedForInspected: string;
+  panelNeedForInspected: number;
   panelPhotos: string[];
 
   additionalInformation?: string;

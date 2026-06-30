@@ -142,8 +142,7 @@ const electricSchema = new Schema<IElectric>(
       trim: true,
     },
     panelNeedForInspected: {
-      type: String,
-      trim: true,
+      type: Number,
     },
     panelPhotos: {
       type: [String],
