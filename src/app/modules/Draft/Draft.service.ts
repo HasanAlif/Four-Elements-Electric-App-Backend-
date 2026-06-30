@@ -10,18 +10,19 @@ const getAllMyDraftsFromDB = async (userId: string) => {
       })
       .lean();
 
-    return {
-      serviceName: name,
-      count: drafts.length,
-      data: drafts,
-    };
+    return drafts.map(draft => ({ serviceName: name, ...draft }));
   });
 
   const results = await Promise.all(draftPromises);
+  const allDrafts = results.flat();
 
-  const filteredResults = results.filter(result => result.count > 0);
+  allDrafts.sort(
+    (a, b) =>
+      new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime() ||
+      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+  );
 
-  return filteredResults;
+  return allDrafts;
 };
 
 export const DraftService = {
