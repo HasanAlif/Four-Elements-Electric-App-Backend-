@@ -37,6 +37,20 @@ export interface IAccessoryBuildingPower extends Document {
   hasHeatingOrCooling: boolean;
   floorType: string;
 
+  electricalNeeds?: string;
+  willThereBeAnyHeatingOrCoolingEquipment?: boolean;
+  willNeedNewService?: string;
+  sizeOfSubPanel?: string;
+  electricalPannelLocation?: string;
+  photosOfElectricalPannel?: string[];
+
+  howManyDedicatedCircuitsNeed?: string;
+  ampRatingForDedicatedCircuit?: string;
+  privateUtilitiesBetweenHouseAndAccessoryBuilding?: string;
+  generalIdeaOfPrivateUtilitiesBetweenHouseAndAccessoryBuilding?: string;
+  existingSpacePhotos: string[];
+  photosOfPlansDrawings?: string[];
+
   electricalServiceType: string;
   serviceSize?: string;
   serviceSizeOther?: string;
@@ -48,10 +62,8 @@ export interface IAccessoryBuildingPower extends Document {
 
   panelPhotos: string[];
   routeDetails?: string;
-  existingSpacePhotos: string[];
 
   hasPlansDrawings: boolean;
-  plansDrawings?: string[];
   permitApplied: boolean;
   permitNumber?: string;
   additionalInformation?: string;

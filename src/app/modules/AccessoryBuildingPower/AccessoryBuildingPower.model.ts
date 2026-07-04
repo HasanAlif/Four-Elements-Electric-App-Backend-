@@ -137,6 +137,53 @@ const accessoryBuildingPowerSchema = new Schema<IAccessoryBuildingPower>(
       type: String,
       trim: true,
     },
+    electricalNeeds: {
+      type: String,
+      trim: true,
+    },
+    willThereBeAnyHeatingOrCoolingEquipment: {
+      type: Boolean,
+    },
+    willNeedNewService: {
+      type: String,
+      trim: true,
+    },
+    sizeOfSubPanel: {
+      type: String,
+      trim: true,
+    },
+    electricalPannelLocation: {
+      type: String,
+      trim: true,
+    },
+    photosOfElectricalPannel: {
+      type: [String],
+      default: [],
+    },
+    howManyDedicatedCircuitsNeed: {
+      type: String,
+      trim: true,
+    },
+    ampRatingForDedicatedCircuit: {
+      type: String,
+      trim: true,
+    },
+    privateUtilitiesBetweenHouseAndAccessoryBuilding: {
+      type: String,
+      trim: true,
+    },
+    generalIdeaOfPrivateUtilitiesBetweenHouseAndAccessoryBuilding: {
+      type: String,
+      trim: true,
+    },
+    existingSpacePhotos: {
+      type: [String],
+      default: [],
+    },
+    photosOfPlansDrawings: {
+      type: [String],
+      default: [],
+    },
     buildingStatus: {
       type: String,
       trim: true,
@@ -188,16 +235,8 @@ const accessoryBuildingPowerSchema = new Schema<IAccessoryBuildingPower>(
       type: String,
       trim: true,
     },
-    existingSpacePhotos: {
-      type: [String],
-      default: [],
-    },
     hasPlansDrawings: {
       type: Boolean,
-    },
-    plansDrawings: {
-      type: [String],
-      default: [],
     },
     permitApplied: {
       type: Boolean,
