@@ -6,6 +6,7 @@ import {
   TIMELINE_URGENCIES,
   Service_STATUSES,
 } from '../../constants';
+import e from 'express';
 
 const accessoryBuildingPowerBodySchema = z.object({
   fullName: z.string({ error: 'Full name is required!' }).min(1),
@@ -29,6 +30,21 @@ const accessoryBuildingPowerBodySchema = z.object({
     .optional(),
   intendedUse: z.string().optional(),
 
+  electricalNeeds: z.string().optional(),
+  willThereBeAnyHeatingOrCoolingEquipment: z.boolean().optional(),
+  willNeedNewService: z.string().optional(),
+  sizeOfSubPanel: z.string().optional(),
+  electricalPannelLocation: z.string().optional(),
+  photosOfElectricalPannel: z.array(z.string()).optional(),
+  howManyDedicatedCircuitsNeed: z.string().optional(),
+  ampRatingForDedicatedCircuit: z.string().optional(),
+  privateUtilitiesBetweenHouseAndAccessoryBuilding: z.string().optional(),
+  generalIdeaOfPrivateUtilitiesBetweenHouseAndAccessoryBuilding: z
+    .string()
+    .optional(),
+  photosOfPlansDrawings: z.array(z.string()).optional(),
+  existingSpacePhotos: z.array(z.string()).optional(),
+
   buildingStatus: z.string().optional(),
   constructionType: z.string().optional(),
   hasHeatingOrCooling: z.boolean().optional(),
@@ -45,7 +61,6 @@ const accessoryBuildingPowerBodySchema = z.object({
 
   panelPhotos: z.array(z.string()).optional(),
   routeDetails: z.string().optional(),
-  existingSpacePhotos: z.array(z.string()).optional(),
 
   hasPlansDrawings: z.boolean().optional(),
   plansDrawings: z.array(z.string()).optional(),
