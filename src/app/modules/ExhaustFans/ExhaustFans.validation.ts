@@ -29,7 +29,7 @@ const exhaustFansBodySchema = z.object({
   isRoofOrGableFan: z.string().optional(),
   willSupplyAtticFan: z.boolean().optional(),
   photoOfNewFan: z.array(z.string()).optional(),
-  howManyStories: z.number().min(1).optional(),
+  howManyStories: z.number().optional(),
   photosOfInstallationArea: z.array(z.string()).optional(),
   whereElectricalPanelLocated: z.string().optional(),
   photosOfPanelCloseUp: z.array(z.string()).optional(),

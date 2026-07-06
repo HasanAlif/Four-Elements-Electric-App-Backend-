@@ -158,7 +158,6 @@ const ExhaustFansSchema = new Schema<IExhaustFans>(
     },
     howManyStories: {
       type: Number,
-      min: 1,
     },
     photosOfInstallationArea: {
       type: [String],
