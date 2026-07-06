@@ -35,7 +35,7 @@ export interface ISwitches extends Document {
   howManySwitchesNeeded?: string;
   isNewInstallationOrReplacement?: TSwitchInstallType;
   photosOfWhereSwitchesInstallationNeeded: string[];
-  typeOfSwitchesNeeded?: string;
+  typeOfSwitchesNeeded?: [string];
   additionalInformation?: string;
 
   status: TServiceStatus;
