@@ -22,15 +22,14 @@ const sendOtpEmail = async ({
   attachments?: { filename: string; path: string }[];
 }) => {
   try {
-    // Create a transporter for sending emails
+    // Create a transporter for sending emails (Mailtrap SMTP)
     const transporter = nodemailer.createTransport({
-      // host: 'smtp.gmail.com',
-      // port: 587,
-      // secure: false, // true for 465, false for other ports
-      service: 'gmail',
+      host: config.mailtrap.host,
+      port: Number(config.mailtrap.port),
+      secure: Number(config.mailtrap.port) === 465, // 587 => STARTTLS (secure:false)
       auth: {
-        user: config.nodemailer.email,
-        pass: config.nodemailer.password,
+        user: config.mailtrap.user,
+        pass: config.mailtrap.token,
       },
     });
 
@@ -39,8 +38,7 @@ const sendOtpEmail = async ({
 
     // Email options: from, to, subject, and HTML body
     const mailOptions = {
-      // from: `${config.preffered_website_name} 🧊💦🫧🧺👚☃️ <${config.nodemailer.email}>`,
-      from: `${config.preffered_website_name} 🧊 <${config.nodemailer.email}>`,
+      from: `${config.preffered_website_name || 'Four Elements Electric App'} <${config.mailtrap.sender_email}>`,
       to: email,
       subject: subject,
       html: htmlTemplate,

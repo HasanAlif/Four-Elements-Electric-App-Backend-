@@ -42,6 +42,14 @@ export default {
     password: process.env.PASSWORD_FOR_NODEMAILER,
   },
 
+  mailtrap: {
+    host: process.env.MAILTRAP_HOST,
+    port: process.env.MAILTRAP_PORT,
+    user: process.env.MAILTRAP_SMTP_USER,
+    token: process.env.MAILTRAP_TOKEN,
+    sender_email: process.env.MAILTRAP_SENDER_EMAIL,
+  },
+
   firebase: {
     project_id: process.env.FIREBASE_PROJECT_ID,
     client_email: process.env.FIREBASE_CLIENT_EMAIL,
