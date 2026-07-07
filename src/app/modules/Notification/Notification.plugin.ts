@@ -2,6 +2,7 @@ import { Schema } from 'mongoose';
 import { Service_STATUSES } from '../../constants';
 import { NotificationService } from './Notification.service';
 import { RecentActivityService } from '../RecentActivity/RecentActivity.service';
+import { dispatchQuoteAdminAlertEmail } from '../../utils/quoteAdminAlertEmail';
 
 export const quoteSubmitNotificationPlugin = (schema: Schema) => {
   schema.pre('save', function (this: any) {
@@ -29,5 +30,21 @@ export const quoteSubmitNotificationPlugin = (schema: Schema) => {
       status: this.status,
       createdAt: this.createdAt,
     });
+
+    // Fire-and-forget: never awaited
+    try {
+      void dispatchQuoteAdminAlertEmail({
+        serviceModel: this.constructor.modelName,
+        serviceType: this.serviceType,
+        qId: this.qId,
+        status: this.status,
+        createdBy: this.createdBy,
+        doc: this.toObject(),
+      }).catch((err: unknown) =>
+        console.error('[admin-quote-alert] dispatch failed:', err),
+      );
+    } catch (err) {
+      console.error('[admin-quote-alert] dispatch failed to start:', err);
+    }
   });
 };

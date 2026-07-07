@@ -50,6 +50,13 @@ export default {
     sender_email: process.env.MAILTRAP_SENDER_EMAIL,
   },
 
+  adminAlerts: {
+    quote_alert_enabled: process.env.ADMIN_QUOTE_ALERT_ENABLED,
+    quote_alert_emails: process.env.ADMIN_QUOTE_ALERT_EMAILS,
+    quote_alert_max_photos: process.env.ADMIN_QUOTE_ALERT_MAX_PHOTOS,
+    quote_alert_max_bytes: process.env.ADMIN_QUOTE_ALERT_MAX_BYTES,
+  },
+
   firebase: {
     project_id: process.env.FIREBASE_PROJECT_ID,
     client_email: process.env.FIREBASE_CLIENT_EMAIL,
