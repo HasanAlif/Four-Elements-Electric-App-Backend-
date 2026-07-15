@@ -1,8 +1,5 @@
 import { model, Schema } from 'mongoose';
-import {
-  IServiceCall,
-  SERVICE_CALL_PREFERRED_TIMES,
-} from './ServiceCall.interface';
+import { IServiceCall } from './ServiceCall.interface';
 import {
   CONTACT_METHODS,
   DEFAULT_REQUEST_STATUS,
@@ -141,8 +138,8 @@ const serviceCallSchema = new Schema<IServiceCall>(
       trim: true,
     },
     preferredTime: {
-      type: String,
-      enum: SERVICE_CALL_PREFERRED_TIMES,
+      type: [String],
+      default: [],
     },
     schedulingPreference: {
       type: [String],

@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { SERVICE_CALL_PREFERRED_TIMES } from './ServiceCall.interface';
 import {
   CONTACT_METHODS,
   OWNERSHIP_STATUSES,
@@ -23,7 +22,7 @@ const serviceCallBodySchema = z.object({
   ownershipStatus: z.enum(OWNERSHIP_STATUSES),
   timelineUrgency: z.enum(TIMELINE_URGENCIES),
   issueDescription: z.string().optional(),
-  preferredTime: z.enum(SERVICE_CALL_PREFERRED_TIMES).optional(),
+  preferredTime: z.array(z.string()).optional(),
   schedulingPreference: z.array(z.string()).optional(),
   panelPhotos: z.array(z.string()).optional(),
   workAreaPhotos: z.array(z.string()).optional(),
@@ -93,7 +92,7 @@ export const ServiceCallValidation = {
       ownershipStatus: z.enum(OWNERSHIP_STATUSES).optional(),
       timelineUrgency: z.enum(TIMELINE_URGENCIES).optional(),
       issueDescription: z.string().optional(),
-      preferredTime: z.enum(SERVICE_CALL_PREFERRED_TIMES).optional(),
+      preferredTime: z.array(z.string()).optional(),
       schedulingPreference: z.array(z.string()).optional(),
       panelPhotos: z.array(z.string()).optional(),
       workAreaPhotos: z.array(z.string()).optional(),

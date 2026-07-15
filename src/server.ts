@@ -9,6 +9,9 @@ import { initFirebase } from './app/lib';
 import { startMaintenanceReminderCron } from './app/modules/MaintenanceAlerts/maintenanceAlerts.cron';
 import 'dotenv/config';
 
+import dns from 'dns';
+dns.setServers(['8.8.8.8', '8.8.4.4']);
+
 let server: Server | null = null;
 
 async function connectToDatabase() {

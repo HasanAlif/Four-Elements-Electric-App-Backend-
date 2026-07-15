@@ -7,14 +7,6 @@ import {
   TTimelineUrgency,
 } from '../../constants';
 
-export const SERVICE_CALL_PREFERRED_TIMES = [
-  'AM (8-11)',
-  'PM (12-2)',
-  'Anytime',
-] as const;
-export type TServiceCallPreferredTime =
-  (typeof SERVICE_CALL_PREFERRED_TIMES)[number];
-
 export interface IServiceCall extends Document {
   _id: Types.ObjectId;
   qId?: string;
@@ -38,7 +30,7 @@ export interface IServiceCall extends Document {
   timelineUrgency: TTimelineUrgency;
 
   issueDescription: string;
-  preferredTime?: TServiceCallPreferredTime;
+  preferredTime?: string[];
   schedulingPreference?: string[];
 
   panelPhotos?: string[];
