@@ -175,6 +175,9 @@ const CellingFansSchema = new Schema<ICellingFans>(
       type: String,
       trim: true,
     },
+    WillMoreThanOneSwitchLocation: {
+      type: Boolean,
+    },
     wantUpgradeSwitch: {
       type: Boolean,
     },

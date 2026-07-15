@@ -35,6 +35,7 @@ const cellingFansBodySchema = z.object({
   tallOfCeilingFanFromFloor: z.string().optional(),
   photosOfNewCeilingFan: z.array(z.string()).optional(),
   willConnectNewOrExistingSwitch: z.string().optional(),
+  WillMoreThanOneSwitchLocation: z.boolean().optional(),
   wantUpgradeSwitch: z.boolean().optional(),
   kindOfSwitchWant: z.string().optional(),
   additionalInformation: z.string().optional(),

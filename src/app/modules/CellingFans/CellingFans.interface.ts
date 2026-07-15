@@ -45,6 +45,7 @@ export interface ICellingFans extends Document {
   tallOfCeilingFanFromFloor?: string;
   photosOfNewCeilingFan: string[];
   willConnectNewOrExistingSwitch?: string;
+  WillMoreThanOneSwitchLocation?: boolean;
   wantUpgradeSwitch?: boolean;
   kindOfSwitchWant?: string;
   additionalInformation?: string;
