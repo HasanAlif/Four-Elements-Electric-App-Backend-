@@ -7,12 +7,6 @@ import {
   TTimelineUrgency,
 } from '../../constants';
 
-export const LIGHTING_INSTALL_TYPES = [
-  'New Installation',
-  'Replacement',
-] as const;
-export type TLightingInstallType = (typeof LIGHTING_INSTALL_TYPES)[number];
-
 export const LIGHTING_SWITCH_CONNECTIONS = ['New', 'Existing'] as const;
 export type TLightingSwitchConnection =
   (typeof LIGHTING_SWITCH_CONNECTIONS)[number];
@@ -43,7 +37,7 @@ export interface ILighting extends Document {
   typeOfInteriorLightingFixture?: string;
   kindOfLightingFixture?: string;
   isFixtureHaveComplexAssembly?: boolean;
-  isNewOrReplacement?: TLightingInstallType;
+  isNewOrReplacement?: string;
   photosOfWhereWantToInstall: string[];
   photosOfCurrentLightFixture: string[];
   photosOfNewLightFixture: string[];

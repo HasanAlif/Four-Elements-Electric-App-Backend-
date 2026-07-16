@@ -10,11 +10,7 @@ import {
 import { qIdPlugin } from '../../lib/qId';
 import { quoteSubmitNotificationPlugin } from '../Notification/Notification.plugin';
 import { statusTimelinePlugin } from '../../lib/statusTimeline';
-import {
-  ILighting,
-  LIGHTING_INSTALL_TYPES,
-  LIGHTING_SWITCH_CONNECTIONS,
-} from './Lighting.interface';
+import { ILighting, LIGHTING_SWITCH_CONNECTIONS } from './Lighting.interface';
 
 const LightingSchema = new Schema<ILighting>(
   {
@@ -154,7 +150,7 @@ const LightingSchema = new Schema<ILighting>(
     },
     isNewOrReplacement: {
       type: String,
-      enum: LIGHTING_INSTALL_TYPES,
+      trim: true,
     },
     photosOfWhereWantToInstall: {
       type: [String],

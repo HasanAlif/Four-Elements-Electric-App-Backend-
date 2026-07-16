@@ -6,10 +6,7 @@ import {
   TIMELINE_URGENCIES,
   Service_STATUSES,
 } from '../../constants';
-import {
-  LIGHTING_INSTALL_TYPES,
-  LIGHTING_SWITCH_CONNECTIONS,
-} from './Lighting.interface';
+import { LIGHTING_SWITCH_CONNECTIONS } from './Lighting.interface';
 
 const lightingBodySchema = z.object({
   fullName: z.string({ error: 'Full name is required!' }).min(1),
@@ -31,7 +28,7 @@ const lightingBodySchema = z.object({
   typeOfInteriorLightingFixture: z.string().optional(),
   kindOfLightingFixture: z.string().optional(),
   isFixtureHaveComplexAssembly: z.boolean().optional(),
-  isNewOrReplacement: z.enum(LIGHTING_INSTALL_TYPES).optional(),
+  isNewOrReplacement: z.string().optional(),
   photosOfWhereWantToInstall: z.array(z.string()).optional(),
   photosOfCurrentLightFixture: z.array(z.string()).optional(),
   photosOfNewLightFixture: z.array(z.string()).optional(),
