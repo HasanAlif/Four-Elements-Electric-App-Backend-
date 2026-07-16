@@ -97,4 +97,8 @@ export default {
     veriff_callback_url: process.env.VERIFF_CALLBACK_URL,
     default_background_provider: process.env.DEFAULT_BACKGROUND_PROVIDER,
   },
+
+  gcs: {
+    bucket_name: process.env.GCS_BUCKET_NAME,
+  },
 };

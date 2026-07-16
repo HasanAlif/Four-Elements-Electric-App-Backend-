@@ -4,7 +4,7 @@ import { UserValidation } from './user.validation';
 import { UserController } from './user.controller';
 import { MaintenanceAlertsController } from '../MaintenanceAlerts/maintenanceAlerts.controller';
 import { MaintenanceAlertsValidation } from '../MaintenanceAlerts/maintenanceAlerts.validation';
-import { multerUpload } from '../../lib';
+import { multerUpload, multerPdfUpload } from '../../lib';
 import { ROLE } from './user.constant';
 
 const router = Router();
@@ -157,6 +157,15 @@ router
     auth(ROLE.USER, ROLE.ADMIN, ROLE.SUPER_ADMIN),
     multerUpload.array('images', 5),
     UserController.uploadImages,
+  );
+
+// uploadPdf
+router
+  .route('/upload-pdf')
+  .post(
+    auth(ROLE.USER, ROLE.ADMIN, ROLE.SUPER_ADMIN),
+    multerPdfUpload.array('pdfs', 5),
+    UserController.uploadPdf,
   );
 
 // 18. deleteImage

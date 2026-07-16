@@ -21,7 +21,11 @@ import {
 } from './user.constant';
 import { UserValidation } from './user.validation';
 import jwt, { JwtPayload, SignOptions } from 'jsonwebtoken';
-import { deleteImageFromCloudinary, sendImageToCloudinary } from '../../lib';
+import {
+  deleteImageFromCloudinary,
+  sendImageToCloudinary,
+  sendPdfToBucket,
+} from '../../lib';
 import { PipelineStage } from 'mongoose';
 import { createPublicKey } from 'crypto';
 import { Service_STATUSES } from '../../constants';
@@ -1115,7 +1119,39 @@ const uploadImagesIntoDB = async (
   return imageUrls;
 };
 
-// 18. deleteImageFromDB
+// 18. uploadPdfIntoDB
+const uploadPdfIntoDB = async (
+  pdfFiles: Express.Multer.File[] | undefined,
+): Promise<string[]> => {
+  if (!pdfFiles || pdfFiles.length === 0) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'No pdfs provided!');
+  }
+
+  const results = await Promise.allSettled(
+    pdfFiles.map(file => sendPdfToBucket(file)),
+  );
+
+  const pdfUrls: string[] = [];
+
+  for (const result of results) {
+    if (result.status === 'fulfilled') {
+      pdfUrls.push(result.value);
+    } else {
+      console.error('GCS upload failed for a PDF file:', result.reason);
+    }
+  }
+
+  if (pdfUrls.length === 0) {
+    throw new AppError(
+      httpStatus.INTERNAL_SERVER_ERROR,
+      'All pdf uploads failed. Please try again!',
+    );
+  }
+
+  return pdfUrls;
+};
+
+// 19. deleteImageFromDB
 const deleteImageFromDB = async (imageUrl: string) => {
   try {
     await deleteImageFromCloudinary(imageUrl);
@@ -1125,7 +1161,7 @@ const deleteImageFromDB = async (imageUrl: string) => {
   }
 };
 
-// 19. addFcmTokenIntoDB — set the user's single active device token (replaces any previous).
+// 20. addFcmTokenIntoDB — set the user's single active device token (replaces any previous).
 const addFcmTokenIntoDB = async (userId: string, fcmToken: string) => {
   await UserModel.updateOne(
     { _id: userId },
@@ -1134,7 +1170,7 @@ const addFcmTokenIntoDB = async (userId: string, fcmToken: string) => {
   return { fcmToken };
 };
 
-// 20. removeFcmTokenFromDB — unregister a device token (called on logout).
+// 21. removeFcmTokenFromDB — unregister a device token (called on logout).
 const removeFcmTokenFromDB = async (userId: string, fcmToken: string) => {
   await UserModel.updateOne(
     { _id: userId },
@@ -1162,6 +1198,7 @@ export const UserService = {
   deleteSpecificUserAccountIntoDB,
   adminGetAllUsersFromDB,
   uploadImagesIntoDB,
+  uploadPdfIntoDB,
   deleteImageFromDB,
   addFcmTokenIntoDB,
   removeFcmTokenFromDB,
