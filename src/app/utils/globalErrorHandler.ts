@@ -44,6 +44,15 @@ const globalErrorHandler: ErrorRequestHandler = (err, req, res, _next) => {
     statusCode = simplifiedError?.statusCode;
     message = simplifiedError?.message;
     errorSources = simplifiedError?.errorSources;
+  } else if (err?.name === 'MulterError') {
+    statusCode = 400;
+    message = err.message;
+    errorSources = [
+      {
+        path: err.field || '',
+        message: err.message,
+      },
+    ];
   } else if (err instanceof AppError) {
     statusCode = err?.statusCode;
     message = err.message;
@@ -55,8 +64,7 @@ const globalErrorHandler: ErrorRequestHandler = (err, req, res, _next) => {
       },
     ];
   } else if (err instanceof Error) {
-    const safeMessage =
-      config.NODE_ENV === 'production' ? 'Something went wrong!' : err.message;
+    const safeMessage = err.message; // Exposing error message for debugging
     message = safeMessage;
     errorSources = [
       {
