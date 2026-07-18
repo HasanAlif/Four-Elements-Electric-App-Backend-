@@ -29,7 +29,7 @@ export interface IAccessoryBuildingPower extends Document {
   ownershipStatus: TOwnershipStatus;
   timelineUrgency: TTimelineUrgency;
 
-  entireSquareFootage: number;
+  entireSquareFootage?: number;
   intendedUse: string;
 
   buildingStatus: string;

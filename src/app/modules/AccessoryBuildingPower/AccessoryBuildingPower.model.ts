@@ -131,7 +131,7 @@ const accessoryBuildingPowerSchema = new Schema<IAccessoryBuildingPower>(
     },
     entireSquareFootage: {
       type: Number,
-      trim: true,
+      default: null,
     },
     intendedUse: {
       type: String,

@@ -24,11 +24,7 @@ const accessoryBuildingPowerBodySchema = z.object({
   ownershipStatus: z.enum(OWNERSHIP_STATUSES),
   timelineUrgency: z.enum(TIMELINE_URGENCIES),
 
-  entireSquareFootage: z.coerce
-    .number()
-    .min(1, 'Entire square footage must be greater than 0!')
-    .optional(),
-  intendedUse: z.string().optional(),
+  entireSquareFootage: z.number().optional(),
 
   electricalNeeds: z.string().optional(),
   willThereBeAnyHeatingOrCoolingEquipment: z.boolean().optional(),
