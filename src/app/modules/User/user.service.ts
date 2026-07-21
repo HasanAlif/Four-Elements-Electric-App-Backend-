@@ -880,7 +880,21 @@ const fetchProfileFromDB = async (userData: IUser) => {
       ),
     ).then(counts => counts.reduce((sum, count) => sum + count, 0)),
     // Saved (favorited) partners.
-    FavoriteModel.countDocuments({ user: userId }),
+    // Count only favorites whose partner document exists and is active
+    FavoriteModel.aggregate([
+      { $match: { user: userId } },
+      {
+        $lookup: {
+          from: 'partners',
+          localField: 'partner',
+          foreignField: '_id',
+          as: 'partnerDoc',
+        },
+      },
+      { $unwind: { path: '$partnerDoc', preserveNullAndEmptyArrays: false } },
+      { $match: { 'partnerDoc.isActive': true } },
+      { $count: 'count' },
+    ]).then(r => (r && r[0] ? r[0].count : 0)),
     // Reminder states only (select:false → explicit +); kept OUT of the response.
     UserModel.findById(userId).select('+maintenanceAlerts').lean(),
   ]);
