@@ -37,7 +37,7 @@ export interface ICellingFans extends Document {
 
   installationType?: TCeilingFanInstallType;
   photosOfCurrentCeilingFan: string[];
-  aboveBelowAreaOfCeilingFan?: string;
+  aboveBelowAreaOfCeilingFan?: string[];
   isThereCurrentLightFixture?: boolean;
   wasAreaPrewired?: string;
   willProvideNewCeilingFan?: boolean;

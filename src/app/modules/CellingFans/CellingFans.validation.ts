@@ -27,7 +27,7 @@ const cellingFansBodySchema = z.object({
 
   installationType: z.enum(CEILING_FAN_INSTALL_TYPES).optional(),
   photosOfCurrentCeilingFan: z.array(z.string()).optional(),
-  aboveBelowAreaOfCeilingFan: z.string().optional(),
+  aboveBelowAreaOfCeilingFan: z.array(z.string()).optional(),
   isThereCurrentLightFixture: z.boolean().optional(),
   wasAreaPrewired: z.string().optional(),
   willProvideNewCeilingFan: z.boolean().optional(),

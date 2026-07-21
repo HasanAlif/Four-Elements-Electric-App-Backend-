@@ -146,8 +146,8 @@ const CellingFansSchema = new Schema<ICellingFans>(
       default: [],
     },
     aboveBelowAreaOfCeilingFan: {
-      type: String,
-      trim: true,
+      type: [String],
+      default: [],
     },
     isThereCurrentLightFixture: {
       type: Boolean,
