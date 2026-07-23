@@ -292,6 +292,21 @@ const fcmTokenSchema = z.object({
   }),
 });
 
+// 18. appleSigninSchema — native-app (Expo) Sign in with Apple
+// identityToken: the raw JWT from Apple's native SDK (required).
+// fullName:  Apple sends this ONLY on the user's very first sign-in ever.
+//            Optional at the API level — subsequent logins won't have it.
+// fcmToken:  optional device push token for notification registration.
+const appleSigninSchema = z.object({
+  body: z.object({
+    identityToken: z.string({
+      error: 'Identity token is required!',
+    }),
+    fullName: z.string().optional(),
+    fcmToken: z.string().min(1).optional(),
+  }),
+});
+
 export const UserValidation = {
   createUserSchema,
   sendSignupOtpAgainSchema,
@@ -308,4 +323,5 @@ export const UserValidation = {
   deactivateUserAccountSchema,
   deleteImageSchema,
   fcmTokenSchema,
+  appleSigninSchema,
 };

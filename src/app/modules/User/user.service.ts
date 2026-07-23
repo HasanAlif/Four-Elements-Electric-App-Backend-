@@ -32,6 +32,7 @@ import { Service_STATUSES } from '../../constants';
 import { serviceModels } from '../serviceModels';
 import FavoriteModel from '../Quotes/Favorite.model';
 import { MAINTENANCE_FIELD_KEYS } from '../MaintenanceAlerts/maintenanceAlerts.constant';
+import { createRemoteJWKSet, jwtVerify } from 'jose';
 
 type TSocialSigninPayload = {
   provider: Exclude<TAuthProvider, 'EMAIL'>;
@@ -177,13 +178,16 @@ const buildAuthResponse = (user: IUser) => {
     name: user.name,
     address: user.address,
     phone: user.phone,
-    email: user.email,
+    // Apple users who withheld email will have '' here — the JWT still works for
+    // auth-middleware (_id-based lookup); the refresh-token path is email-based and
+    // will need the user to re-sign-in via Apple if the access token expires.
+    email: user.email ?? '',
     image: user.image || defaultUserImage,
     role: user.role,
   };
 
   const refreshTokenPayload = {
-    email: user.email,
+    email: user.email ?? '',
   };
 
   const accessToken = createAccessToken(accessTokenPayload);
@@ -199,7 +203,7 @@ const buildAuthResponse = (user: IUser) => {
 // 1. createUserIntoDB
 const createUserIntoDB = async (payload: IUser & { fcmToken?: string }) => {
   const existingUser = await UserModel.isUserExistsByEmailWithPassword(
-    payload.email,
+    payload.email!,
   );
 
   // if user exists but unverified
@@ -209,7 +213,7 @@ const createUserIntoDB = async (payload: IUser & { fcmToken?: string }) => {
     // if OTP expired sending new otp
     if (!existingUser.otpExpiry || existingUser.otpExpiry < now) {
       const otp = generateOtp();
-      await sendOtpEmail({ email: payload.email, otp, name: payload.name });
+      await sendOtpEmail({ email: payload.email!, otp, name: payload.name });
 
       existingUser.otp = otp;
       existingUser.otpExpiry = new Date(
@@ -240,7 +244,7 @@ const createUserIntoDB = async (payload: IUser & { fcmToken?: string }) => {
   if (!existingUser) {
     //  OTP generating and sending if user is new
     const otp = generateOtp();
-    await sendOtpEmail({ email: payload?.email, otp, name: payload?.name });
+    await sendOtpEmail({ email: payload?.email!, otp, name: payload?.name });
 
     // Save new user as unverified
     const now = new Date();
@@ -279,7 +283,7 @@ const sendSignupOtpAgainIntoDB = async (userEmail: string) => {
     const otp = generateOtp();
 
     // send OTP via Email
-    await sendOtpEmail({ email: user?.email, otp, name: user?.name });
+    await sendOtpEmail({ email: user.email!, otp, name: user?.name });
 
     user.otp = otp;
     user.otpExpiry = new Date(now.getTime() + otpExpiryMinutes * 60 * 1000);
@@ -346,13 +350,13 @@ const verifySignupOtpIntoDB = async (
     name: user?.name,
     address: user?.address,
     phone: user?.phone,
-    email: user?.email,
+    email: user?.email ?? '',
     image: user?.image || defaultUserImage,
     role: user?.role,
   };
 
   const refreshTokenPayload = {
-    email: user?.email,
+    email: user?.email ?? '',
   };
 
   // tokens
@@ -389,7 +393,7 @@ const signinIntoDB = async (payload: {
     // if OTP expired sending new otp
     if (!user.otpExpiry || user.otpExpiry < now) {
       const otp = generateOtp();
-      await sendOtpEmail({ email: user?.email, otp, name: user?.name });
+      await sendOtpEmail({ email: user.email!, otp, name: user?.name });
 
       user.otp = otp;
       user.otpExpiry = new Date(now.getTime() + otpExpiryMinutes * 60 * 1000);
@@ -431,13 +435,13 @@ const signinIntoDB = async (payload: {
     name: user?.name,
     address: user?.address,
     phone: user?.phone,
-    email: user?.email,
+    email: user?.email ?? '',
     image: user?.image || defaultUserImage,
     role: user?.role,
   };
 
   const refreshTokenPayload = {
-    email: user?.email,
+    email: user?.email ?? '',
   };
 
   // tokens
@@ -539,7 +543,7 @@ const updateProfilePhotoIntoDB = async (
     name: userNewData.name,
     address: userNewData.address,
     phone: userNewData.phone,
-    email: userNewData.email,
+    email: userNewData.email ?? '',
     image: userNewData.image || defaultUserImage,
     role: userNewData.role,
   };
@@ -595,7 +599,7 @@ const updateUserDataIntoDB = async (
     name: user.name,
     address: user.address,
     phone: user.phone,
-    email: user.email,
+    email: user.email ?? '',
     image: user.image || defaultUserImage,
     role: user.role,
   };
@@ -652,7 +656,7 @@ const changePasswordIntoDB = async (
     name: user?.name,
     address: user?.address,
     phone: user?.phone,
-    email: user?.email,
+    email: user?.email ?? '',
     image: user?.image || defaultUserImage,
     role: user?.role,
   };
@@ -809,7 +813,7 @@ const verifyOtpForForgotPasswordIntoDB = async (payload: {
   // OTP verified → issue reset password token
   const resetPasswordToken = jwt.sign(
     {
-      email: user.email,
+      email: user.email ?? '',
       isResetPassword: true,
     },
     config.jwt.otp_secret!,
@@ -957,7 +961,7 @@ const getNewAccessTokenFromDB = async (refreshToken: string) => {
     name: user?.name,
     address: user?.address,
     phone: user?.phone,
-    email: user?.email,
+    email: user?.email ?? '',
     image: user?.image || defaultUserImage,
     role: user?.role,
   };
@@ -1193,6 +1197,153 @@ const removeFcmTokenFromDB = async (userId: string, fcmToken: string) => {
   return { fcmToken };
 };
 
+// ─── Apple Sign-in (native-app / Expo flow) ───────────────────────────────────
+//
+// Two functions, deliberately separated:
+//   verifyAppleIdentityToken — thin; the ONLY part that touches Apple's network.
+//     Only a real Apple token can fully exercise this end-to-end.
+//   handleAppleAuthPayload   — pure business logic; never touches Apple.
+//     Call it directly with a hand-built fake payload in tests.
+// ─────────────────────────────────────────────────────────────────────────────
+
+type TAppleVerifiedPayload = {
+  sub: string;
+  email?: string;
+  email_verified?: boolean;
+};
+
+// Lazily-created remote JWKS (cached internally by jose).
+const appleJWKS = createRemoteJWKSet(
+  new URL('https://appleid.apple.com/auth/keys'),
+);
+
+/**
+ * Phase 2 — Verification (thin / isolated).
+ *
+ * Validates an Apple-issued identityToken against Apple's public JWKS.
+ * - issuer:    https://appleid.apple.com
+ * - audience:  config.apple.bundle_id  (native-app Bundle ID, NOT a Service ID)
+ * - algorithm: RS256 (Apple's native-app token algorithm)
+ *
+ * Throws on any failure (bad signature, wrong issuer/audience, expired exp).
+ * The controller maps any thrown error to AppError(401, 'Invalid Apple credential').
+ *
+ * THIS IS THE ONLY FUNCTION that requires a real Apple token to prove end-to-end.
+ */
+export const verifyAppleIdentityToken = async (
+  identityToken: string,
+): Promise<TAppleVerifiedPayload> => {
+  if (!config.apple.bundle_id) {
+    throw new AppError(
+      httpStatus.INTERNAL_SERVER_ERROR,
+      'Apple Bundle ID is not configured!',
+    );
+  }
+
+  const { payload } = await jwtVerify(identityToken, appleJWKS, {
+    issuer: 'https://appleid.apple.com',
+    audience: config.apple.bundle_id,
+    algorithms: ['RS256'],
+  });
+
+  const sub = payload.sub;
+  if (!sub) {
+    throw new AppError(httpStatus.UNAUTHORIZED, 'Invalid Apple credential');
+  }
+
+  return {
+    sub,
+    email: typeof payload['email'] === 'string' ? payload['email'] : undefined,
+    email_verified:
+      payload['email_verified'] === true ||
+      payload['email_verified'] === 'true',
+  };
+};
+
+/**
+ * Phase 3 — Business logic (fully unit-testable without a real device).
+ *
+ * Accepts an ALREADY-VERIFIED payload object — never touches Apple, never
+ * verifies a signature.  Call it directly with hand-built fake payloads in
+ * your test scripts (see Phase 5A verification).
+ *
+ * Logic:
+ *  1. Find by appleId → if found, return auth tokens (do NOT overwrite name).
+ *  2. Not found + email present + email_verified === true → find by email;
+ *     if found, link appleId onto that account (account-linking).
+ *  3. Still not found → create new user.
+ *  4. If fcmToken present → mirror the existing $set pattern from signinIntoDB.
+ *  5. Return buildAuthResponse (the same function every other signin path uses).
+ */
+export const handleAppleAuthPayload = async (
+  payload: TAppleVerifiedPayload,
+  extras: { fullName?: string; fcmToken?: string },
+) => {
+  // ── 1. Lookup by stable Apple sub ────────────────────────────────────────
+  let user = await UserModel.findOne({ appleId: payload.sub });
+
+  if (user) {
+    // Subsequent logins: DO NOT overwrite fullName — Apple only sends it once.
+    if (!user.isActive) {
+      throw new AppError(httpStatus.BAD_REQUEST, 'User is not active!');
+    }
+
+    if (extras.fcmToken) {
+      await UserModel.updateOne(
+        { _id: user._id },
+        { $set: { fcmTokens: [extras.fcmToken] } },
+      );
+    }
+
+    return buildAuthResponse(user);
+  }
+
+  // ── 2. Account-linking: email match on a verified-email Apple token ───────
+  if (payload.email && payload.email_verified === true) {
+    const existingByEmail = await UserModel.findOne({
+      email: payload.email.toLowerCase(),
+    });
+
+    if (existingByEmail) {
+      if (!existingByEmail.isActive) {
+        throw new AppError(httpStatus.BAD_REQUEST, 'User is not active!');
+      }
+
+      existingByEmail.appleId = payload.sub;
+      existingByEmail.isVerifiedByOTP = true; // ensure auth-middleware gate passes
+      await existingByEmail.save();
+
+      if (extras.fcmToken) {
+        await UserModel.updateOne(
+          { _id: existingByEmail._id },
+          { $set: { fcmTokens: [extras.fcmToken] } },
+        );
+      }
+
+      return buildAuthResponse(existingByEmail);
+    }
+  }
+
+  // ── 3. Create a brand-new user ────────────────────────────────────────────
+  const fallbackName = payload.email
+    ? payload.email.split('@')[0]
+    : `apple_user_${payload.sub.slice(0, 8)}`;
+
+  user = await UserModel.create({
+    name: extras.fullName || fallbackName,
+    phone: 'N/A',
+    address: 'N/A',
+    ...(payload.email ? { email: payload.email.toLowerCase() } : {}),
+    image: defaultUserImage,
+    authProvider: AUTH_PROVIDER.APPLE,
+    appleId: payload.sub,
+    isVerifiedByOTP: true,
+    fcmTokens: extras.fcmToken ? [extras.fcmToken] : [],
+  });
+
+  return buildAuthResponse(user);
+};
+
 export const UserService = {
   createUserIntoDB,
   sendSignupOtpAgainIntoDB,
@@ -1216,4 +1367,7 @@ export const UserService = {
   deleteImageFromDB,
   addFcmTokenIntoDB,
   removeFcmTokenFromDB,
+  // Apple Sign-in
+  verifyAppleIdentityToken,
+  handleAppleAuthPayload,
 };

@@ -32,7 +32,7 @@ export interface IUser extends Document {
   image: string;
   addresses?: TUserAddress[];
 
-  email: string;
+  email?: string;
   password?: string;
   passwordChangedAt?: Date;
 

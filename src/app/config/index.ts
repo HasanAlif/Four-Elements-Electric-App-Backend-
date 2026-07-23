@@ -101,4 +101,8 @@ export default {
   gcs: {
     bucket_name: process.env.GCS_BUCKET_NAME,
   },
+
+  apple: {
+    bundle_id: process.env.APPLE_BUNDLE_ID,
+  },
 };

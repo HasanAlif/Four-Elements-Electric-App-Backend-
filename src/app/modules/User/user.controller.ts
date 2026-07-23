@@ -279,6 +279,43 @@ const removeFcmToken = asyncHandler(async (req, res) => {
   });
 });
 
+// 22. appleSignin
+// Controller is intentionally thin — it owns the error-translation boundary.
+// verifyAppleIdentityToken is the only call that can throw a jose error;
+// wrapping ONLY that call keeps the catch scope minimal and precise.
+const appleSignin = asyncHandler(async (req, res) => {
+  const { identityToken, fullName, fcmToken } = req.body as {
+    identityToken: string;
+    fullName?: string;
+    fcmToken?: string;
+  };
+
+  // Phase 2: verify signature — translate any Apple / jose failure to 401.
+  let applePayload: Awaited<
+    ReturnType<typeof UserService.verifyAppleIdentityToken>
+  >;
+  try {
+    applePayload = await UserService.verifyAppleIdentityToken(identityToken);
+  } catch (err) {
+    // Re-throw AppErrors (e.g. missing bundle_id config) as-is.
+    if (err instanceof AppError) throw err;
+    // All other errors are jose verification failures → 401.
+    throw new AppError(httpStatus.UNAUTHORIZED, 'Invalid Apple credential');
+  }
+
+  // Phase 3: pure business logic — find-or-create / account-linking.
+  const result = await UserService.handleAppleAuthPayload(applePayload, {
+    fullName,
+    fcmToken,
+  });
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    message: 'Apple signin successful!',
+    data: result,
+  });
+});
+
 export const UserController = {
   createUser,
   sendSignupOtpAgain,
@@ -302,4 +339,5 @@ export const UserController = {
   deleteImage,
   addFcmToken,
   removeFcmToken,
+  appleSignin,
 };

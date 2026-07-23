@@ -54,6 +54,15 @@ router
     UserController.socialSignin,
   );
 
+// 5b. Apple signin (native-app / Expo flow — Bundle ID audience)
+router
+  .route('/apple-signin')
+  .post(
+    authLimiter,
+    validateRequest(UserValidation.appleSigninSchema),
+    UserController.appleSignin,
+  );
+
 // 6. updateProfilePhoto
 router
   .route('/update-profile-photo')

@@ -81,8 +81,12 @@ const userSchema = new Schema<IUser, IUserModel>(
     email: {
       type: String,
       trim: true,
-      required: [true, 'Email is required!'],
-      unique: [true, 'This email is already used!'],
+      // Required only for email/OTP accounts; Apple users may withhold their email.
+      required: function (this: IUser) {
+        return this.authProvider === AUTH_PROVIDER.EMAIL;
+      },
+      unique: true,
+      sparse: true,
       lowercase: true,
       index: true,
     },
@@ -119,6 +123,7 @@ const userSchema = new Schema<IUser, IUserModel>(
     },
     appleId: {
       type: String,
+      unique: true,
       sparse: true,
     },
 

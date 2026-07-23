@@ -8,7 +8,7 @@ type TTokenData = {
   name: string;
   address: string;
   phone: string;
-  email: string;
+  email?: string;
   image: string;
   role: string;
 };
@@ -22,7 +22,7 @@ export const createAccessToken = (payload: TTokenData): string => {
   return token;
 };
 
-export const createRefreshToken = (payload: { email: string }): string => {
+export const createRefreshToken = (payload: { email?: string }): string => {
   const token = jwt.sign(payload, config.jwt.refresh_secret!, {
     algorithm: 'HS256',
     expiresIn: config.jwt.refresh_expires_in!,
