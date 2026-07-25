@@ -84,6 +84,7 @@ const getAllPartnerDetailsInSingleCategory = asyncHandler(
   async (req: Request, res: Response) => {
     const data = await QuotesService.getAllPartnerDetailsInSingleCategory(
       req.params.id as string,
+      req.user._id.toString(),
     );
 
     sendResponse(res, {

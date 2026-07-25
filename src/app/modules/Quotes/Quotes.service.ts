@@ -495,6 +495,7 @@ type PartnerDetailsDoc = {
   description?: string;
   phoneNumber?: string;
   websiteUrl?: string;
+  isFavourite?: boolean;
   isVerified: boolean;
   isActive: boolean;
   createdAt: Date;
@@ -508,28 +509,47 @@ const formatPartnerDetails = (partner: PartnerDetailsDoc) => ({
   description: partner.description ?? null,
   phoneNumber: partner.phoneNumber ?? null,
   websiteUrl: partner.websiteUrl ?? null,
+  isFavourite: partner.isFavourite ?? false,
   isVerified: partner.isVerified,
   isActive: partner.isActive,
   createdAt: partner.createdAt,
   updatedAt: partner.updatedAt,
 });
 
-const getAllPartnerDetailsInSingleCategory = async (categoryId: string) => {
+const getAllPartnerDetailsInSingleCategory = async (
+  categoryId: string,
+  userId: string,
+) => {
   if (!isValidObjectId(categoryId)) {
     throw new AppError(httpStatus.NOT_FOUND, 'Category not found!');
   }
-
   const category = await CategoryModel.findById(categoryId).lean();
   if (!category) {
     throw new AppError(httpStatus.NOT_FOUND, 'Category not found!');
   }
-
   const partners = await PartnerModel.find({
     category: category.name,
     isActive: true,
   }).lean();
 
-  return partners.map(formatPartnerDetails);
+  // Single batch query — avoid N+1 favourite lookups.
+  const partnerIds = partners.map(p => p._id);
+
+  const favourites = await FavoriteModel.find({
+    user: userId,
+    partner: { $in: partnerIds },
+  })
+    .select('partner')
+    .lean();
+
+  const favouritedSet = new Set(favourites.map(f => String(f.partner)));
+
+  return partners.map(partner =>
+    formatPartnerDetails({
+      ...partner,
+      isFavourite: favouritedSet.has(String(partner._id)),
+    }),
+  );
 };
 
 // Set the favorite state explicitly from isFavourite: true saves, false removes
