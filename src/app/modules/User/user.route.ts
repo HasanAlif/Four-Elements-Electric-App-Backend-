@@ -63,6 +63,15 @@ router
     UserController.appleSignin,
   );
 
+// 5c. Google signin (native-app / Expo flow — WEB client ID audience)
+router
+  .route('/google-signin')
+  .post(
+    authLimiter,
+    validateRequest(UserValidation.googleSigninSchema),
+    UserController.googleSignin,
+  );
+
 // 6. updateProfilePhoto
 router
   .route('/update-profile-photo')

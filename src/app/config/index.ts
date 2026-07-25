@@ -105,4 +105,10 @@ export default {
   apple: {
     bundle_id: process.env.APPLE_BUNDLE_ID,
   },
+
+  google: {
+    // WEB OAuth client ID — the only audience value used for native-app idToken verification.
+    // Distinct from the comma-separated GOOGLE_CLIENT_IDS used by the legacy social-signin web flow.
+    web_client_id: process.env.GOOGLE_WEB_CLIENT_ID,
+  },
 };

@@ -33,6 +33,7 @@ import { serviceModels } from '../serviceModels';
 import FavoriteModel from '../Quotes/Favorite.model';
 import { MAINTENANCE_FIELD_KEYS } from '../MaintenanceAlerts/maintenanceAlerts.constant';
 import { createRemoteJWKSet, jwtVerify } from 'jose';
+import { OAuth2Client } from 'google-auth-library';
 
 type TSocialSigninPayload = {
   provider: Exclude<TAuthProvider, 'EMAIL'>;
@@ -1197,14 +1198,137 @@ const removeFcmTokenFromDB = async (userId: string, fcmToken: string) => {
   return { fcmToken };
 };
 
-// ─── Apple Sign-in (native-app / Expo flow) ───────────────────────────────────
+// ─── Social Sign-in (native-app / Expo flow) ──────────────────────────────────
 //
-// Two functions, deliberately separated:
-//   verifyAppleIdentityToken — thin; the ONLY part that touches Apple's network.
-//     Only a real Apple token can fully exercise this end-to-end.
-//   handleAppleAuthPayload   — pure business logic; never touches Apple.
-//     Call it directly with a hand-built fake payload in tests.
+// Architecture: two functions per provider, deliberately separated:
+//
+//   verify<Provider>...Token  — thin; the ONLY part that touches the provider's
+//     network / certs.  Only a real token from that provider can fully exercise
+//     this end-to-end.  Keep it this small and isolated.
+//
+//   handle<Provider>AuthPayload  — thin wrapper that calls findOrLinkUserByProvider
+//     with the right provider config.  Never touches the provider's network.
+//     Call it directly with hand-built fake payloads in Phase 5A tests.
+//
+//   findOrLinkUserByProvider  — shared, provider-agnostic business logic used
+//     by BOTH Apple and Google (and any future provider).  Fully testable without
+//     any real token.
+//
 // ─────────────────────────────────────────────────────────────────────────────
+
+/** Payload returned by both verifyAppleIdentityToken and verifyGoogleIdToken. */
+type TSocialVerifiedPayload = {
+  /** Stable provider-issued user identifier — the permanent primary key. */
+  sub: string;
+  /** May be absent (Apple users can withhold their email). */
+  email?: string;
+  email_verified?: boolean;
+  /** Display name from the provider (Google sends it; Apple only on first login). */
+  name?: string;
+  /** Profile photo URL (Google provides this; Apple does not). */
+  picture?: string;
+};
+
+type TSocialProviderConfig = {
+  /** The IUser field that holds this provider's stable user ID. */
+  providerIdField: 'googleId' | 'appleId';
+  authProvider: TAuthProvider;
+  /** Prefix for the auto-generated fallback name when neither displayName nor email is available. */
+  fallbackNamePrefix: string;
+};
+
+/**
+ * Shared business logic for all social sign-in providers.
+ *
+ * Accepts an ALREADY-VERIFIED payload — never touches any provider network,
+ * never verifies a signature.  Call it directly with hand-built fake payloads
+ * in your test scripts (see Phase 5A verification).
+ *
+ * Logic:
+ *  1. Find by providerIdField (stable sub) → if found, return auth tokens.
+ *  2. Not found + email present + email_verified === true → find by email
+ *     (regardless of how that account was originally created: email/OTP,
+ *     Apple, or Google) → if found, link providerIdField onto that account.
+ *  3. Still not found → create a new user.
+ *  4. If fcmToken present → $set (mirrors the existing signinIntoDB pattern).
+ *  5. Return buildAuthResponse — the same function every other signin path uses.
+ */
+const findOrLinkUserByProvider = async (
+  payload: TSocialVerifiedPayload,
+  providerConfig: TSocialProviderConfig,
+  extras: { displayName?: string; fcmToken?: string; picture?: string },
+) => {
+  const { providerIdField, authProvider, fallbackNamePrefix } = providerConfig;
+
+  // ── 1. Lookup by stable provider sub ───────────────────────────────────────
+  let user = await UserModel.findOne({ [providerIdField]: payload.sub });
+
+  if (user) {
+    // Subsequent logins: DO NOT overwrite name — provider only sends it once
+    // (Apple), or we want to preserve any manual profile update the user made.
+    if (!user.isActive) {
+      throw new AppError(httpStatus.BAD_REQUEST, 'User is not active!');
+    }
+
+    if (extras.fcmToken) {
+      await UserModel.updateOne(
+        { _id: user._id },
+        { $set: { fcmTokens: [extras.fcmToken] } },
+      );
+    }
+
+    return buildAuthResponse(user);
+  }
+
+  // ── 2. Account-linking: email match on a verified-email token ───────────────
+  if (payload.email && payload.email_verified === true) {
+    const existingByEmail = await UserModel.findOne({
+      email: payload.email.toLowerCase(),
+    });
+
+    if (existingByEmail) {
+      if (!existingByEmail.isActive) {
+        throw new AppError(httpStatus.BAD_REQUEST, 'User is not active!');
+      }
+
+      // Link this provider's sub onto the existing account.
+      (existingByEmail as unknown as Record<string, unknown>)[providerIdField] =
+        payload.sub;
+      existingByEmail.isVerifiedByOTP = true; // ensure auth-middleware gate passes
+      await existingByEmail.save();
+
+      if (extras.fcmToken) {
+        await UserModel.updateOne(
+          { _id: existingByEmail._id },
+          { $set: { fcmTokens: [extras.fcmToken] } },
+        );
+      }
+
+      return buildAuthResponse(existingByEmail);
+    }
+  }
+
+  // ── 3. Create a brand-new user ──────────────────────────────────────────────
+  const fallbackName = payload.email
+    ? payload.email.split('@')[0]
+    : `${fallbackNamePrefix}_${payload.sub.slice(0, 8)}`;
+
+  user = await UserModel.create({
+    name: extras.displayName || payload.name || fallbackName,
+    phone: 'N/A',
+    address: 'N/A',
+    ...(payload.email ? { email: payload.email.toLowerCase() } : {}),
+    image: extras.picture || defaultUserImage,
+    authProvider,
+    [providerIdField]: payload.sub,
+    isVerifiedByOTP: true,
+    fcmTokens: extras.fcmToken ? [extras.fcmToken] : [],
+  });
+
+  return buildAuthResponse(user);
+};
+
+// ─── Apple Sign-in ────────────────────────────────────────────────────────────
 
 type TAppleVerifiedPayload = {
   sub: string;
@@ -1218,12 +1342,12 @@ const appleJWKS = createRemoteJWKSet(
 );
 
 /**
- * Phase 2 — Verification (thin / isolated).
+ * Apple — Verification (thin / isolated).
  *
  * Validates an Apple-issued identityToken against Apple's public JWKS.
  * - issuer:    https://appleid.apple.com
  * - audience:  config.apple.bundle_id  (native-app Bundle ID, NOT a Service ID)
- * - algorithm: RS256 (Apple's native-app token algorithm)
+ * - algorithm: RS256
  *
  * Throws on any failure (bad signature, wrong issuer/audience, expired exp).
  * The controller maps any thrown error to AppError(401, 'Invalid Apple credential').
@@ -1261,88 +1385,107 @@ export const verifyAppleIdentityToken = async (
 };
 
 /**
- * Phase 3 — Business logic (fully unit-testable without a real device).
+ * Apple — Business logic thin wrapper.
  *
- * Accepts an ALREADY-VERIFIED payload object — never touches Apple, never
- * verifies a signature.  Call it directly with hand-built fake payloads in
- * your test scripts (see Phase 5A verification).
+ * Delegates entirely to findOrLinkUserByProvider with Apple's provider config.
+ * Apple behavior is IDENTICAL to before the refactor — same logic, same
+ * find-by-appleId → account-link-by-email → create-new flow.
  *
- * Logic:
- *  1. Find by appleId → if found, return auth tokens (do NOT overwrite name).
- *  2. Not found + email present + email_verified === true → find by email;
- *     if found, link appleId onto that account (account-linking).
- *  3. Still not found → create new user.
- *  4. If fcmToken present → mirror the existing $set pattern from signinIntoDB.
- *  5. Return buildAuthResponse (the same function every other signin path uses).
+ * Never touches Apple's network; call directly with hand-built fake payloads
+ * in Phase 5A verification tests.
  */
 export const handleAppleAuthPayload = async (
   payload: TAppleVerifiedPayload,
   extras: { fullName?: string; fcmToken?: string },
-) => {
-  // ── 1. Lookup by stable Apple sub ────────────────────────────────────────
-  let user = await UserModel.findOne({ appleId: payload.sub });
+) =>
+  findOrLinkUserByProvider(
+    payload,
+    {
+      providerIdField: 'appleId',
+      authProvider: AUTH_PROVIDER.APPLE,
+      fallbackNamePrefix: 'apple_user',
+    },
+    { displayName: extras.fullName, fcmToken: extras.fcmToken },
+  );
 
-  if (user) {
-    // Subsequent logins: DO NOT overwrite fullName — Apple only sends it once.
-    if (!user.isActive) {
-      throw new AppError(httpStatus.BAD_REQUEST, 'User is not active!');
-    }
+// ─── Google Sign-in ───────────────────────────────────────────────────────────
 
-    if (extras.fcmToken) {
-      await UserModel.updateOne(
-        { _id: user._id },
-        { $set: { fcmTokens: [extras.fcmToken] } },
-      );
-    }
+// Singleton client — verifyIdToken() fetches and caches Google's signing certs
+// internally.  No client secret needed for ID token verification.
+const googleOAuthClient = new OAuth2Client();
 
-    return buildAuthResponse(user);
+/**
+ * Google — Verification (thin / isolated).
+ *
+ * Verifies a Google-issued idToken using google-auth-library's OAuth2Client.
+ * The library checks signature, audience, expiry, and issuer automatically.
+ *
+ * - audience:  config.google.web_client_id  (WEB client ID, not iOS/Android)
+ * - Google's library fetches its federated signon certs internally
+ *   (https://www.googleapis.com/oauth2/v3/certs)
+ *
+ * Throws on any failure (bad signature, wrong audience, expired exp).
+ * The controller maps any thrown error to AppError(401, 'Invalid Google credential').
+ *
+ * THIS IS THE ONLY FUNCTION that requires a real Google token to prove end-to-end.
+ */
+export const verifyGoogleIdToken = async (
+  idToken: string,
+): Promise<TSocialVerifiedPayload> => {
+  if (!config.google.web_client_id) {
+    throw new AppError(
+      httpStatus.INTERNAL_SERVER_ERROR,
+      'Google Web Client ID is not configured!',
+    );
   }
 
-  // ── 2. Account-linking: email match on a verified-email Apple token ───────
-  if (payload.email && payload.email_verified === true) {
-    const existingByEmail = await UserModel.findOne({
-      email: payload.email.toLowerCase(),
-    });
-
-    if (existingByEmail) {
-      if (!existingByEmail.isActive) {
-        throw new AppError(httpStatus.BAD_REQUEST, 'User is not active!');
-      }
-
-      existingByEmail.appleId = payload.sub;
-      existingByEmail.isVerifiedByOTP = true; // ensure auth-middleware gate passes
-      await existingByEmail.save();
-
-      if (extras.fcmToken) {
-        await UserModel.updateOne(
-          { _id: existingByEmail._id },
-          { $set: { fcmTokens: [extras.fcmToken] } },
-        );
-      }
-
-      return buildAuthResponse(existingByEmail);
-    }
-  }
-
-  // ── 3. Create a brand-new user ────────────────────────────────────────────
-  const fallbackName = payload.email
-    ? payload.email.split('@')[0]
-    : `apple_user_${payload.sub.slice(0, 8)}`;
-
-  user = await UserModel.create({
-    name: extras.fullName || fallbackName,
-    phone: 'N/A',
-    address: 'N/A',
-    ...(payload.email ? { email: payload.email.toLowerCase() } : {}),
-    image: defaultUserImage,
-    authProvider: AUTH_PROVIDER.APPLE,
-    appleId: payload.sub,
-    isVerifiedByOTP: true,
-    fcmTokens: extras.fcmToken ? [extras.fcmToken] : [],
+  const ticket = await googleOAuthClient.verifyIdToken({
+    idToken,
+    audience: config.google.web_client_id,
   });
 
-  return buildAuthResponse(user);
+  const googlePayload = ticket.getPayload();
+  if (!googlePayload || !googlePayload.sub) {
+    throw new AppError(httpStatus.UNAUTHORIZED, 'Invalid Google credential');
+  }
+
+  return {
+    sub: googlePayload.sub,
+    email: googlePayload.email,
+    email_verified: googlePayload.email_verified ?? false,
+    name: googlePayload.name,
+    picture: googlePayload.picture,
+  };
 };
+
+/**
+ * Google — Business logic thin wrapper.
+ *
+ * Delegates entirely to findOrLinkUserByProvider with Google's provider config.
+ * Cross-provider account linking: if a user with the same verified email
+ * already exists (created via email/OTP OR Apple sign-in), the googleId is
+ * linked onto that existing account — no duplicate created.
+ *
+ * Never touches Google's network; call directly with hand-built fake payloads
+ * in Phase 5A verification tests.
+ */
+export const handleGoogleAuthPayload = async (
+  payload: TSocialVerifiedPayload,
+  extras: { fcmToken?: string },
+) =>
+  findOrLinkUserByProvider(
+    payload,
+    {
+      providerIdField: 'googleId',
+      authProvider: AUTH_PROVIDER.GOOGLE,
+      fallbackNamePrefix: 'google_user',
+    },
+    {
+      displayName: payload.name,
+      fcmToken: extras.fcmToken,
+      picture: payload.picture,
+    },
+  );
 
 export const UserService = {
   createUserIntoDB,
@@ -1367,7 +1510,10 @@ export const UserService = {
   deleteImageFromDB,
   addFcmTokenIntoDB,
   removeFcmTokenFromDB,
-  // Apple Sign-in
+  // Apple Sign-in (native-app flow)
   verifyAppleIdentityToken,
   handleAppleAuthPayload,
+  // Google Sign-in (native-app flow)
+  verifyGoogleIdToken,
+  handleGoogleAuthPayload,
 };

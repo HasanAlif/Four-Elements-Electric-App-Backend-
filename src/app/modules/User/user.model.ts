@@ -119,6 +119,7 @@ const userSchema = new Schema<IUser, IUserModel>(
     },
     googleId: {
       type: String,
+      unique: true,
       sparse: true,
     },
     appleId: {

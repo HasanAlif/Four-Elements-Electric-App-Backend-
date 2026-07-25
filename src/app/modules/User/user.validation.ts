@@ -307,6 +307,18 @@ const appleSigninSchema = z.object({
   }),
 });
 
+// 19. googleSigninSchema — native-app (Expo) Sign in with Google
+// idToken:  the raw ID token from Google's native SDK (required).
+// fcmToken: optional device push token for notification registration.
+const googleSigninSchema = z.object({
+  body: z.object({
+    idToken: z.string({
+      error: 'Google ID token is required!',
+    }),
+    fcmToken: z.string().min(1).optional(),
+  }),
+});
+
 export const UserValidation = {
   createUserSchema,
   sendSignupOtpAgainSchema,
@@ -324,4 +336,5 @@ export const UserValidation = {
   deleteImageSchema,
   fcmTokenSchema,
   appleSigninSchema,
+  googleSigninSchema,
 };

@@ -316,6 +316,40 @@ const appleSignin = asyncHandler(async (req, res) => {
   });
 });
 
+// 23. googleSignin
+// Same thin pattern as appleSignin: asyncHandler wraps everything, but the
+// try/catch only wraps verifyGoogleIdToken so the 401 translation is precise.
+const googleSignin = asyncHandler(async (req, res) => {
+  const { idToken, fcmToken } = req.body as {
+    idToken: string;
+    fcmToken?: string;
+  };
+
+  // Phase 2: verify signature — translate any google-auth-library failure to 401.
+  let googlePayload: Awaited<
+    ReturnType<typeof UserService.verifyGoogleIdToken>
+  >;
+  try {
+    googlePayload = await UserService.verifyGoogleIdToken(idToken);
+  } catch (err) {
+    // Re-throw AppErrors (e.g. missing web_client_id config) as-is.
+    if (err instanceof AppError) throw err;
+    // All other errors are google-auth-library verification failures → 401.
+    throw new AppError(httpStatus.UNAUTHORIZED, 'Invalid Google credential');
+  }
+
+  // Phase 3: pure business logic — find-or-create / account-linking.
+  const result = await UserService.handleGoogleAuthPayload(googlePayload, {
+    fcmToken,
+  });
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    message: 'Google signin successful!',
+    data: result,
+  });
+});
+
 export const UserController = {
   createUser,
   sendSignupOtpAgain,
@@ -340,4 +374,5 @@ export const UserController = {
   addFcmToken,
   removeFcmToken,
   appleSignin,
+  googleSignin,
 };
