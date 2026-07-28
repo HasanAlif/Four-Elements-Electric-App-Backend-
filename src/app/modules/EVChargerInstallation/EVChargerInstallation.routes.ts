@@ -12,7 +12,7 @@ import { multerUpload } from '../../lib';
 const router = Router();
 
 const uploadEVChargerImages = multerUpload.fields([
-  { name: 'areaPhoto', maxCount: 1 },
+  { name: 'areaPhoto', maxCount: 10 },
   { name: 'panelPhotos', maxCount: 10 },
 ]);
 

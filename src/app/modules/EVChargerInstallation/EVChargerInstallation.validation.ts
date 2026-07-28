@@ -38,7 +38,7 @@ const evChargerBodySchema = z.object({
   schedule: z.string().optional(),
 
   additionalInformation: z.string().optional(),
-  areaPhoto: z.string().optional(),
+  areaPhoto: z.array(z.string()).optional(),
   panelPhotos: z.array(z.string()).optional(),
   status: z.enum(Service_STATUSES).optional(),
   completionPercentage: z.number().optional(),

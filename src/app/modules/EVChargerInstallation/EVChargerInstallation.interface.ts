@@ -44,7 +44,7 @@ export interface IEVChargerInstallation extends Document {
   schedule?: string;
 
   additionalInformation?: string;
-  areaPhoto?: string;
+  areaPhoto?: string[];
   panelPhotos: string[];
 
   status: TServiceStatus;
