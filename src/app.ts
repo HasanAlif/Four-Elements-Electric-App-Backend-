@@ -15,26 +15,37 @@ app.set('trust proxy', 1);
 app.use(helmet());
 
 // CORS configuration
-app.use(
-  cors({
-    credentials: true,
-    origin: [
-      'http://localhost:3000',
-      'http://localhost:3001',
-      'http://localhost:3002',
-      'http://localhost:3003',
-      'http://localhost:5173',
-      'http://10.10.20.30:3000',
-      'http://10.10.20.30:3001',
-      'http://10.10.20.30:3002',
-      'http://10.10.20.30:3003',
-      'http://10.10.20.30:5173',
-      'http://10.10.20.30:5173',
-      'https://ashely-dashboard.vercel.app',
-      'https://dashboard.fourelementselectrical.com',
-    ],
-  }),
-);
+const corsOptions = {
+  credentials: true,
+  origin: [
+    'http://localhost:3000',
+    'http://localhost:3001',
+    'http://localhost:3002',
+    'http://localhost:3003',
+    'http://localhost:5173',
+    'http://10.10.20.30:3000',
+    'http://10.10.20.30:3001',
+    'http://10.10.20.30:3002',
+    'http://10.10.20.30:3003',
+    'http://10.10.20.30:5173',
+    'http://10.10.20.30:5173',
+    'https://ashely-dashboard.vercel.app',
+    'https://dashboard.fourelementselectrical.com',
+  ],
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: [
+    'Content-Type',
+    'Authorization',
+    'X-Requested-With',
+    'Accept',
+    'Origin',
+  ],
+};
+
+app.use(cors(corsOptions));
+
+// Handle preflight OPTIONS requests explicitly (before helmet, rate-limiter, etc.)
+app.options('*', cors(corsOptions));
 
 //parser
 app.use(cookieParser());
