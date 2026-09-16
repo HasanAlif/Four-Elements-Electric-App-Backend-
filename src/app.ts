@@ -40,8 +40,7 @@ const corsOptions = {
   ],
 };
 
-// Handle preflight OPTIONS requests FIRST — before helmet, rate-limiter, etc.
-app.options('*', cors(corsOptions));
+app.options(/(.*)/,  cors(corsOptions));
 app.use(cors(corsOptions));
 
 app.use(helmet());
