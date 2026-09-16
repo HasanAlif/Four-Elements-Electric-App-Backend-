@@ -12,9 +12,7 @@ const app: Application = express();
 
 app.set('trust proxy', 1);
 
-app.use(helmet());
-
-// CORS configuration
+// CORS configuration — must be registered BEFORE helmet and other middlewares
 const corsOptions = {
   credentials: true,
   origin: [
@@ -42,10 +40,11 @@ const corsOptions = {
   ],
 };
 
+// Handle preflight OPTIONS requests FIRST — before helmet, rate-limiter, etc.
+app.options('*', cors(corsOptions));
 app.use(cors(corsOptions));
 
-// Handle preflight OPTIONS requests explicitly (before helmet, rate-limiter, etc.)
-app.options('*', cors(corsOptions));
+app.use(helmet());
 
 //parser
 app.use(cookieParser());
