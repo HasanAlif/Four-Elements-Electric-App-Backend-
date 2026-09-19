@@ -202,7 +202,8 @@ const ExhaustFansSchema = new Schema<IExhaustFans>(
       trim: true,
     },
     aboveBelowAreaOfExhaustFan: {
-      type: String,
+      type: [String],
+      default: [],
       trim: true,
     },
     distanceOfElectricalPanelToExhaustFan: {

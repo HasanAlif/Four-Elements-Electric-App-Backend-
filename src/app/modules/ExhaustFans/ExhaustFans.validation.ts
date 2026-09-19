@@ -41,7 +41,7 @@ const exhaustFansBodySchema = z.object({
   willProvideBathroomExhaustFan: z.boolean().optional(),
   typeOfExhaustFanWanted: z.string().optional(),
   specialityControlsWanted: z.string().optional(),
-  aboveBelowAreaOfExhaustFan: z.string().optional(),
+  aboveBelowAreaOfExhaustFan: z.array(z.string()).optional(),
   distanceOfElectricalPanelToExhaustFan: z.string().optional(),
   additionalInformation: z.string().optional(),
 
