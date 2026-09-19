@@ -52,7 +52,7 @@ export interface IExhaustFans extends Document {
   willProvideBathroomExhaustFan: boolean;
   typeOfExhaustFanWanted?: string;
   specialityControlsWanted?: string;
-  aboveBelowAreaOfExhaustFan?: string;
+  aboveBelowAreaOfExhaustFan?: string[];
   distanceOfElectricalPanelToExhaustFan?: string;
   additionalInformation?: string;
 
