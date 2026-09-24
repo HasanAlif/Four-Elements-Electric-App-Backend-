@@ -9,7 +9,7 @@ import CategoryModel from './Category.model';
 import PartnerModel from './Partner.model';
 import FAQModel from '../FAQ/FAQ.model';
 import User from '../User/user.model';
-import { IUser } from '../User/user.interface';
+import { IUser, TUserAddress } from '../User/user.interface';
 import {
   createAccessToken,
   createRefreshToken,
@@ -1153,6 +1153,45 @@ const adminActionSummary = async () => {
     FAQItemsUpdates,
   };
 };
+type UserListRow = {
+  name?: string;
+  image?: string;
+  phone?: string;
+  email?: string;
+  addresses?: TUserAddress[];
+};
+
+const orNull = (value?: string | null) => {
+  const trimmed = value?.trim();
+  return trimmed && trimmed !== 'N/A' ? trimmed : null;
+};
+
+const getAllUsers = async () => {
+  const users = await User.find({ role: ROLE.USER })
+    .select('name image phone email address addresses')
+    .sort({ createdAt: -1 })
+    .lean<UserListRow[]>();
+
+  return users.map(user => {
+    const saved = user.addresses ?? [];
+    const primary = saved.find(entry => entry.isDefault) ?? saved[0];
+
+    return {
+      name: orNull(user.name),
+      image: orNull(user.image),
+      phone: orNull(user.phone),
+      email: orNull(user.email),
+      addresses: {
+        addressName: orNull(primary?.addressName),
+        streetAddress: orNull(primary?.streetAddress),
+        apartmentUnit: orNull(primary?.apartmentUnit),
+        city: orNull(primary?.city),
+        state: orNull(primary?.state),
+        zipCode: orNull(primary?.zipCode),
+      },
+    };
+  });
+};
 
 export const AdminService = {
   getAllQuotes,
@@ -1184,4 +1223,5 @@ export const AdminService = {
   partnerVerificationStats,
   recentPartnersUpdates,
   adminActionSummary,
+  getAllUsers,
 };

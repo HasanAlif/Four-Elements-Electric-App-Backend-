@@ -348,6 +348,16 @@ const adminActionSummary = asyncHandler(async (req: Request, res: Response) => {
   });
 });
 
+const getAllUsers = asyncHandler(async (req: Request, res: Response) => {
+  const data = await AdminService.getAllUsers();
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    message: 'Users retrieved successfully!',
+    data,
+  });
+});
+
 export const AdminController = {
   getAllQuotes,
   getSingleQuote,
@@ -378,4 +388,5 @@ export const AdminController = {
   partnerVerificationStats,
   recentPartnersUpdates,
   adminActionSummary,
+  getAllUsers,
 };
