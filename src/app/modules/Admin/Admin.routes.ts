@@ -120,6 +120,10 @@ router
   .get(auth(ROLE.SUPER_ADMIN), AdminController.getAllAdmins);
 
 router
+  .route('/all-users')
+  .get(auth(ROLE.ADMIN, ROLE.SUPER_ADMIN), AdminController.getAllUsers);
+
+router
   .route('/dashboard-stats')
   .get(auth(ROLE.ADMIN, ROLE.SUPER_ADMIN), AdminController.getDashboardStats);
 
